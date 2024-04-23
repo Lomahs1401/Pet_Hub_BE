@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Account;
+use App\Models\Ranking;
 use App\Models\Role;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -71,16 +72,20 @@ class AccountSeeder extends Seeder
         define('TOTAL_STAFF_ACCOUNT', count($list_staff_avatars));
         define('TOTAL_ADMIN_ACCOUNT', count($list_admin_avatars));
 
-        for($i = 0; $i < TOTAL_CUSTOMER_ACCOUNT; $i++) {
+        // --------------------------      CUSTOMERS     --------------------------
+        $is_male_customer = $faker->boolean();
+        $rankings = Ranking::all();
+
+        for ($i = 0; $i < TOTAL_CUSTOMER_ACCOUNT; $i++) {
             $customer_account = Account::factory()->create([
                 'username' => $faker->userName(),
                 'email' => $faker->safeEmail(),
                 'password' => Hash::make('customer123'),
                 'avatar' => $list_customer_avatars[$i],
                 'enabled' => $faker->boolean(100),
-                'reset_code'=> null,
-                'reset_code_expires_at'=>null,
-                'reset_code_attempts'=>null
+                'reset_code' => null,
+                'reset_code_expires_at' => null,
+                'reset_code_attempts' => null
             ]);
 
             DB::table('account_has_roles')->insert([
@@ -90,18 +95,46 @@ class AccountSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
+
+            $ranking_point = $faker->randomNumber(4);
+            foreach ($rankings as $ranking) {
+                if ($ranking_point >= $ranking->check_point) {
+                    $ranking_id = $ranking->id;
+                    break;
+                }
+            }
+
+            if (!isset($ranking_id)) {
+                $ranking_id = 1; // Giá trị mặc định
+            }
+
+            DB::table('customers')->insert([
+                'account_id' => $customer_account->id,
+                'full_name' => $is_male_customer ? $faker->lastName('vi_VN') . ' ' . $faker->firstNameMale('vi_VN')
+                    : $faker->lastName('vi_VN') . ' ' . $faker->firstNameFemale('vi_VN'),
+                'gender' => $is_male_customer ? 'Male' : 'Female',
+                'birthdate' => $faker->dateTimeInInterval('-20 years', '+2 years', 'Asia/Ho_Chi_Minh')->format('Y-m-d'),
+                'CMND' => $faker->numerify('#########'),
+                // 'address' => $faker->boolean() ? $faker->city('vi_VN') : $faker->province('vi_VN'),
+                'phone' => $faker->regexify('0(3|5|7|8|9){1}([0-9]{8})'),
+                'ranking_point' => $ranking_point,
+                // 'ranking_id' => $ranking_id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
         }
 
-        for($i = 0; $i < TOTAL_STAFF_ACCOUNT; $i++) {
+        // --------------------------      STAFFS     -------------------------- 
+        for ($i = 0; $i < TOTAL_STAFF_ACCOUNT; $i++) {
             $staff_account = Account::factory()->create([
                 'username' => $faker->userName(),
                 'email' => $faker->safeEmail(),
                 'password' => Hash::make('staff123'),
                 'avatar' => $list_staff_avatars[$i],
                 'enabled' => $faker->boolean(100),
-                'reset_code'=> null,
-                'reset_code_expires_at'=>null,
-                'reset_code_attempts'=>null
+                'reset_code' => null,
+                'reset_code_expires_at' => null,
+                'reset_code_attempts' => null
             ]);
 
             DB::table('account_has_roles')->insert([
@@ -111,24 +144,62 @@ class AccountSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
+
+            $is_male_staff = $faker->boolean();
+            $nameBanks = ['Vietcombank', 'BIDV', 'Techcombank', 'Agribank', 'Vietinbank', 'Oceanbank', 'MBBank'];
+            DB::table('staffs')->insert([
+                'account_id' => $staff_account->id,
+                'full_name' => $is_male_staff ? $faker->lastName('vi_VN') . ' ' . $faker->firstNameMale('vi_VN')
+                    : $faker->lastName('vi_VN') . ' ' . $faker->firstNameFemale('vi_VN'),
+                'gender' => $is_male_staff ? 'Male' : 'Female',
+                'birthdate' => $faker->dateTimeInInterval('-50 years', '+40 years', 'Asia/Ho_Chi_Minh')->format('Y-m-d'),
+                'CMND' => $faker->numerify('#########'),
+                'address' => $faker->city('vi_VN'),
+                'phone' => $faker->regexify('(0|3|5|7|8|9){1}([0-9]{8})'),
+                'account_bank' => $faker->numerify('##########'),
+                'name_bank' => $faker->randomElement($nameBanks),
+                'day_start' => $faker->dateTimeInInterval('-50 years', '+40 years', 'Asia/Ho_Chi_Minh'),
+                'day_quit' => null,
+                'image' => $faker->imageUrl(),
+                'status' => $faker->boolean(1000),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
         }
 
-        for($i = 0; $i < TOTAL_ADMIN_ACCOUNT; $i++) {
+        // --------------------------      ADMINS     -------------------------- 
+        $is_male_admin = $faker->boolean();
+        for ($i = 0; $i < TOTAL_ADMIN_ACCOUNT; $i++) {
             $admin_account = Account::factory()->create([
                 'username' => $faker->userName(),
                 'email' => $faker->safeEmail(),
                 'password' => Hash::make('admin123'),
                 'avatar' => $list_admin_avatars[$i],
                 'enabled' => $faker->boolean(100),
-                'reset_code'=> null,
-                'reset_code_expires_at'=>null,
-                'reset_code_attempts'=>null
+                'reset_code' => null,
+                'reset_code_expires_at' => null,
+                'reset_code_attempts' => null
             ]);
 
             DB::table('account_has_roles')->insert([
                 'account_id' => $admin_account->id,
                 'role_id' => $role_admin->id,
                 'licensed' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            DB::table('admins')->insert([
+                'account_id' => $admin_account->id,
+                'full_name' => $is_male_admin ? $faker->lastName('vi_VN') . ' ' . $faker->firstNameMale('vi_VN')
+                    : $faker->lastName('vi_VN') . ' ' . $faker->firstNameFemale('vi_VN'),
+                'gender' => $is_male_admin ? 'Male' : 'Female',
+                'birthdate' => $faker->dateTimeInInterval('-20 years', '+2 years', 'Asia/Ho_Chi_Minh')->format('Y-m-d'),
+                'CMND' => $faker->numerify('#########'),
+                'address' => $faker->city('vi_VN'),
+                'phone' => $faker->regexify('0(3|5|7|8|9){1}([0-9]{8})'),
+                'image' => $faker->imageUrl(),
+                'status' => $faker->boolean(100),
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
