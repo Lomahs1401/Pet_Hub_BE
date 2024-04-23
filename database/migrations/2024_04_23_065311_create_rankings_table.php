@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateReviewerTable extends Migration
+class CreateRankingsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,10 @@ class CreateReviewerTable extends Migration
      */
     public function up()
     {
-        Schema::create('reviewer', function (Blueprint $table) {
+        Schema::create('rankings', function (Blueprint $table) {
             $table->id();
+            $table->string('ranking_name');
+            $table->integer('check_point');
             $table->timestamps();
         });
     }
@@ -26,6 +28,6 @@ class CreateReviewerTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('reviewer');
+        Schema::dropIfExists('rankings');
     }
 }

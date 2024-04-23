@@ -24,5 +24,6 @@ class DatabaseSeeder extends Seeder
         $this->call(AccountSeeder::class);
         $this->call(PermissionSeeder::class);
         $this->call(RoleHasPermissionSeeder::class);
+        $this->call(RankingSeeder::class);
     }
 }
