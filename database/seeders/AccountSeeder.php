@@ -22,7 +22,13 @@ class AccountSeeder extends Seeder
         $faker = Faker::create();
 
         $role_model = new Role();
-        $role_customer = $role_model->where('role_name', 'Customer')->first();
+
+        // Customer Role
+        $normal_customer_role = $role_model->where('role_name', 'Normal Customer')->first();
+        $vip_customer_role = $role_model->where('role_name', 'VIP Customer')->first();
+        $doctor_customer_role = $role_model->where('role_name', 'Doctor')->first();
+
+        $role_customer = Role::where('role_type', 'Customer')->get();
         $role_staff = $role_model->where('role_name', 'Staff')->first();
         $role_admin = $role_model->where('role_name', 'Admin')->first();
 
@@ -76,6 +82,16 @@ class AccountSeeder extends Seeder
         $is_male_customer = $faker->boolean();
         $rankings = Ranking::all();
 
+        // Define tỉ lệ cho mỗi role
+        $normal_customer_rate = 0.7;
+        $vip_customer_rate = 0.2;
+        $doctor_rate = 0.1;
+
+        // Tính toán phạm vi cho từng role
+        $normal_customer_range = $normal_customer_rate;
+        $vip_customer_range = $normal_customer_range + $vip_customer_rate;
+        $doctor_range = $vip_customer_range + $doctor_rate;
+
         for ($i = 0; $i < TOTAL_CUSTOMER_ACCOUNT; $i++) {
             $customer_account = Account::factory()->create([
                 'username' => $faker->userName(),
@@ -88,9 +104,21 @@ class AccountSeeder extends Seeder
                 'reset_code_attempts' => null
             ]);
 
+            // Random một số từ 0 đến 1
+            $random_number = $faker->randomFloat(2, 0, 1);
+
+            // Xác định role_id dựa vào tỉ lệ
+            if ($random_number < $normal_customer_range) {
+                $role_id = $normal_customer_role->id; // Normal Customer
+            } elseif ($random_number < $vip_customer_range) {
+                $role_id = $vip_customer_role->id; // VIP Customer
+            } else {
+                $role_id = $doctor_customer_role->id; // Doctor
+            }
+
             DB::table('account_has_roles')->insert([
                 'account_id' => $customer_account->id,
-                'role_id' => $role_customer->id,
+                'role_id' => $role_id,
                 'licensed' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -118,6 +146,7 @@ class AccountSeeder extends Seeder
                 // 'address' => $faker->boolean() ? $faker->city('vi_VN') : $faker->province('vi_VN'),
                 'phone' => $faker->regexify('0(3|5|7|8|9){1}([0-9]{8})'),
                 'ranking_point' => $ranking_point,
+                'certificate' => $faker->imageUrl(),
                 // 'ranking_id' => $ranking_id,
                 'created_at' => now(),
                 'updated_at' => now(),

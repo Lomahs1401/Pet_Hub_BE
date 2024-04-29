@@ -21,6 +21,7 @@ class CreateCustomersTable extends Migration
             $table->string('CMND')->unique()->nullable();
             $table->string('phone')->unique()->nullable();
             $table->integer('ranking_point');
+            $table->string('certificate');
             $table->foreignId('account_id')->constrained('accounts');
             $table->foreignId('ranking_id')->nullable()->constrained('rankings');
             $table->timestamps();

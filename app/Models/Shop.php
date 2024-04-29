@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Customer extends Model
+class Shop extends Model
 {
     use HasFactory;
 
@@ -14,7 +14,7 @@ class Customer extends Model
      *
      * @var string
      */
-    protected $table = 'customers';
+    protected $table = 'shops';
 
     /**
      * The attributes that are mass assignable.
@@ -22,15 +22,15 @@ class Customer extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'full_name',
-        'gender',
-        'birthdate',
-        'CMND',
-        'address',  
-        'phone',
-        'ranking_point',
-        'certificate',
-        'account_id',
-        'ranking_id'
+        'name',
+        'email',
+        'description',
+        'image',
+        'phone',  
+        'address',
+        'website',
+        'fanpage',
+        'work_time',
+        'establish_year',
     ];
 }
