@@ -17,15 +17,41 @@ class RoleSeeder extends Seeder
     {
         $faker = Faker::create();
 
-        $list_roles = [
-            'Admin',
-            'Staff',
-            'Customer'
+        $list_admin_roles = [
+            'Admin'
         ];
 
-        for ($i = 0; $i < count($list_roles); $i++) {
+        $list_staff_roles = [
+            'Staff'
+        ];
+
+        $list_customer_roles = [
+            'Normal Customer',
+            'VIP Customer',
+            'Doctor'
+        ];
+
+        // Add Admin Role
+        for ($i = 0; $i < count($list_admin_roles); $i++) {
             Role::factory()->create([
-                'role_name' => $list_roles[$i]
+                'role_name' => $list_admin_roles[$i],
+                'role_type' => 'Admin'
+            ]);
+        }
+
+        // Add Staff Role
+        for ($i = 0; $i < count($list_staff_roles); $i++) {
+            Role::factory()->create([
+                'role_name' => $list_staff_roles[$i],
+                'role_type' => 'Staff'
+            ]);
+        }
+
+        // Add Customer Role
+        for ($i = 0; $i < count($list_customer_roles); $i++) {
+            Role::factory()->create([
+                'role_name' => $list_customer_roles[$i],
+                'role_type' => 'Customer'
             ]);
         }
     }

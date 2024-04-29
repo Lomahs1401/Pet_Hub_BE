@@ -15,6 +15,8 @@ class CreateShopHasProducts extends Migration
     {
         Schema::create('shop_has_products', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('shop_id')->constrained('shops');
+            $table->foreignId('product_id')->constrained('products');
             $table->timestamps();
         });
     }

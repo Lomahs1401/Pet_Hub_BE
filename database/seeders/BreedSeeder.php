@@ -490,7 +490,7 @@ class BreedSeeder extends Seeder
                 'description' => $dog_breed['description'],
                 'image' => $dog_breed['image'],
                 'origin' => $dog_breed['origin'],
-                'life_span' => $dog_breed['life_span'],
+                'lifespan' => $dog_breed['life_span'],
                 'average_size' => $dog_breed['average_size']
             ]);
         }
@@ -501,7 +501,7 @@ class BreedSeeder extends Seeder
                 'description' => $cat_breed['description'],
                 'image' => $cat_breed['image'],
                 'origin' => $cat_breed['origin'],
-                'life_span' => $cat_breed['life_span'],
+                'lifespan' => $cat_breed['life_span'],
                 'average_size' => $cat_breed['average_size']
             ]);
         }

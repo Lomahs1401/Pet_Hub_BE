@@ -25,5 +25,6 @@ class Comments extends Model
         'text',
         'account_id',
         'parent_comments_id',
+        'blog_id',
     ];
 }
