@@ -22,6 +22,12 @@ class Role extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'role_name', 
+        'role_name',
+        'role_type'
     ];
+
+    public function accounts()
+    {
+        return $this->belongsToMany(Account::class, 'account_has_roles', 'role_id', 'account_id');
+    }
 }
