@@ -23,6 +23,7 @@ class Breed extends Model
      */
     protected $fillable = [
         'name',
+        'type',
         'description',
         'image',
         'origin',

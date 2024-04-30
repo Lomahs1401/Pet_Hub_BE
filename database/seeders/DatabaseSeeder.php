@@ -30,5 +30,7 @@ class DatabaseSeeder extends Seeder
         $this->call(BlogSeeder::class);
         $this->call(CommentSeeder::class);
         $this->call(InteractSeeder::class);
+        $this->call(PetSeeder::class);
+        $this->call(ShopSeeder::class);
     }
 }

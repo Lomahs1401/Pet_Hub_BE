@@ -487,6 +487,7 @@ class BreedSeeder extends Seeder
         foreach ($all_dog_breeds as $dog_breed) {
             Breed::factory()->create([
                 'name' => $dog_breed['name'],
+                'type' => 'Dog',
                 'description' => $dog_breed['description'],
                 'image' => $dog_breed['image'],
                 'origin' => $dog_breed['origin'],
@@ -498,6 +499,7 @@ class BreedSeeder extends Seeder
         foreach ($all_cat_breeds as $cat_breed) {
             Breed::factory()->create([
                 'name' => $cat_breed['name'],
+                'type' => 'Cat',
                 'description' => $cat_breed['description'],
                 'image' => $cat_breed['image'],
                 'origin' => $cat_breed['origin'],
