@@ -14,7 +14,7 @@ class Pet extends Model
      *
      * @var string
      */
-    protected $table = 'products';
+    protected $table = 'pets';
 
     /**
      * The attributes that are mass assignable.
@@ -23,10 +23,15 @@ class Pet extends Model
      */
     protected $fillable = [
         'name',
+        'type',
+        'age',
+        'gender',
         'description',
         'price',
-        'images',
+        'image',
+        'is_purebred',
+        'is_adopt',
         'status',
-        'product_category_id',  
+        'breed_id',  
     ];
 }

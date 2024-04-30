@@ -15,13 +15,15 @@ class CreatePetsTable extends Migration
     {
         Schema::create('pets', function (Blueprint $table) {
             $table->id();
+            $table->string('name')->nullable();
             $table->string('type');
-            $table->string('age');
+            $table->float('age')->nullable();
             $table->string('gender');
             $table->text('description');
-            $table->double('price');
+            $table->double('price')->nullable();
             $table->string('image');
             $table->boolean('is_purebred');
+            $table->boolean('is_adopt');
             $table->boolean('status');
             $table->foreignId('breed_id')->constrained('breeds');
             $table->timestamps();
