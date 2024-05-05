@@ -18,7 +18,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Belarus',
                 'description' => 'Belarus is a Central Asian sheepdog breed that has existed for 2000 years before Christ. Due to harsh living conditions, these dogs have excellent endurance and remarkable intelligence.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/belarus.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/dog/belarus.jpg',
                 'origin' => 'Central Asia',
                 'life_span' => '10-12 years',
                 'average_size' => 'Male: 65-78 cm, Female: 62-75 cm',
@@ -26,7 +26,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Alaska Malamute',
                 'description' => 'The Alaska Malamute is a large, powerful breed originally bred for hauling heavy freight as sled dogs. They are known for their strength, endurance, and friendly disposition. The breed\'s name comes from the Mahlemut tribe of native Alaskans who first developed them.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/alaska_malamute.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/dog/alaska_malamute.jpg',
                 'origin' => 'United States (Alaska)',
                 'life_span' => '10-14 years',
                 'average_size' => 'Male: 63-71 cm, Female: 58-66 cm',
@@ -34,7 +34,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'English Mastiff',
                 'description' => 'The English Mastiff is a giant breed known for its massive size and gentle demeanor. Originating from England, they were historically used as guard dogs and protectors. Despite their imposing appearance, Mastiffs are affectionate, calm, and good-natured companions.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/english_mastiff.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/dog/english_mastiff.jpg',
                 'origin' => 'England',
                 'life_span' => '6-10 years',
                 'average_size' => 'Male: 70-91 cm, Female: 70-91 cm',
@@ -42,7 +42,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Dogo Argentino',
                 'description' => 'The Dogo Argentino is a large, muscular breed developed in Argentina primarily for big-game hunting, including wild boar. They are known for their strength, bravery, and loyalty to their owners. Dogo Argentinos are intelligent and protective but require early socialization and training.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/dogo_argentino.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/dog/dogo_argentino.jpg',
                 'origin' => 'Argentina',
                 'life_span' => '10-12 years',
                 'average_size' => 'Male: 62-68 cm, Female: 60-65 cm',
@@ -50,7 +50,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Afghan Hound',
                 'description' => 'The Afghan Hound is an ancient breed with a regal appearance and elegant demeanor. Originating from Afghanistan, they are known for their long, flowing coat and distinctive appearance. Afghan Hounds are independent, aloof, and require regular grooming to maintain their coat.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/afghan_hound.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/dog/afghan_hound.jpg',
                 'origin' => 'Afghanistan',
                 'life_span' => '12-14 years',
                 'average_size' => 'Male: 68-74 cm, Female: 60-69 cm',
@@ -58,7 +58,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Bernese Mountain Dog',
                 'description' => 'The Bernese Mountain Dog is a large and sturdy working breed with a friendly and gentle disposition. Originating from Switzerland, they were traditionally used as farm dogs. Bernese Mountain Dogs are affectionate, intelligent, and loyal companions.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/bernese_mountain_dog.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/dog/bernese_mountain_dog.jpg',
                 'origin' => 'Switzerland',
                 'life_span' => '7-10 years',
                 'average_size' => 'Male: 64-70 cm, Female: 58-66 cm',
@@ -66,7 +66,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Bloodhound',
                 'description' => 'The Bloodhound is a large scent hound known for its incredible sense of smell and droopy appearance. Originating from Belgium, they were originally bred for tracking game. Bloodhounds are affectionate, gentle, and make devoted family pets.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/bloodhound.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/dog/bloodhound.jpg',
                 'origin' => 'Belgium',
                 'life_span' => '10-12 years',
                 'average_size' => 'Male: 64-69 cm, Female: 58-63 cm',
@@ -74,7 +74,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Beauceron',
                 'description' => 'The Beauceron, also known as the French Shorthaired Shepherd, is a herding dog originating from France. They are known for their intelligence, loyalty, and versatility. Beaucerons excel in various dog sports and make excellent working dogs.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/beauceron.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/dog/beauceron.jpg',
                 'origin' => 'France',
                 'life_span' => '10-12 years',
                 'average_size' => 'Male: 65-70 cm, Female: 61-68 cm',
@@ -82,7 +82,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Briard',
                 'description' => 'The Briard, also known as Berger de Brie, is an ancient French herding breed known for its long, shaggy coat and loyalty. Briards are intelligent, protective, and excel in various dog sports. They make devoted family companions.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/briard.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/dog/briard.jpg',
                 'origin' => 'France',
                 'life_span' => '10-12 years',
                 'average_size' => '58-69 cm, Female: 56-64 cm',
@@ -90,7 +90,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Bullmastiff',
                 'description' => 'The Bullmastiff is a large, powerful breed known for its strength, intelligence, and loyalty. Originally bred in England as a gamekeeper\'s dog, they are gentle giants with a protective nature. Bullmastiffs are affectionate family companions.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/bullmastiff.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/dog/bullmastiff.jpg',
                 'origin' => 'England',
                 'life_span' => '8-10 years',
                 'average_size' => '64-68 cm, Female: 61-66 cm',
@@ -98,7 +98,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Boerboel',
                 'description' => 'The Boerboel, also known as the South African Mastiff, is a large, muscular breed with a fearless and protective nature. Bred as farm guardians in South Africa, they are loyal, intelligent, and make excellent family protectors.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/boerboel.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/dog/boerboel.jpg',
                 'origin' => 'South Africa',
                 'life_span' => '10-12 years',
                 'average_size' => '64-70 cm, Female: 59-65 cm',
@@ -106,7 +106,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Greyhound',
                 'description' => 'The Greyhound is a sleek and graceful breed known for its speed and athleticism. Originating from ancient Egypt, they are gentle, affectionate, and make loving companions. Greyhounds excel in various dog sports, including racing and lure coursing.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/greyhound.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/dog/greyhound.jpg',
                 'origin' => 'Egypt',
                 'life_span' => '10-12 years',
                 'average_size' => 'Male: 71-76 cm, Female: 68-71 cm',
@@ -114,7 +114,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Doberman',
                 'description' => 'The Doberman Pinscher, often simply referred to as Doberman, is a medium to large breed known for its loyalty, intelligence, and protective nature. Developed in Germany, they are versatile working dogs and make excellent guard dogs and family pets.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/doberman.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/dog/doberman.jpg',
                 'origin' => 'Germany',
                 'life_span' => '10-13 years',
                 'average_size' => '68-72 cm, Female: 63-68 cm',
@@ -122,7 +122,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Goldens',
                 'description' => 'The Golden Retriever, affectionately known as Goldens, is a friendly, intelligent, and devoted breed. Originally bred in Scotland, they are popular family pets, therapy dogs, and service dogs due to their gentle temperament and versatility.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/goldens.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/dog/goldens.jpg',
                 'origin' => 'Scotland',
                 'life_span' => '10-12 years',
                 'average_size' => 'Male: 56-61 cm, Female: 51-56 cm',
@@ -130,7 +130,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Irish Wolfhound',
                 'description' => 'The Irish Wolfhound is one of the tallest dog breeds with a noble and gentle temperament. Historically used in Ireland for hunting wolves and as war dogs, they are now valued as loving and dignified companions.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/irish_wolfhound.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/dog/irish_wolfhound.jpg',
                 'origin' => 'Ireland',
                 'life_span' => '6-8 years',
                 'average_size' => 'Male: 81-86 cm, Female: 71-76 cm',
@@ -138,7 +138,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Ailen Setter',
                 'description' => 'The Irish Setter, also known as Ailen Setter, is an elegant and energetic breed known for its stunning red coat and friendly disposition. Bred as bird dogs in Ireland, they are affectionate, playful, and make excellent family companions.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/ailen_setter.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/dog/ailen_setter.jpg',
                 'origin' => 'Ireland',
                 'life_span' => '12-15 years',
                 'average_size' => '58-67 cm, Female: 55-62 cm',
@@ -146,7 +146,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Spanish Mastiff',
                 'description' => 'The Spanish Mastiff is a versatile and intelligent breed originally used for herding and retrieving in Spain. With their curly coat and lively personality, they are valued as both working dogs and companions.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/spanish_mastiff.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/dog/spanish_mastiff.jpg',
                 'origin' => 'Spain',
                 'life_span' => '10-14 years',
                 'average_size' => '44-50 cm, Female: 40-46 cm',
@@ -154,7 +154,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Cane Corso',
                 'description' => 'The Cane Corso, originating from Italy, is a muscular and powerful breed known for its intelligence, loyalty, and protective nature. Historically used as a guard dog and hunter, they are devoted family protectors with a calm and confident demeanor.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/cane_corso.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/dog/cane_corso.jpg',
                 'origin' => 'Italy',
                 'life_span' => '10-12 years',
                 'average_size' => 'Male: 64-68 cm, Female: 60-64 cm',
@@ -162,7 +162,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Komondor',
                 'description' => 'The Komondor, also known as the Hungarian Sheepdog, is a large, muscular breed with a unique corded coat. Bred as livestock guardians in Hungary, they are fearless, independent, and fiercely loyal to their family and flock.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/komondor.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/dog/komondor.jpg',
                 'origin' => 'Hungary',
                 'life_span' => '10-12 years',
                 'average_size' => 'Male: 70-80 cm, Female: 65-75 cm',
@@ -170,7 +170,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Cocker Spaniel',
                 'description' => 'The Cocker Spaniel is a beloved breed known for its cheerful disposition, intelligence, and affectionate nature. Originally bred as hunting dogs in the United Kingdom, they are now cherished family pets and excel in various dog sports and activities.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/cocker_spaniel.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/dog/cocker_spaniel.jpg',
                 'origin' => 'United Kingdom',
                 'life_span' => '12-15 years',
                 'average_size' => 'Male: 38-43 cm, Female: 36-41 cm',
@@ -178,7 +178,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Basset Hound',
                 'description' => 'The Basset Hound is a charming and laid-back breed known for its long ears, droopy eyes, and affectionate personality. Originally bred for hunting small game in France, they are now cherished as loving family companions with a gentle and friendly demeanor.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/basset_hound.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/dog/basset_hound.jpg',
                 'origin' => 'France',
                 'life_span' => '10-12 years',
                 'average_size' => 'Male: 30-38 cm, Female: 28-36 cm',
@@ -186,7 +186,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Beagle',
                 'description' => 'The Beagle is a small to medium-sized breed with a merry and friendly disposition. Originating from England, they are known for their keen sense of smell and boundless energy. Beagles are popular family pets, valued for their loving nature and playful demeanor.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/beagle.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/dog/beagle.jpg',
                 'origin' => 'England',
                 'life_span' => '10-15 years',
                 'average_size' => 'Male: 36-41 cm, Female: 33-38 cm',
@@ -194,7 +194,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Border Collies',
                 'description' => 'The Border Collie is a highly intelligent and energetic breed known for its exceptional herding abilities. Originating from the border regions of Scotland and England, they are prized as working dogs and excel in various canine sports, including agility and obedience.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/border_collies.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/dog/border_collies.jpg',
                 'origin' => 'United Kingdom (Scotland/England)',
                 'life_span' => '12-15 years',
                 'average_size' => 'Male: 48-56 cm, Female: 46-53 cm',
@@ -202,7 +202,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Dalmatian',
                 'description' => 'The Dalmatian is a distinctive and energetic breed known for its unique spotted coat and dignified appearance. Originally bred as carriage dogs in Croatia, they are intelligent, playful, and make loyal family companions.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/dalmatian.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/dog/dalmatian.jpg',
                 'origin' => 'Croatia',
                 'life_span' => '10-13 years',
                 'average_size' => 'Male: 58-61 cm, Female: 56-58 cm',
@@ -210,7 +210,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Labrador',
                 'description' => 'The Labrador Retriever is one of the most popular and versatile dog breeds, known for its friendly and outgoing personality. Originating from Newfoundland, Canada, they were initially bred as fishing and hunting companions. Labs are highly intelligent, trainable, and excel in various roles, including assistance and search and rescue.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/labrador.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/dog/labrador.jpg',
                 'origin' => 'Canada (Newfoundland)',
                 'life_span' => '10-12 years',
                 'average_size' => 'Male: 57-62 cm, Female: 55-60 cm',
@@ -218,7 +218,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Welsh Corgi',
                 'description' => 'The Welsh Corgi is a small herding dog with a big personality, known for its distinctive short legs and long body. Originating from Wales, United Kingdom, they were historically used to herd cattle. Corgis are intelligent, affectionate, and make loyal companions.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/welsh_corgi.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/dog/welsh_corgi.jpg',
                 'origin' => 'United Kingdom (Wales)',
                 'life_span' => '12-15 years',
                 'average_size' => 'Male: 25-30 cm, Female: 25-30 cm',
@@ -226,7 +226,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Pug',
                 'description' => 'The Pug is a charming and affectionate toy breed known for its wrinkled face and playful nature. Originating from China, they were treasured by Chinese emperors as companions and lapdogs. Pugs are friendly, sociable, and thrive on human companionship.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/pug.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/dog/pug.jpg',
                 'origin' => 'China',
                 'life_span' => '12-15 years',
                 'average_size' => 'Male: 30-36 cm, Female: 25-30 cm',
@@ -234,7 +234,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Pitzanian Spitz',
                 'description' => 'The Pitzanian, also known as a Pomshi or Shih Tzu Pom, is a small designer breed that combines the traits of the Pomeranian and Shih Tzu. They are affectionate, playful, and make delightful companions. Pitzanians inherit characteristics from both parent breeds, including a fluffy coat and friendly demeanor.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/pitzanian_spitz.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/dog/pitzanian_spitz.jpg',
                 'origin' => 'Designer breed (Pomeranian, Shih Tzu)',
                 'life_span' => '12-16 years',
                 'average_size' => 'Small',
@@ -242,7 +242,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Poodle',
                 'description' => 'The Poodle is a highly intelligent and elegant breed known for its curly coat and graceful appearance. Originating from Germany, they were originally bred as water retrievers and excel in various dog sports and activities. Poodles come in three sizes: standard, miniature, and toy.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/poodle.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/dog/poodle.jpg',
                 'origin' => 'Germany',
                 'life_span' => '12-15 years',
                 'average_size' => 'Standard: 45-60 cm, Miniature: 28-35 cm, Toy: 24-28 cm',
@@ -250,7 +250,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Chihuahua',
                 'description' => 'The Chihuahua is the smallest dog breed in the world, known for its saucy personality and big attitude. Originating from Mexico, they are named after the Mexican state of Chihuahua. Despite their tiny size, Chihuahuas are confident, alert, and make loyal companions.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/chihuahua.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/dog/chihuahua.jpg',
                 'origin' => 'Mexico',
                 'life_span' => '12-20 years',
                 'average_size' => 'Male: 15-23 cm, Female: 15-23 cm',
@@ -258,7 +258,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Shih Tzu',
                 'description' => 'The Shih Tzu is a toy dog breed known for its long, flowing coat and friendly disposition. They were originally bred to be companion dogs for Chinese royalty. Shih Tzus are affectionate, outgoing, and often have a stubborn streak.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/shih_tzu.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/dog/shih_tzu.jpg',
                 'origin' => 'China',
                 'life_span' => '10-18 years',
                 'average_size' => 'Male: 20-28 cm, Female: 20-28 cm',
@@ -266,7 +266,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Siberian Husky',
                 'description' => 'The Siberian Husky is a medium-sized working dog breed known for its striking appearance and endurance. They were originally bred by the Chukchi people of Siberia to pull sleds and work as sled dogs. Siberian Huskies are energetic, intelligent, and independent.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/siberian_husky.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/dog/siberian_husky.jpg',
                 'origin' => 'Siberia, Russia',
                 'life_span' => '12-15 years',
                 'average_size' => 'Male: 53-61 cm, Female: 53-56 cm',
@@ -274,7 +274,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Rottweiler',
                 'description' => 'The Rottweiler is a large, powerful dog breed known for its strength and loyalty. They were originally bred to drive cattle to market and work as guard dogs. Rottweilers are confident, courageous, and often aloof with strangers.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/rottweiler.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/dog/rottweiler.jpg',
                 'origin' => 'Germany',
                 'life_span' => '8-10 years',
                 'average_size' => 'Male: 61-69 cm, Female: 56-63 cm',
@@ -282,7 +282,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Shetland Sheepdog',
                 'description' => 'The Shetland Sheepdog, also known as the Sheltie, is a small to medium-sized herding dog breed known for its intelligence and agility. They were originally bred to herd sheep in the Shetland Islands of Scotland. Shetland Sheepdogs are loyal, affectionate, and highly trainable.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/shetland_sheepdog.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/dog/shetland_sheepdog.jpg',
                 'origin' => 'Scotland, United Kingdom',
                 'life_span' => '12-14 years',
                 'average_size' => 'Male: 33-41 cm, Female: 33-41 cm',
@@ -290,7 +290,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Great Dane',
                 'description' => 'The Great Dane is a giant dog breed known for its imposing size and gentle nature. They were originally bred to hunt wild boar in Germany. Great Danes are friendly, affectionate, and often referred to as "gentle giants.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/greet_dane.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/dog/greet_dane.jpg',
                 'origin' => 'Germany',
                 'life_span' => '7-10 years',
                 'average_size' => 'Male: 76-86 cm, Female: 71-81 cm',
@@ -298,7 +298,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Boxer',
                 'description' => 'The Boxer is a medium to large-sized dog breed known for its muscular build and playful demeanor. They were originally bred to be working dogs in Germany. Boxers are energetic, loyal, and great with children.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/boxer.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/dog/boxer.jpg',
                 'origin' => 'Germany',
                 'life_span' => '10-12 years',
                 'average_size' => 'Male: 58-64 cm, Female: 53-58 cm',
@@ -306,7 +306,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Australian Shepherd',
                 'description' => 'The Australian Shepherd is a medium-sized herding dog breed known for its intelligence, agility, and strong work ethic. Despite its name, the breed was developed in the western United States. Australian Shepherds are versatile, energetic, and excel in various dog sports and activities.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/australian_shepherd.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/dog/australian_shepherd.jpg',
                 'origin' => 'United States',
                 'life_span' => '12-15 years',
                 'average_size' => 'Male: 51-58 cm, Female: 46-53 cm',
@@ -314,7 +314,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Saint Bernard',
                 'description' => 'The Saint Bernard is a giant dog breed known for its gentle temperament and impressive size. They were originally bred as rescue dogs in the Swiss Alps. Saint Bernards are affectionate, patient, and excellent with children.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/saint_bernard.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/dog/saint_bernard.jpg',
                 'origin' => 'Switzerland, Italy',
                 'life_span' => '8-10 years',
                 'average_size' => 'Male: 71-76 cm, Female: 66-71 cm',
@@ -322,7 +322,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Maltese',
                 'description' => 'The Maltese is a small toy dog breed known for its long, flowing white coat and playful personality. They have a rich history dating back to ancient times, where they were favored by aristocrats and royals. Maltese dogs are affectionate, lively, and make great companions.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/maltese.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/dog/maltese.jpg',
                 'origin' => 'Malta',
                 'life_span' => '12-15 years',
                 'average_size' => 'Male: 20-25 cm, Female: 20-23 cm',
@@ -330,7 +330,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Yorkshire Terrier',
                 'description' => 'The Yorkshire Terrier, often called the Yorkie, is a small toy dog breed known for its long, silky coat and confident demeanor. They were originally bred to catch rats in clothing mills during the Industrial Revolution. Yorkshire Terriers are feisty, affectionate, and full of personality.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/yorkshire_terrier.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/dog/yorkshire_terrier.jpg',
                 'origin' => 'England',
                 'life_span' => '12-16 years',
                 'average_size' => 'Male: 18-20 cm, Female: 15-18 cm',
@@ -338,7 +338,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Bull Terrier',
                 'description' => 'The Bull Terrier is a muscular terrier breed known for its distinctive egg-shaped head and playful nature. They were originally bred for dog fighting but have since become popular family pets. Bull Terriers are energetic, affectionate, and sometimes stubborn.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/bull_terrier.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/dog/bull_terrier.jpg',
                 'origin' => 'England',
                 'life_span' => '10-14 years',
                 'average_size' => 'Male: 51-61 cm, Female: 51-61 cm',
@@ -346,7 +346,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Cavalier King Charles Spaniel',
                 'description' => 'The Cavalier King Charles Spaniel is a small toy dog breed known for its elegant appearance and friendly disposition. They were originally bred as lap dogs for royalty and are named after King Charles II of England. Cavalier King Charles Spaniels are affectionate, sociable, and adaptable to various living environments.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/cavalier_king_charles_spaniel.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/dog/cavalier_king_charles_spaniel.jpg',
                 'origin' => 'United Kingdom',
                 'life_span' => '10-14 years',
                 'average_size' => 'Male: 30-33 cm, Female: 30-33 cm',
@@ -354,7 +354,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Bichon Frise',
                 'description' => 'The Bichon Frise is a small toy dog breed known for its fluffy white coat and cheerful disposition. They were popular among European nobility during the Renaissance and later became circus performers. Bichon Frises are affectionate, playful, and make excellent family pets.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/bichon_frise.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/dog/bichon_frise.jpg',
                 'origin' => 'France, Belgium',
                 'life_span' => '12-15 years',
                 'average_size' => 'Male: 24-29 cm, Female: 24-29 cm',
@@ -362,7 +362,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Chinese Crested',
                 'description' => 'The Chinese Crested is a small breed of dog known for its unique appearance, with hairless and powderpuff varieties. They were originally bred in China as companions for sailors and were used to hunt vermin aboard ships. Chinese Cresteds are affectionate, lively, and make excellent family pets.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/chinese_crested.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/dog/chinese_crested.jpg',
                 'origin' => 'China',
                 'life_span' => '13-15 years',
                 'average_size' => 'Male: 28-33 cm, Female: 28-33 cm',
@@ -370,7 +370,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Border Terrier',
                 'description' => 'The Border Terrier is a small working terrier breed known for its alertness, intelligence, and affectionate nature. They were originally bred to hunt foxes and other vermin along the border between England and Scotland. Border Terriers are energetic, loyal, and make excellent companions for active families.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/border_terrier.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/dog/border_terrier.jpg',
                 'origin' => 'United Kingdom',
                 'life_span' => '12-15 years',
                 'average_size' => 'Male: 25-28 cm, Female: 25-28 cm',
@@ -378,7 +378,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Jack Russell Terrier',
                 'description' => 'The Jack Russell Terrier is a small, energetic breed known for its intelligence, agility, and strong hunting instinct. They were originally bred in England for fox hunting and have since become popular as family pets and working dogs. Jack Russell Terriers are bold, playful, and require regular exercise and mental stimulation.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/jack_russell_terrier.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/dog/jack_russell_terrier.jpg',
                 'origin' => 'United Kingdom',
                 'life_span' => '13-16 years',
                 'average_size' => 'Male: 25-30 cm, Female: 25-30 cm',
@@ -389,7 +389,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Siamese',
                 'description' => 'The Siamese cat is known for its striking blue almond-shaped eyes, short coat with color points, and slender, elegant body. Siamese cats are sociable, vocal, and intelligent, forming strong bonds with their human companions.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/siamese.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/cat/siamese.jpg',
                 'origin' => 'Thailand (formerly Siam)',
                 'life_span' => '12-15 years',
                 'average_size' => 'Male: 3.6-4.5 kg, Female: 2.7-3.6 kg',
@@ -397,7 +397,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Persian',
                 'description' => 'The Persian cat is characterized by its long, luxurious coat, flat face, and large, round eyes. Persians have a calm and gentle temperament, enjoying a quiet indoor lifestyle. They require regular grooming due to their thick fur.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/persian.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/cat/persian.jpg',
                 'origin' => 'Iran (formerly Persia)',
                 'life_span' => '10-15 years',
                 'average_size' => 'Male: 4-6.4 kg, Female: 3.2-5 kg',
@@ -405,7 +405,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Maine Coon',
                 'description' => 'The Maine Coon is one of the largest domesticated cat breeds, known for its sturdy build, tufted ears, bushy tail, and friendly disposition. They are affectionate, intelligent, and often enjoy interacting with humans and other pets.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/maine_coon.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/cat/maine_coon.jpg',
                 'origin' => 'United States (Maine)',
                 'life_span' => '12-15 years',
                 'average_size' => 'Male: 5.9-8.2 kg, Female: 3.6-5.4 kg',
@@ -413,7 +413,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Bengal',
                 'description' => 'The Bengal cat is known for its distinctive spotted or marbled coat resembling that of a wild leopard. Bengals are energetic, playful, and intelligent, often enjoying interactive play and learning tricks.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/bengal.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/cat/bengal.jpg',
                 'origin' => 'United States (bred from Asian Leopard Cats)',
                 'life_span' => '12-16 years',
                 'average_size' => 'Male: 4.5-6.8 kg, Female: 3.2-4.5 kg',
@@ -421,7 +421,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Ragdoll',
                 'description' => 'The Ragdoll cat is characterized by its large size, semi-longhair coat, striking blue eyes, and docile temperament. Ragdolls are known for their affectionate nature and tendency to go limp when picked up, hence the name "Ragdoll.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/ragdoll.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/cat/ragdoll.jpg',
                 'origin' => 'United States',
                 'life_span' => '12-17 years',
                 'average_size' => 'Male: 5.4-9 kg, Female: 4.5-6.8 kg',
@@ -429,7 +429,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Scottish Fold',
                 'description' => 'The Scottish Fold is recognized by its unique folded ears, round face, and large, expressive eyes. They are known for their sweet and gentle demeanor, getting along well with children and other pets.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/scottish_fold.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/cat/scottish_fold.jpg',
                 'origin' => 'Scotland',
                 'life_span' => '12-15 years',
                 'average_size' => 'Male: 4-6 kg, Female: 2.7-4 kg',
@@ -437,7 +437,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Sphynx',
                 'description' => 'The Sphynx cat is known for its hairless appearance, wrinkled skin, large ears, and muscular body. Despite their lack of fur, Sphynx cats are affectionate, playful, and enjoy attention from their human companions. They require regular bathing to remove oil buildup on their skin.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/sphynx.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/cat/sphynx.jpg',
                 'origin' => 'Canada',
                 'life_span' => '8-14 years',
                 'average_size' => 'Male: 3.6-5 kg, Female: 2.7-4 kg',
@@ -445,7 +445,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Abyssinian',
                 'description' => 'The Abyssinian cat is characterized by its ticked coat, expressive almond-shaped eyes, and slender build. Abyssinians are active, curious, and intelligent cats, often seeking out high places to observe their surroundings.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/abyssinian.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/cat/abyssinian.jpg',
                 'origin' => 'France',
                 'life_span' => '12-15 years',
                 'average_size' => 'Male: 3.6-5.4 kg, Female: 2.7-4.5 kg',
@@ -453,7 +453,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Birman',
                 'description' => 'The Birman cat is known for its striking blue eyes, long, silky coat, and distinctive white-gloved paws. Birmans are affectionate, gentle, and sociable cats, often forming strong bonds with their human families.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/birman.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/cat/birman.jpg',
                 'origin' => 'Burma (Myanmar)',
                 'life_span' => '12-16 years',
                 'average_size' => 'Male: 3.6-5.4 kg, Female: 2.7-4.5 kg',
@@ -461,7 +461,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Burmese',
                 'description' => 'The Burmese cat is known for its sleek, muscular body, expressive eyes, and affectionate nature. Burmese cats are sociable, playful, and enjoy being part of a family environment.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/burmese.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/cat/burmese.jpg',
                 'origin' => 'Burma (Myanmar)',
                 'life_span' => '14-16 years',
                 'average_size' => 'Male: 3.6-5.4 kg, Female: 2.7-4.5 kg',
@@ -469,7 +469,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'Exotic Shorthair',
                 'description' => 'The Exotic Shorthair is a breed similar to the Persian cat but with a short, plush coat. They have a sweet, gentle temperament and are known for their laid-back demeanor.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/exotic_shorthair.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/cat/exotic_shorthair.jpg',
                 'origin' => 'United States',
                 'life_span' => '10-12 years',
                 'average_size' => 'Male: 3.6-5.4 kg, Female: 2.7-4.5 kg',
@@ -477,7 +477,7 @@ class BreedSeeder extends Seeder
             [
                 'name' => 'British Shorthair',
                 'description' => 'The British Shorthair is a sturdy, muscular cat with a plush coat, round face, and dense fur. They are known for their calm, easygoing nature and make excellent companions for families and individuals alike.',
-                'image' => 'gs://petshop-3d4ae.appspot.com/breed/british_shorthair.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/breeds/cat/british_shorthair.jpg',
                 'origin' => 'United Kingdom',
                 'life_span' => '12-20 years',
                 'average_size' => 'Male: 4-7.7 kg, Female: 3-5.4 kg',
