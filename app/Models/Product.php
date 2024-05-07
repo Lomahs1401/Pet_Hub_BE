@@ -29,4 +29,8 @@ class Product extends Model
         'status',
         'product_category_id',  
     ];
+
+    public function shops() {
+        return $this->belongsToMany(Shop::class, 'shop_has_products', 'product_id', 'shop_id');
+    }
 }

@@ -26,6 +26,7 @@ class CreatePetsTable extends Migration
             $table->boolean('is_adopt');
             $table->boolean('status');
             $table->foreignId('breed_id')->constrained('breeds');
+            $table->foreignId('shop_id')->constrained('shops');
             $table->timestamps();
         });
     }

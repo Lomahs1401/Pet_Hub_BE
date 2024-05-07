@@ -17,7 +17,7 @@ class ShopSeeder extends Seeder
     {
         $faker = Faker::create();
 
-        $number_of_shops = 50;
+        $number_of_shops = 30;
 
         for ($i = 0; $i < $number_of_shops; $i++) {
             $startTime = $faker->time('H:i A'); // Giờ bắt đầu làm việc (AM/PM format)
