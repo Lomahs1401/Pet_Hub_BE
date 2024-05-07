@@ -33,5 +33,6 @@ class Pet extends Model
         'is_adopt',
         'status',
         'breed_id',  
+        'shop_id',  
     ];
 }

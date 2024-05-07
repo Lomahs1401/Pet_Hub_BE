@@ -33,4 +33,8 @@ class Shop extends Model
         'work_time',
         'establish_year',
     ];
+
+    public function products() {
+        return $this->belongsToMany(Product::class, 'shop_has_products', 'shop_id', 'product_id');
+    }
 }
