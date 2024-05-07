@@ -577,6 +577,7 @@ class ProductSeeder extends Seeder
             [
                 'name' => 'Pate SmartHeart cho chó lon 400g vị thị bò và thịt gà',
                 'description' => 'Pate SmartHeart cho chó đem lại nhiều dưỡng chất cần thiết cho cún cưng cùng hương vị thơm ngon hấp đẫn cuốn hút các boss nhỏ.',
+                'price' => 38000,
                 'image' => 'gs://petshop-3d4ae.appspot.com/products/dog/food_and_nutritions/pate_sauces/pate-smartheart-cho-cho-lon-400g-vi-thit-bo-va-thit-ga.jpg',
                 'status' => true,
                 'product_category_id' => 3,
@@ -3483,9 +3484,101 @@ class ProductSeeder extends Seeder
             ],
         ];
 
-        // Tạo fake data cho product từ dữ liệu thực
+        // ================================     FOOD AND NUTRITION     ================================
         foreach ($dog_food_products as $dog_food_product) {
             Product::create($dog_food_product);
+        }
+
+        foreach ($dog_milk_products as $dog_milk_product) {
+            Product::create($dog_milk_product);
+        }
+
+        foreach ($dog_pate_sauce_products as $dog_pate_sauce_product) {
+            Product::create($dog_pate_sauce_product);
+        }
+
+        foreach ($dog_treats_and_chew_products as $dog_treats_and_chew_product) {
+            Product::create($dog_treats_and_chew_product);
+        }
+
+        // ================================     ACCESSORIES AND TOYS     ================================
+        foreach ($dog_clothing_products as $dog_clothing_product) {
+            Product::create($dog_clothing_product);
+        }
+
+        foreach ($dog_toy_products as $dog_toy_product) {
+            Product::create($dog_toy_product);
+        }
+
+        foreach ($dog_collar_products as $dog_collar_product) {
+            Product::create($dog_collar_product);
+        }
+
+        foreach ($dog_leash_products as $dog_leash_product) {
+            Product::create($dog_leash_product);
+        }
+
+        foreach ($dog_muzzles_products as $dog_muzzles_product) {
+            Product::create($dog_muzzles_product);
+        }
+
+        foreach ($dog_water_bowls_products as $dog_water_bowls_product) {
+            Product::create($dog_water_bowls_product);
+        }
+
+        foreach ($dog_feeding_bowls_products as $dog_feeding_bowls_product) {
+            Product::create($dog_feeding_bowls_product);
+        }
+
+        foreach ($dog_grooming_brush_products as $dog_grooming_brush_product) {
+            Product::create($dog_grooming_brush_product);
+        }
+
+        // ================================     HYGIENE AND CARE     ================================
+        foreach ($dog_shampoo_products as $dog_shampoo_product) {
+            Product::create($dog_shampoo_product);
+        }
+
+        foreach ($dog_towel_products as $dog_towel_product) {
+            Product::create($dog_towel_product);
+        }
+
+        foreach ($dog_perfumes_products as $dog_perfumes_product) {
+            Product::create($dog_perfumes_product);
+        }
+
+        foreach ($dog_diapers_products as $dog_diapers_product) {
+            Product::create($dog_diapers_product);
+        }
+
+        foreach ($dog_tray_products as $dog_tray_product) {
+            Product::create($dog_tray_product);
+        }
+
+        // ================================     ACCOMMODATION     ================================
+        foreach ($dog_house_products as $dog_house_product) {
+            Product::create($dog_house_product);
+        }
+
+        foreach ($dog_backpack_products as $dog_backpack_product) {
+            Product::create($dog_backpack_product);
+        }
+
+        foreach ($dog_carrying_bag_products as $dog_carrying_bag_product) {
+            Product::create($dog_carrying_bag_product);
+        }
+
+        foreach ($dog_mattresses_bedding_products as $dog_mattresses_bedding_product) {
+            Product::create($dog_mattresses_bedding_product);
+        }
+
+        // ================================     MEDICINE AND FUNCTIONAL FOODS     ================================
+        foreach ($dog_veterinary_medicine_products as $dog_veterinary_medicine_product) {
+            Product::create($dog_veterinary_medicine_product);
+        }
+
+        foreach ($dog_functional_food_products as $dog_functional_food_product) {
+            Product::create($dog_functional_food_product);
         }
     }
 }
