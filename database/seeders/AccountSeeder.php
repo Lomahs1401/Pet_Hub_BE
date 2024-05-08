@@ -79,7 +79,6 @@ class AccountSeeder extends Seeder
         define('TOTAL_ADMIN_ACCOUNT', count($list_admin_avatars));
 
         // --------------------------      CUSTOMERS     --------------------------
-        $is_male_customer = $faker->boolean();
         $rankings = Ranking::all();
 
         // Define tỉ lệ cho mỗi role
@@ -136,6 +135,8 @@ class AccountSeeder extends Seeder
                 $ranking_id = 1; // Giá trị mặc định
             }
 
+            $is_male_customer = $faker->boolean(chanceOfGettingTrue: 50);
+
             DB::table('customers')->insert([
                 'account_id' => $customer_account->id,
                 'full_name' => $is_male_customer ? $faker->lastName('vi_VN') . ' ' . $faker->firstNameMale('vi_VN')
@@ -174,7 +175,8 @@ class AccountSeeder extends Seeder
                 'updated_at' => now(),
             ]);
 
-            $is_male_staff = $faker->boolean();
+            $is_male_staff = $faker->boolean(chanceOfGettingTrue: 50);
+
             $nameBanks = ['Vietcombank', 'BIDV', 'Techcombank', 'Agribank', 'Vietinbank', 'Oceanbank', 'MBBank'];
             DB::table('staffs')->insert([
                 'account_id' => $staff_account->id,
@@ -197,7 +199,6 @@ class AccountSeeder extends Seeder
         }
 
         // --------------------------      ADMINS     -------------------------- 
-        $is_male_admin = $faker->boolean();
         for ($i = 0; $i < TOTAL_ADMIN_ACCOUNT; $i++) {
             $admin_account = Account::factory()->create([
                 'username' => $faker->userName(),
@@ -217,6 +218,8 @@ class AccountSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
+
+            $is_male_admin = $faker->boolean(chanceOfGettingTrue: 50);
 
             DB::table('admins')->insert([
                 'account_id' => $admin_account->id,

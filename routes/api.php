@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\AccountController;
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\ProductController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -38,6 +39,35 @@ Route::group([
     Route::post('/refresh', [AuthController::class, 'refresh']);
     Route::post('/me', [AuthController::class, 'me']);
     Route::patch('/changePassword', [AccountController::class, 'changePassword']);
+});
+
+// Customer API
+Route::group([
+    'middleware' => ['force.json.response', 'api', 'auth', 'auth.customer'],
+    'prefix' => 'customer',
+], function ($router) {
+    // Product Category
+    // Route::get('/product_ca', [ProductController::class, 'index']);
+    // Route::get('/products/category/{category_id}', [ProductController::class, 'getProductByCategoryId']);
+    // Route::get('/products/{id}', [ProductController::class, 'show']);
+    // Route::post('/products', [ProductController::class, 'store']);
+    // Route::put('/products/{id}', [ProductController::class, 'update']);
+    // Route::delete('/products/{id}', [ProductController::class, 'destroy']);
+
+    // Product
+    Route::get('/products', [ProductController::class, 'index']); // lấy tất cả product
+    Route::get('/products/shop/{shop_id}', [ProductController::class, 'getProductByShopId']); // lấy dsach các product được bán bởi shop
+    Route::get('/products/shop/{shop_id}/total', [ProductController::class, 'getNumberOfProductByShopId']); // lấy số lượng product mà shop đang bán
+    Route::get('/products/category/{category_id}', [ProductController::class, 'getProductByCategoryId']); // lấy dsach các product thuộc category
+    Route::get('/products/category/{category_id}/total', [ProductController::class, 'getNumberOfProductByCategoryId']); // lấy số lượng product thuộc category
+    Route::get('/products/shop/distinct/{category_id}', [ProductController::class, 'getNumberOfShopSellingCategory']); // lấy số lượng các shop bán product thuộc category
+    Route::get('/products/shop/{shop_id}/category/{category_id}', [ProductController::class, 'getProductWithShopAndCategory']); // lấy ds các product được bán bởi shop và thuộc category_id
+    Route::get('/products/shop/{shop_id}/category/{category_id}/total', [ProductController::class, 'getNumberOfProductWithShopAndCategory']); // lấy số lượng product được bán bởi shop và thuộc category_id
+    Route::get('/products/sort/{order}', [ProductController::class, 'sortProductsByPrice']);
+    Route::get('/products/{id}', [ProductController::class, 'show']); // lấy chi tiết product by id
+    Route::post('/products', [ProductController::class, 'store']);
+    Route::put('/products/{id}', [ProductController::class, 'update']);
+    Route::delete('/products/{id}', [ProductController::class, 'destroy']);
 });
 
 

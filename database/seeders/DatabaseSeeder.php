@@ -34,6 +34,5 @@ class DatabaseSeeder extends Seeder
         $this->call(PetSeeder::class);
         $this->call(ProductCategorySeeder::class);
         $this->call(ProductSeeder::class);
-        $this->call(ShopHasProductSeeder::class);
     }
 }
