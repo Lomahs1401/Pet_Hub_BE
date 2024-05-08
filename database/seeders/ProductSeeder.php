@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Product;
+use App\Models\Shop;
 use Illuminate\Database\Seeder;
 
 class ProductSeeder extends Seeder
@@ -3484,100 +3485,217 @@ class ProductSeeder extends Seeder
             ],
         ];
 
+        $shop_ids = Shop::pluck('id')->toArray();
+
         // ================================     FOOD AND NUTRITION     ================================
         foreach ($dog_food_products as $dog_food_product) {
+            $random_shop_id = $shop_ids[array_rand($shop_ids)];
+
+            $dog_food_product['quantity'] = rand(0, 20);
+            $dog_food_product['shop_id'] = $random_shop_id;
+
             Product::create($dog_food_product);
         }
 
         foreach ($dog_milk_products as $dog_milk_product) {
+            $random_shop_id = $shop_ids[array_rand($shop_ids)];
+
+            $dog_milk_product['quantity'] = rand(0, 20);
+            $dog_milk_product['shop_id'] = $random_shop_id;
+
             Product::create($dog_milk_product);
         }
 
         foreach ($dog_pate_sauce_products as $dog_pate_sauce_product) {
+            $random_shop_id = $shop_ids[array_rand($shop_ids)];
+
+            $dog_pate_sauce_product['quantity'] = rand(0, 20);
+            $dog_pate_sauce_product['shop_id'] = $random_shop_id;
+
             Product::create($dog_pate_sauce_product);
         }
 
         foreach ($dog_treats_and_chew_products as $dog_treats_and_chew_product) {
+            $random_shop_id = $shop_ids[array_rand($shop_ids)];
+            
+            $dog_treats_and_chew_product['quantity'] = rand(0, 20);
+            $dog_treats_and_chew_product['shop_id'] = $random_shop_id;
+
             Product::create($dog_treats_and_chew_product);
         }
 
         // ================================     ACCESSORIES AND TOYS     ================================
         foreach ($dog_clothing_products as $dog_clothing_product) {
+            $random_shop_id = $shop_ids[array_rand($shop_ids)];
+            
+            $dog_clothing_product['quantity'] = rand(0, 20);
+            $dog_clothing_product['shop_id'] = $random_shop_id;
+
             Product::create($dog_clothing_product);
         }
 
         foreach ($dog_toy_products as $dog_toy_product) {
+            $random_shop_id = $shop_ids[array_rand($shop_ids)];
+            
+            $dog_toy_product['quantity'] = rand(0, 20);
+            $dog_toy_product['shop_id'] = $random_shop_id;
+
             Product::create($dog_toy_product);
         }
 
         foreach ($dog_collar_products as $dog_collar_product) {
+            $random_shop_id = $shop_ids[array_rand($shop_ids)];
+            
+            $dog_collar_product['quantity'] = rand(0, 20);
+            $dog_collar_product['shop_id'] = $random_shop_id;
+
             Product::create($dog_collar_product);
         }
 
         foreach ($dog_leash_products as $dog_leash_product) {
+            $random_shop_id = $shop_ids[array_rand($shop_ids)];
+            
+            $dog_leash_product['quantity'] = rand(0, 20);
+            $dog_leash_product['shop_id'] = $random_shop_id;
+
             Product::create($dog_leash_product);
         }
 
         foreach ($dog_muzzles_products as $dog_muzzles_product) {
+            $random_shop_id = $shop_ids[array_rand($shop_ids)];
+            
+            $dog_muzzles_product['quantity'] = rand(0, 20);
+            $dog_muzzles_product['shop_id'] = $random_shop_id;
+
             Product::create($dog_muzzles_product);
         }
 
         foreach ($dog_water_bowls_products as $dog_water_bowls_product) {
+            $random_shop_id = $shop_ids[array_rand($shop_ids)];
+            
+            $dog_water_bowls_product['quantity'] = rand(0, 20);
+            $dog_water_bowls_product['shop_id'] = $random_shop_id;
+
             Product::create($dog_water_bowls_product);
         }
 
         foreach ($dog_feeding_bowls_products as $dog_feeding_bowls_product) {
+            $random_shop_id = $shop_ids[array_rand($shop_ids)];
+            
+            $dog_feeding_bowls_product['quantity'] = rand(0, 20);
+            $dog_feeding_bowls_product['shop_id'] = $random_shop_id;
+
             Product::create($dog_feeding_bowls_product);
         }
 
         foreach ($dog_grooming_brush_products as $dog_grooming_brush_product) {
+            $random_shop_id = $shop_ids[array_rand($shop_ids)];
+            
+            $dog_grooming_brush_product['quantity'] = rand(0, 20);
+            $dog_grooming_brush_product['shop_id'] = $random_shop_id;
+
             Product::create($dog_grooming_brush_product);
         }
 
         // ================================     HYGIENE AND CARE     ================================
         foreach ($dog_shampoo_products as $dog_shampoo_product) {
+            $random_shop_id = $shop_ids[array_rand($shop_ids)];
+            
+            $dog_shampoo_product['quantity'] = rand(0, 20);
+            $dog_shampoo_product['shop_id'] = $random_shop_id;
+
             Product::create($dog_shampoo_product);
         }
 
         foreach ($dog_towel_products as $dog_towel_product) {
+            $random_shop_id = $shop_ids[array_rand($shop_ids)];
+            
+            $dog_towel_product['quantity'] = rand(0, 20);
+            $dog_towel_product['shop_id'] = $random_shop_id;
+
             Product::create($dog_towel_product);
         }
 
         foreach ($dog_perfumes_products as $dog_perfumes_product) {
+            $random_shop_id = $shop_ids[array_rand($shop_ids)];
+            
+            $dog_perfumes_product['quantity'] = rand(0, 20);
+            $dog_perfumes_product['shop_id'] = $random_shop_id;
+
             Product::create($dog_perfumes_product);
         }
 
         foreach ($dog_diapers_products as $dog_diapers_product) {
+            $random_shop_id = $shop_ids[array_rand($shop_ids)];
+            
+            $dog_diapers_product['quantity'] = rand(0, 20);
+            $dog_diapers_product['shop_id'] = $random_shop_id;
+
             Product::create($dog_diapers_product);
         }
 
         foreach ($dog_tray_products as $dog_tray_product) {
+            $random_shop_id = $shop_ids[array_rand($shop_ids)];
+            
+            $dog_tray_product['quantity'] = rand(0, 20);
+            $dog_tray_product['shop_id'] = $random_shop_id;
+
             Product::create($dog_tray_product);
         }
 
         // ================================     ACCOMMODATION     ================================
         foreach ($dog_house_products as $dog_house_product) {
+            $random_shop_id = $shop_ids[array_rand($shop_ids)];
+            
+            $dog_house_product['quantity'] = rand(0, 20);
+            $dog_house_product['shop_id'] = $random_shop_id;
+
             Product::create($dog_house_product);
         }
 
         foreach ($dog_backpack_products as $dog_backpack_product) {
+            $random_shop_id = $shop_ids[array_rand($shop_ids)];
+            
+            $dog_backpack_product['quantity'] = rand(0, 20);
+            $dog_backpack_product['shop_id'] = $random_shop_id;
+
             Product::create($dog_backpack_product);
         }
 
         foreach ($dog_carrying_bag_products as $dog_carrying_bag_product) {
+            $random_shop_id = $shop_ids[array_rand($shop_ids)];
+            
+            $dog_carrying_bag_product['quantity'] = rand(0, 20);
+            $dog_carrying_bag_product['shop_id'] = $random_shop_id;
+
             Product::create($dog_carrying_bag_product);
         }
 
         foreach ($dog_mattresses_bedding_products as $dog_mattresses_bedding_product) {
+            $random_shop_id = $shop_ids[array_rand($shop_ids)];
+            
+            $dog_mattresses_bedding_product['quantity'] = rand(0, 20);
+            $dog_mattresses_bedding_product['shop_id'] = $random_shop_id;
+
             Product::create($dog_mattresses_bedding_product);
         }
 
         // ================================     MEDICINE AND FUNCTIONAL FOODS     ================================
         foreach ($dog_veterinary_medicine_products as $dog_veterinary_medicine_product) {
+            $random_shop_id = $shop_ids[array_rand($shop_ids)];
+            
+            $dog_veterinary_medicine_product['quantity'] = rand(0, 20);
+            $dog_veterinary_medicine_product['shop_id'] = $random_shop_id;
+
             Product::create($dog_veterinary_medicine_product);
         }
 
         foreach ($dog_functional_food_products as $dog_functional_food_product) {
+            $random_shop_id = $shop_ids[array_rand($shop_ids)];
+            
+            $dog_functional_food_product['quantity'] = rand(0, 20);
+            $dog_functional_food_product['shop_id'] = $random_shop_id;
+
             Product::create($dog_functional_food_product);
         }
     }

@@ -18,8 +18,10 @@ class CreateProductsTable extends Migration
             $table->string('name');
             $table->text('description');
             $table->double('price');
-            $table->string('image');
+            $table->string('image')->nullable();
+            $table->boolean('quantity');
             $table->boolean('status');
+            $table->foreignId('shop_id')->constrained('shops');
             $table->foreignId('product_category_id')->constrained('product_categories');
             $table->timestamps();
         });

@@ -26,11 +26,17 @@ class Product extends Model
         'description',
         'price',
         'images',
+        'quantity',
         'status',
-        'product_category_id',  
+        'product_category_id', 
+        'shop_id',  
     ];
 
-    public function shops() {
-        return $this->belongsToMany(Shop::class, 'shop_has_products', 'product_id', 'shop_id');
+    public function shop() {
+        return $this->belongsTo(Shop::class, 'shop_id');
+    }
+
+    public function category() {
+        return $this->belongsTo(ProductCategory::class, 'product_category_id');
     }
 }
