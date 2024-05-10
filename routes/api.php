@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\AccountController;
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\BlogController;
 use App\Http\Controllers\API\ProductController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -46,13 +47,12 @@ Route::group([
     'middleware' => ['force.json.response', 'api', 'auth', 'auth.customer'],
     'prefix' => 'customer',
 ], function ($router) {
-    // Product Category
-    // Route::get('/product_ca', [ProductController::class, 'index']);
-    // Route::get('/products/category/{category_id}', [ProductController::class, 'getProductByCategoryId']);
-    // Route::get('/products/{id}', [ProductController::class, 'show']);
-    // Route::post('/products', [ProductController::class, 'store']);
-    // Route::put('/products/{id}', [ProductController::class, 'update']);
-    // Route::delete('/products/{id}', [ProductController::class, 'destroy']);
+    Route::get('/blog-categories', [BlogController::class, 'index']);
+    Route::get('/blog-categories/count', [BlogController::class, 'countCategories']);
+    Route::get('/blog-categories/count-blogs', [BlogController::class, 'countBlogsByCategory']);
+    Route::post('/blog-categories', [BlogController::class, 'store']);
+    Route::put('/blog-categories/{id}', [BlogController::class, 'update']);
+    Route::delete('/blog-categories/{id}', [BlogController::class, 'destroy']);
 
     // Product
     Route::get('/products', [ProductController::class, 'index']); // lấy tất cả product
