@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ShopHasService extends Model
+class ServiceCategory extends Model
 {
     use HasFactory;
 
@@ -14,7 +14,7 @@ class ShopHasService extends Model
      *
      * @var string
      */
-    protected $table = 'shop_has_services';
+    protected $table = 'service_categories';
 
     /**
      * The attributes that are mass assignable.
@@ -22,7 +22,8 @@ class ShopHasService extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'shop_id',
-        'service_id',
+        'name',
+        'target',
+        'type',
     ];
 }

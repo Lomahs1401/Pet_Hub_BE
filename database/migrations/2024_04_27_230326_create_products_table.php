@@ -19,7 +19,8 @@ class CreateProductsTable extends Migration
             $table->text('description');
             $table->double('price');
             $table->string('image')->nullable();
-            $table->boolean('quantity');
+            $table->integer('quantity');
+            $table->integer('sold_quantity');
             $table->boolean('status');
             $table->foreignId('shop_id')->constrained('shops');
             $table->foreignId('product_category_id')->constrained('product_categories');

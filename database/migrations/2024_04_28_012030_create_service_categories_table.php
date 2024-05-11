@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateShopHasServicesTable extends Migration
+class CreateServiceCategoriesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,11 @@ class CreateShopHasServicesTable extends Migration
      */
     public function up()
     {
-        Schema::create('shop_has_services', function (Blueprint $table) {
+        Schema::create('service_categories', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('shop_id')->constrained('shops');
-            $table->foreignId('service_id')->constrained('services');
+            $table->string('name');
+            $table->string('target');
+            $table->string('type');
             $table->timestamps();
         });
     }
@@ -28,6 +29,6 @@ class CreateShopHasServicesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('shop_has_services');
+        Schema::dropIfExists('service_categories');
     }
 }

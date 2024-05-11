@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateServicesTable extends Migration
+class CreateMedicalCentersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,15 +13,18 @@ class CreateServicesTable extends Migration
      */
     public function up()
     {
-        Schema::create('services', function (Blueprint $table) {
+        Schema::create('medical_centers', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->double('price');
+            $table->string('email')->unique();
             $table->text('description');
             $table->string('image');
-            $table->integer('sold_quantity');
-            $table->foreignId('service_category_id')->constrained('service_categories');
-            $table->foreignId('medical_center_id')->constrained('medical_centers');
+            $table->string('phone');
+            $table->string('address');
+            $table->string('website');
+            $table->string('fanpage');
+            $table->string('work_time');
+            $table->string('establish_year');
             $table->timestamps();
         });
     }
@@ -33,6 +36,6 @@ class CreateServicesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('services');
+        Schema::dropIfExists('medical_centers');
     }
 }

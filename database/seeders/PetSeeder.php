@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Breed;
+use App\Models\MedicalCenter;
 use App\Models\Pet;
 use App\Models\Shop;
 use Illuminate\Database\Seeder;
@@ -21,7 +22,7 @@ class PetSeeder extends Seeder
 
         $dog_breed_ids = Breed::where('type', 'Dog')->pluck('id')->toArray();
         $cat_breed_ids = Breed::where('type', 'Cat')->pluck('id')->toArray();
-        $shop_ids = Shop::pluck('id')->toArray();
+        $medical_centers_ids = MedicalCenter::pluck('id')->toArray();
 
         $number_of_pets = 80;
 
@@ -46,7 +47,7 @@ class PetSeeder extends Seeder
                 'is_adopt' => $is_adopt,
                 'status' => $faker->randomElement([true, false]),
                 'breed_id' => ($type == 'dog') ? $faker->randomElement($dog_breed_ids) : $faker->randomElement($cat_breed_ids),
-                'shop_id' => $faker->randomElement($shop_ids),
+                'medical_center_id' => $faker->randomElement($medical_centers_ids),
             ]);
         }
     }

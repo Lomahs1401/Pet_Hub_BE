@@ -31,8 +31,14 @@ class DatabaseSeeder extends Seeder
         $this->call(CommentSeeder::class);
         $this->call(InteractSeeder::class);
         $this->call(ShopSeeder::class);
+        $this->call(MedicalCenterSeeder::class);
         $this->call(PetSeeder::class);
         $this->call(ProductCategorySeeder::class);
         $this->call(ProductSeeder::class);
+        $this->call(ServiceCategorySeeder::class);
+        $this->call(ServiceSeeder::class);
+        $this->call(RatingPetSeeder::class);
+        $this->call(RatingProductSeeder::class);
+        $this->call(RatingServiceSeeder::class);
     }
 }
