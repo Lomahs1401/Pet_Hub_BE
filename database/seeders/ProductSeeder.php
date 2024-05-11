@@ -3492,6 +3492,7 @@ class ProductSeeder extends Seeder
             $random_shop_id = $shop_ids[array_rand($shop_ids)];
 
             $dog_food_product['quantity'] = rand(0, 20);
+            $dog_food_product['sold_quantity'] = rand(10, 40);
             $dog_food_product['shop_id'] = $random_shop_id;
 
             Product::create($dog_food_product);
@@ -3501,6 +3502,7 @@ class ProductSeeder extends Seeder
             $random_shop_id = $shop_ids[array_rand($shop_ids)];
 
             $dog_milk_product['quantity'] = rand(0, 20);
+            $dog_milk_product['sold_quantity'] = rand(10, 40);
             $dog_milk_product['shop_id'] = $random_shop_id;
 
             Product::create($dog_milk_product);
@@ -3510,6 +3512,7 @@ class ProductSeeder extends Seeder
             $random_shop_id = $shop_ids[array_rand($shop_ids)];
 
             $dog_pate_sauce_product['quantity'] = rand(0, 20);
+            $dog_pate_sauce_product['sold_quantity'] = rand(10, 40);
             $dog_pate_sauce_product['shop_id'] = $random_shop_id;
 
             Product::create($dog_pate_sauce_product);
@@ -3519,6 +3522,7 @@ class ProductSeeder extends Seeder
             $random_shop_id = $shop_ids[array_rand($shop_ids)];
             
             $dog_treats_and_chew_product['quantity'] = rand(0, 20);
+            $dog_treats_and_chew_product['sold_quantity'] = rand(10, 40);
             $dog_treats_and_chew_product['shop_id'] = $random_shop_id;
 
             Product::create($dog_treats_and_chew_product);
@@ -3529,6 +3533,7 @@ class ProductSeeder extends Seeder
             $random_shop_id = $shop_ids[array_rand($shop_ids)];
             
             $dog_clothing_product['quantity'] = rand(0, 20);
+            $dog_clothing_product['sold_quantity'] = rand(10, 40);
             $dog_clothing_product['shop_id'] = $random_shop_id;
 
             Product::create($dog_clothing_product);
@@ -3538,6 +3543,7 @@ class ProductSeeder extends Seeder
             $random_shop_id = $shop_ids[array_rand($shop_ids)];
             
             $dog_toy_product['quantity'] = rand(0, 20);
+            $dog_toy_product['sold_quantity'] = rand(10, 40);
             $dog_toy_product['shop_id'] = $random_shop_id;
 
             Product::create($dog_toy_product);
@@ -3547,6 +3553,7 @@ class ProductSeeder extends Seeder
             $random_shop_id = $shop_ids[array_rand($shop_ids)];
             
             $dog_collar_product['quantity'] = rand(0, 20);
+            $dog_collar_product['sold_quantity'] = rand(10, 40);
             $dog_collar_product['shop_id'] = $random_shop_id;
 
             Product::create($dog_collar_product);
@@ -3556,6 +3563,7 @@ class ProductSeeder extends Seeder
             $random_shop_id = $shop_ids[array_rand($shop_ids)];
             
             $dog_leash_product['quantity'] = rand(0, 20);
+            $dog_leash_product['sold_quantity'] = rand(10, 40);
             $dog_leash_product['shop_id'] = $random_shop_id;
 
             Product::create($dog_leash_product);
@@ -3565,6 +3573,7 @@ class ProductSeeder extends Seeder
             $random_shop_id = $shop_ids[array_rand($shop_ids)];
             
             $dog_muzzles_product['quantity'] = rand(0, 20);
+            $dog_muzzles_product['sold_quantity'] = rand(10, 40);
             $dog_muzzles_product['shop_id'] = $random_shop_id;
 
             Product::create($dog_muzzles_product);
@@ -3574,6 +3583,7 @@ class ProductSeeder extends Seeder
             $random_shop_id = $shop_ids[array_rand($shop_ids)];
             
             $dog_water_bowls_product['quantity'] = rand(0, 20);
+            $dog_water_bowls_product['sold_quantity'] = rand(10, 40);
             $dog_water_bowls_product['shop_id'] = $random_shop_id;
 
             Product::create($dog_water_bowls_product);
@@ -3583,6 +3593,7 @@ class ProductSeeder extends Seeder
             $random_shop_id = $shop_ids[array_rand($shop_ids)];
             
             $dog_feeding_bowls_product['quantity'] = rand(0, 20);
+            $dog_feeding_bowls_product['sold_quantity'] = rand(10, 40);
             $dog_feeding_bowls_product['shop_id'] = $random_shop_id;
 
             Product::create($dog_feeding_bowls_product);
@@ -3592,6 +3603,7 @@ class ProductSeeder extends Seeder
             $random_shop_id = $shop_ids[array_rand($shop_ids)];
             
             $dog_grooming_brush_product['quantity'] = rand(0, 20);
+            $dog_grooming_brush_product['sold_quantity'] = rand(10, 40);
             $dog_grooming_brush_product['shop_id'] = $random_shop_id;
 
             Product::create($dog_grooming_brush_product);
@@ -3602,6 +3614,7 @@ class ProductSeeder extends Seeder
             $random_shop_id = $shop_ids[array_rand($shop_ids)];
             
             $dog_shampoo_product['quantity'] = rand(0, 20);
+            $dog_shampoo_product['sold_quantity'] = rand(10, 40);
             $dog_shampoo_product['shop_id'] = $random_shop_id;
 
             Product::create($dog_shampoo_product);
@@ -3611,6 +3624,7 @@ class ProductSeeder extends Seeder
             $random_shop_id = $shop_ids[array_rand($shop_ids)];
             
             $dog_towel_product['quantity'] = rand(0, 20);
+            $dog_towel_product['sold_quantity'] = rand(10, 40);
             $dog_towel_product['shop_id'] = $random_shop_id;
 
             Product::create($dog_towel_product);
@@ -3620,6 +3634,7 @@ class ProductSeeder extends Seeder
             $random_shop_id = $shop_ids[array_rand($shop_ids)];
             
             $dog_perfumes_product['quantity'] = rand(0, 20);
+            $dog_perfumes_product['sold_quantity'] = rand(10, 40);
             $dog_perfumes_product['shop_id'] = $random_shop_id;
 
             Product::create($dog_perfumes_product);
@@ -3629,6 +3644,7 @@ class ProductSeeder extends Seeder
             $random_shop_id = $shop_ids[array_rand($shop_ids)];
             
             $dog_diapers_product['quantity'] = rand(0, 20);
+            $dog_diapers_product['sold_quantity'] = rand(10, 40);
             $dog_diapers_product['shop_id'] = $random_shop_id;
 
             Product::create($dog_diapers_product);
@@ -3638,6 +3654,7 @@ class ProductSeeder extends Seeder
             $random_shop_id = $shop_ids[array_rand($shop_ids)];
             
             $dog_tray_product['quantity'] = rand(0, 20);
+            $dog_tray_product['sold_quantity'] = rand(10, 40);
             $dog_tray_product['shop_id'] = $random_shop_id;
 
             Product::create($dog_tray_product);
@@ -3648,6 +3665,7 @@ class ProductSeeder extends Seeder
             $random_shop_id = $shop_ids[array_rand($shop_ids)];
             
             $dog_house_product['quantity'] = rand(0, 20);
+            $dog_house_product['sold_quantity'] = rand(10, 40);
             $dog_house_product['shop_id'] = $random_shop_id;
 
             Product::create($dog_house_product);
@@ -3657,6 +3675,7 @@ class ProductSeeder extends Seeder
             $random_shop_id = $shop_ids[array_rand($shop_ids)];
             
             $dog_backpack_product['quantity'] = rand(0, 20);
+            $dog_backpack_product['sold_quantity'] = rand(10, 40);
             $dog_backpack_product['shop_id'] = $random_shop_id;
 
             Product::create($dog_backpack_product);
@@ -3666,6 +3685,7 @@ class ProductSeeder extends Seeder
             $random_shop_id = $shop_ids[array_rand($shop_ids)];
             
             $dog_carrying_bag_product['quantity'] = rand(0, 20);
+            $dog_carrying_bag_product['sold_quantity'] = rand(10, 40);
             $dog_carrying_bag_product['shop_id'] = $random_shop_id;
 
             Product::create($dog_carrying_bag_product);
@@ -3675,6 +3695,7 @@ class ProductSeeder extends Seeder
             $random_shop_id = $shop_ids[array_rand($shop_ids)];
             
             $dog_mattresses_bedding_product['quantity'] = rand(0, 20);
+            $dog_mattresses_bedding_product['sold_quantity'] = rand(10, 40);
             $dog_mattresses_bedding_product['shop_id'] = $random_shop_id;
 
             Product::create($dog_mattresses_bedding_product);
@@ -3685,6 +3706,7 @@ class ProductSeeder extends Seeder
             $random_shop_id = $shop_ids[array_rand($shop_ids)];
             
             $dog_veterinary_medicine_product['quantity'] = rand(0, 20);
+            $dog_veterinary_medicine_product['sold_quantity'] = rand(10, 40);
             $dog_veterinary_medicine_product['shop_id'] = $random_shop_id;
 
             Product::create($dog_veterinary_medicine_product);
@@ -3694,6 +3716,7 @@ class ProductSeeder extends Seeder
             $random_shop_id = $shop_ids[array_rand($shop_ids)];
             
             $dog_functional_food_product['quantity'] = rand(0, 20);
+            $dog_functional_food_product['sold_quantity'] = rand(10, 40);
             $dog_functional_food_product['shop_id'] = $random_shop_id;
 
             Product::create($dog_functional_food_product);
