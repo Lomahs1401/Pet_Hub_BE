@@ -23,21 +23,28 @@ class PermissionSeeder extends Seeder
         
         // Customer Role
         $normal_customer_role = $role_model->where('role_name', 'Normal Customer')->first();
-        $vip_customer_role = $role_model->where('role_name', 'VIP Customer')->first();
-        $doctor_customer_role = $role_model->where('role_name', 'Doctor')->first();
+        $shop_manager_customer_role = $role_model->where('role_name', 'Shop Manager Customer')->first();
 
-        $role_staff = $role_model->where('role_name', 'Staff')->first();
+        // Staff Role
+        $normal_staff_role = $role_model->where('role_name', 'Normal Staff')->first();
+        $doctor_staff_role = $role_model->where('role_name', 'Doctor Staff')->first();
+        
+        // Admin Role
         $role_admin = $role_model->where('role_name', 'Admin')->first();
 
         $list_normal_customer_permission = [
             // Pet
             'View Pet',
+            'Rate Pet',
+            'Buy Pet',
             // Product
             'View Product',
             'Rate Product',
+            'Buy Product',
             // Service
             'View Service',
             'Rate Service',
+            'Buy Service',
             // Profile
             'View Profile',
             'Update Profile',
@@ -48,33 +55,22 @@ class PermissionSeeder extends Seeder
             'Delete Appointment',
         ];
 
-        $list_vip_customer_permission = [
+        $list_shop_manager_customer_permission = [
             // Pet
             'View Pet',
-            // Service
-            'View Service',
-            'Rate Service',
-            // Profile
-            'View Profile',
-            'Update Profile',
-            // Appointment
-            'Create Appointment',
-            'View Appointment',
-            'Update Appointment',
-            'Delete Appointment',
-        ];
-
-        $list_doctor_customer_permission = [
-            // Pet
-            'View Pet',
+            'Create Pet',
             'Update Pet',
             'Delete Pet',
             // Product
             'View Product',
-            'Rate Product',
+            'Create Product',
+            'Update Product',
+            'Delete Product',
             // Service
             'View Service',
-            'Rate Service',
+            'Create Service',
+            'Update Service',
+            'Delete Service',
             // Profile
             'View Profile',
             'Update Profile',
@@ -85,16 +81,32 @@ class PermissionSeeder extends Seeder
             'Delete Appointment',
         ];
 
-        $list_staff_permission = [
+        $list_normal_staff_permission = [
             // Product
             'View Product',
-            'Create Product',
-            'Update Product',
+            'Manage Product',
+            // Service
+            'View Service',
+            'Manage Service',
+            // Profile (User)
+            'View Profile',
+            'Manage Profile',
+        ];
+
+        $list_doctor_staff_permission = [
+            // Pet
+            'View Pet',
+            'Create Pet',
+            'Update Pet',
+            'Delete Pet',
+            // Product
+            'View Product',
             // Service
             'View Service',
             'Create Service',
             'Update Service',
-            // Profile (User)
+            'Delete Service',
+            // Profile
             'View Profile',
             'Update Profile',
             // Appointment
@@ -102,8 +114,6 @@ class PermissionSeeder extends Seeder
             'View Appointment',
             'Update Appointment',
             'Delete Appointment',
-            // Order
-            'View Orders',
         ];
 
         $list_admin_permission = [
@@ -146,42 +156,42 @@ class PermissionSeeder extends Seeder
             ]);
         }
 
-        foreach ($list_vip_customer_permission as $permissionName) {
-            $vip_customer_permissions = Permission::factory()->create([
+        foreach ($list_shop_manager_customer_permission as $permissionName) {
+            $shop_manager_customer_permissions = Permission::factory()->create([
                 'permission_name' => $permissionName,
                 'check_permission' => 1,
             ]);
 
             DB::table('role_has_permissions')->insert([
-                'role_id' => $vip_customer_role->id,
-                'permission_id' => $vip_customer_permissions->id,
-                'licensed' => 1,
-            ]);
-        }
-
-        foreach ($list_doctor_customer_permission as $permissionName) {
-            $doctor_customer_permissions = Permission::factory()->create([
-                'permission_name' => $permissionName,
-                'check_permission' => 1,
-            ]);
-
-            DB::table('role_has_permissions')->insert([
-                'role_id' => $doctor_customer_role->id,
-                'permission_id' => $doctor_customer_permissions->id,
+                'role_id' => $shop_manager_customer_role->id,
+                'permission_id' => $shop_manager_customer_permissions->id,
                 'licensed' => 1,
             ]);
         }
 
         // Add permissions for staff
-        foreach ($list_staff_permission as $permissionName) {
-            $staff_permission = Permission::factory()->create([
+        foreach ($list_normal_staff_permission as $permissionName) {
+            $normal_staff_permission = Permission::factory()->create([
                 'permission_name' => $permissionName,
                 'check_permission' => 1,
             ]);
 
             DB::table('role_has_permissions')->insert([
-                'role_id' => $role_staff->id,
-                'permission_id' => $staff_permission->id,
+                'role_id' => $normal_staff_role->id,
+                'permission_id' => $normal_staff_permission->id,
+                'licensed' => 1,
+            ]);
+        }
+
+        foreach ($list_doctor_staff_permission as $permissionName) {
+            $doctor_staff_permissions = Permission::factory()->create([
+                'permission_name' => $permissionName,
+                'check_permission' => 1,
+            ]);
+
+            DB::table('role_has_permissions')->insert([
+                'role_id' => $doctor_staff_role->id,
+                'permission_id' => $doctor_staff_permissions->id,
                 'licensed' => 1,
             ]);
         }

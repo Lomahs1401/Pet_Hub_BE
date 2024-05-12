@@ -18,6 +18,7 @@ class CreateCustomersTable extends Migration
             $table->string('full_name')->nullable();
             $table->string('gender')->nullable();
             $table->date('birthdate')->nullable();
+            $table->string('address')->nullable();
             $table->string('CMND')->unique()->nullable();
             $table->string('phone')->unique()->nullable();
             $table->integer('ranking_point');
