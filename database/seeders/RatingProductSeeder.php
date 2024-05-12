@@ -32,6 +32,13 @@ class RatingProductSeeder extends Seeder
 
             $selected_customer_ids = [];
 
+            // 25% xác suất cho rating 5 sao
+            // 45% xác suất cho rating 4 sao
+            // 12% xác suất cho rating 3 sao
+            // 6% xác suất cho rating 2 sao
+            // 12% xác suất cho rating 1 sao
+            $rating = $faker->randomElement([5, 4, 4, 3, 3, 2, 1, 1]);
+
             for ($i = 0; $i < $num_ratings_for_product; $i++) {
                 // Random một khách hàng chưa được chọn trước đó
                 do {
@@ -42,7 +49,7 @@ class RatingProductSeeder extends Seeder
                 $selected_customer_ids[] = $random_customer_id;
 
                 RatingProduct::create([
-                    'rating' => $faker->numberBetween(1, 5),
+                    'rating' => $rating,
                     'description' => $faker->paragraph(8),
                     'customer_id' => $random_customer_id,
                     'product_id' => $product_id,

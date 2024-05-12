@@ -7,20 +7,13 @@ use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\Shop;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
     public function index(Request $request)
     {
         $query = Product::query();
-
-        // if ($request->has('sort')) {
-        //     if ($request->sort == 'asc') {
-        //         $query->orderBy('price', 'asc');
-        //     } elseif ($request->sort == 'desc') {
-        //         $query->orderBy('price', 'desc');
-        //     }
-        // }
     
         $products = $query->get();
 
@@ -48,7 +41,7 @@ class ProductController extends Controller
         ], 200);
     }
 
-    public function getProductByShopId($shop_id)
+    public function getListProductByShopId($shop_id)
     {
         if (!Shop::find($shop_id)) {
             return response()->json([
@@ -84,7 +77,7 @@ class ProductController extends Controller
         ], 200);
     }
 
-    public function getProductByCategoryId($product_category_id)
+    public function getListProductByCategoryId($product_category_id)
     {
         if (!ProductCategory::find($product_category_id)) {
             return response()->json([
@@ -120,7 +113,7 @@ class ProductController extends Controller
         ], 200);
     }
 
-    public function getProductWithShopAndCategory($shop_id, $product_category_id)
+    public function getListProductWithShopAndCategory($shop_id, $product_category_id)
     {
         $shop = Shop::find($shop_id);
         if (!$shop) {
@@ -137,7 +130,6 @@ class ProductController extends Controller
                 'status' => 404
             ], 404);
         }
-
 
         $number_of_products = Product::where('shop_id', $shop_id)
             ->where('product_category_id', $product_category_id)
@@ -180,13 +172,13 @@ class ProductController extends Controller
         ], 200);
     }
 
-    public function getNumberOfShopSellingCategory($product_category_id)
+    public function getNumberOfShopSellingByCategory($product_category_id)
     {
         $shops = Product::whereHas('category', function ($query) use ($product_category_id) {
             $query->where('id', $product_category_id);
         })
-        ->distinct('shop_id')
-        ->pluck('shop_id');
+            ->distinct('shop_id')
+            ->pluck('shop_id');
 
         $number_of_shops = $shops->count();
 
@@ -195,6 +187,101 @@ class ProductController extends Controller
             'status' => 200,
             'data' => $number_of_shops,
         ], 200);
+    }
+
+    public function paging(Request $request) {
+        $categories = [];
+
+        $page_number = $request->query('page_number') ?? 1;
+        $num_of_page = $request->query('num_of_page') ?? 10;
+        $target = $request->query('target') ?? 'all';
+
+        if ($target === 'all') {
+            // Nếu không có field 'target' được gửi đến, lấy tất cả các danh mục
+            $categories = DB::table('product_categories')
+                ->pluck('id')
+                ->toArray();
+        } else {
+            // Nếu 'target' là 'dog' hoặc 'cat' thì query dữ liệu từ bảng 'product_categories'
+            if ($target === 'dog' || $target === 'cat') {
+                $categories = DB::table('product_categories')
+                ->where('target', $target)
+                ->pluck('id')
+                ->toArray();
+
+                // Nếu không có danh mục nào phù hợp thì trả về mảng rỗng
+                if (empty($categories)) {
+                    return response()->json([
+                        'message' => 'Query successfully!',
+                        'status' => 200,
+                        'data' => []
+                    ]);
+                }
+            }
+        }
+
+        // Lấy số lượng sản phẩm
+        $total_products_query = DB::table('products');
+
+        // Nếu có danh mục, thêm điều kiện whereIn
+        if (!empty($categories)) {
+            $total_products_query->whereIn('product_category_id', $categories);
+        }
+
+        $total_products = $total_products_query->count();
+
+        // Tính toán offset
+        $offset = ($page_number - 1) * $num_of_page;
+
+        // Lấy dữ liệu sản phẩm dựa trên trang hiện tại và số lượng sản phẩm trên mỗi trang
+        $products = Product::with('shop') // Sử dụng eager loading để lấy thông tin cửa hàng
+            ->whereIn('product_category_id', $categories)
+            ->offset($offset)
+            ->limit($num_of_page)
+            ->get();
+
+        $formatted_products = [];
+        foreach ($products as $product) {
+            $formatted_products[] = [
+                'id' => $product->id,
+                'name' => $product->name,
+                'description' => $product->description,
+                'price' => $product->price,
+                'image' => $product->image,
+                'quantity' => $product->quantity,
+                'sold_quantity' => $product->sold_quantity,
+                'status' => $product->status,
+                'product_category_id' => $product->product_category_id,
+                'rating' => $product->calculateProductRating($product->id),
+                'created_at' => $product->created_at,
+                'updated_at' => $product->updated_at,
+                'shop' => [
+                    'id' => $product->shop->id,
+                    'name' => $product->shop->name,
+                    'email' => $product->shop->email,
+                    'description' => $product->shop->description,
+                    'image' => $product->shop->image,
+                    'phone' => $product->shop->phone,
+                    'address' => $product->shop->address,
+                    'website' => $product->shop->website,
+                    'fanpage' => $product->shop->fanpage,
+                    'work_time' => $product->shop->work_time,
+                    'establish_year' => $product->shop->establish_year,
+                    'created_at' => $product->shop->created_at,
+                    'updated_at' => $product->shop->updated_at,
+                ],
+            ];
+        }
+
+        // Trả về JSON response
+        return response()->json([
+            'message' => 'Query successfully!',
+            'status' => 200,
+            'data' => $formatted_products,
+            'page_number' => $page_number,
+            'num_of_page' => $num_of_page,
+            'total_products' => $total_products,
+        ]);
     }
 
     public function store(Request $request)
