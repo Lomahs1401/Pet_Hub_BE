@@ -25,11 +25,11 @@ class AccountSeeder extends Seeder
 
         // Customer Role
         $normal_customer_role = $role_model->where('role_name', 'Normal Customer')->first();
-        $vip_customer_role = $role_model->where('role_name', 'VIP Customer')->first();
-        $doctor_customer_role = $role_model->where('role_name', 'Doctor')->first();
+        $shop_manager_customer_role = $role_model->where('role_name', 'Shop Manager Customer')->first();
 
-        $role_customer = Role::where('role_type', 'Customer')->get();
-        $role_staff = $role_model->where('role_name', 'Staff')->first();
+        $normal_staff_role = $role_model->where('role_name', 'Normal Staff')->first();
+        $doctor_staff_role = $role_model->where('role_name', 'Doctor Staff')->first();
+
         $role_admin = $role_model->where('role_name', 'Admin')->first();
 
 
@@ -83,13 +83,6 @@ class AccountSeeder extends Seeder
 
         // Define tỉ lệ cho mỗi role
         $normal_customer_rate = 0.7;
-        $vip_customer_rate = 0.2;
-        $doctor_rate = 0.1;
-
-        // Tính toán phạm vi cho từng role
-        $normal_customer_range = $normal_customer_rate;
-        $vip_customer_range = $normal_customer_range + $vip_customer_rate;
-        $doctor_range = $vip_customer_range + $doctor_rate;
 
         for ($i = 0; $i < TOTAL_CUSTOMER_ACCOUNT; $i++) {
             $customer_account = Account::factory()->create([
@@ -107,12 +100,10 @@ class AccountSeeder extends Seeder
             $random_number = $faker->randomFloat(2, 0, 1);
 
             // Xác định role_id dựa vào tỉ lệ
-            if ($random_number < $normal_customer_range) {
+            if ($random_number < $normal_customer_rate) {
                 $role_id = $normal_customer_role->id; // Normal Customer
-            } elseif ($random_number < $vip_customer_range) {
-                $role_id = $vip_customer_role->id; // VIP Customer
             } else {
-                $role_id = $doctor_customer_role->id; // Doctor
+                $role_id = $shop_manager_customer_role->id; // Shop Manager Customer
             }
 
             DB::table('account_has_roles')->insert([
@@ -144,7 +135,7 @@ class AccountSeeder extends Seeder
                 'gender' => $is_male_customer ? 'Male' : 'Female',
                 'birthdate' => $faker->dateTimeInInterval('-20 years', '+2 years', 'Asia/Ho_Chi_Minh')->format('Y-m-d'),
                 'CMND' => $faker->numerify('#########'),
-                // 'address' => $faker->boolean() ? $faker->city('vi_VN') : $faker->province('vi_VN'),
+                'address' => $faker->city('vi_VN'),
                 'phone' => $faker->regexify('0(3|5|7|8|9){1}([0-9]{8})'),
                 'ranking_point' => $ranking_point,
                 'certificate' => $faker->imageUrl(),
@@ -155,6 +146,8 @@ class AccountSeeder extends Seeder
         }
 
         // --------------------------      STAFFS     -------------------------- 
+        $normal_staff_rate = 0.6;
+
         for ($i = 0; $i < TOTAL_STAFF_ACCOUNT; $i++) {
             $staff_account = Account::factory()->create([
                 'username' => $faker->userName(),
@@ -167,9 +160,19 @@ class AccountSeeder extends Seeder
                 'reset_code_attempts' => null
             ]);
 
+            // Random một số từ 0 đến 1
+            $random_number = $faker->randomFloat(2, 0, 1);
+
+            // Xác định role_id dựa vào tỉ lệ
+            if ($random_number < $normal_staff_rate) {
+                $role_id = $normal_staff_role->id; // Normal Staff
+            } else {
+                $role_id = $doctor_staff_role->id; // Doctor Staff
+            }
+
             DB::table('account_has_roles')->insert([
                 'account_id' => $staff_account->id,
-                'role_id' => $role_staff->id,
+                'role_id' => $role_id,
                 'licensed' => true,
                 'created_at' => now(),
                 'updated_at' => now(),

@@ -22,13 +22,13 @@ class RoleSeeder extends Seeder
         ];
 
         $list_staff_roles = [
-            'Staff'
+            'Normal Staff',
+            'Doctor Staff'
         ];
 
         $list_customer_roles = [
             'Normal Customer',
-            'VIP Customer',
-            'Doctor'
+            'Shop Manager Customer',
         ];
 
         // Add Admin Role
