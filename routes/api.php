@@ -47,6 +47,22 @@ Route::group([
     'middleware' => ['force.json.response', 'api', 'auth', 'auth.customer'],
     'prefix' => 'customer',
 ], function ($router) {
+    // Product
+    Route::get('/products', [ProductController::class, 'index']); // lấy tất cả product
+    Route::get('/products/shop/{shop_id}', [ProductController::class, 'getListProductByShopId']); // lấy dsach các product được bán bởi shop
+    Route::get('/products/shop/{shop_id}/total', [ProductController::class, 'getNumberOfProductByShopId']); // lấy số lượng product mà shop đang bán
+    Route::get('/products/category/{category_id}', [ProductController::class, 'getListProductByCategoryId']); // lấy dsach các product thuộc category
+    Route::get('/products/category/{category_id}/total', [ProductController::class, 'getNumberOfProductByCategoryId']); // lấy số lượng product thuộc category
+    Route::get('/products/shop/distinct/{category_id}', [ProductController::class, 'getNumberOfShopSellingByCategory']); // lấy số lượng các shop bán product thuộc category
+    Route::get('/products/shop/{shop_id}/category/{category_id}', [ProductController::class, 'getListProductWithShopAndCategory']); // lấy ds các product được bán bởi shop và thuộc category_id
+    Route::get('/products/shop/{shop_id}/category/{category_id}/total', [ProductController::class, 'getNumberOfProductWithShopAndCategory']); // lấy số lượng product được bán bởi shop và thuộc category_id
+    Route::get('/products/sort/{order}', [ProductController::class, 'sortProductsByPrice']);
+    Route::get('/products/paginate', [ProductController::class, 'paging']);
+    Route::get('/products/{id}', [ProductController::class, 'show']); // lấy chi tiết product by id
+    Route::post('/products', [ProductController::class, 'store']);
+    Route::put('/products/{id}', [ProductController::class, 'update']);
+    Route::delete('/products/{id}', [ProductController::class, 'destroy']);
+
     Route::get('/blog-categories', [BlogController::class, 'index']);
     Route::get('/blog-categories/count', [BlogController::class, 'countCategories']);
     Route::get('/blog-categories/count-blogs', [BlogController::class, 'countBlogsByCategory']);
@@ -54,20 +70,7 @@ Route::group([
     Route::put('/blog-categories/{id}', [BlogController::class, 'update']);
     Route::delete('/blog-categories/{id}', [BlogController::class, 'destroy']);
 
-    // Product
-    Route::get('/products', [ProductController::class, 'index']); // lấy tất cả product
-    Route::get('/products/shop/{shop_id}', [ProductController::class, 'getProductByShopId']); // lấy dsach các product được bán bởi shop
-    Route::get('/products/shop/{shop_id}/total', [ProductController::class, 'getNumberOfProductByShopId']); // lấy số lượng product mà shop đang bán
-    Route::get('/products/category/{category_id}', [ProductController::class, 'getProductByCategoryId']); // lấy dsach các product thuộc category
-    Route::get('/products/category/{category_id}/total', [ProductController::class, 'getNumberOfProductByCategoryId']); // lấy số lượng product thuộc category
-    Route::get('/products/shop/distinct/{category_id}', [ProductController::class, 'getNumberOfShopSellingCategory']); // lấy số lượng các shop bán product thuộc category
-    Route::get('/products/shop/{shop_id}/category/{category_id}', [ProductController::class, 'getProductWithShopAndCategory']); // lấy ds các product được bán bởi shop và thuộc category_id
-    Route::get('/products/shop/{shop_id}/category/{category_id}/total', [ProductController::class, 'getNumberOfProductWithShopAndCategory']); // lấy số lượng product được bán bởi shop và thuộc category_id
-    Route::get('/products/sort/{order}', [ProductController::class, 'sortProductsByPrice']);
-    Route::get('/products/{id}', [ProductController::class, 'show']); // lấy chi tiết product by id
-    Route::post('/products', [ProductController::class, 'store']);
-    Route::put('/products/{id}', [ProductController::class, 'update']);
-    Route::delete('/products/{id}', [ProductController::class, 'destroy']);
+
 });
 
 

@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Faker\Factory as Faker;
 
 class AuthController extends Controller
 {
@@ -27,6 +28,8 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
+        $faker = Faker::create();
+
         // validate form
         $validator = Validator::make($request->all(), [
             'username' => 'required',
@@ -57,7 +60,7 @@ class AuthController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'avatar' => $request->avatar,
-            'enabled' => $request->enabled | '1',
+            'enabled' => $request->enabled ?? '1',
         ]);
 
         $bronze_ranking_id = Ranking::where('ranking_name', 'Bronze')->value('id');

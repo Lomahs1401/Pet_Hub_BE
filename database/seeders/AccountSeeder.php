@@ -102,8 +102,10 @@ class AccountSeeder extends Seeder
             // Xác định role_id dựa vào tỉ lệ
             if ($random_number < $normal_customer_rate) {
                 $role_id = $normal_customer_role->id; // Normal Customer
+                $certificate_url = null;
             } else {
                 $role_id = $shop_manager_customer_role->id; // Shop Manager Customer
+                $certificate_url = $faker->imageUrl();
             }
 
             DB::table('account_has_roles')->insert([
@@ -130,15 +132,15 @@ class AccountSeeder extends Seeder
 
             DB::table('customers')->insert([
                 'account_id' => $customer_account->id,
-                'full_name' => $is_male_customer ? $faker->lastName('vi_VN') . ' ' . $faker->firstNameMale('vi_VN')
-                    : $faker->lastName('vi_VN') . ' ' . $faker->firstNameFemale('vi_VN'),
+                'full_name' => $is_male_customer ? $faker->lastName() . ' ' . $faker->firstNameMale()
+                    : $faker->lastName() . ' ' . $faker->firstNameFemale(),
                 'gender' => $is_male_customer ? 'Male' : 'Female',
                 'birthdate' => $faker->dateTimeInInterval('-20 years', '+2 years', 'Asia/Ho_Chi_Minh')->format('Y-m-d'),
                 'CMND' => $faker->numerify('#########'),
-                'address' => $faker->city('vi_VN'),
+                'address' => $faker->city(),
                 'phone' => $faker->regexify('0(3|5|7|8|9){1}([0-9]{8})'),
                 'ranking_point' => $ranking_point,
-                'certificate' => $faker->imageUrl(),
+                'certificate' => $certificate_url,
                 // 'ranking_id' => $ranking_id,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -183,12 +185,12 @@ class AccountSeeder extends Seeder
             $nameBanks = ['Vietcombank', 'BIDV', 'Techcombank', 'Agribank', 'Vietinbank', 'Oceanbank', 'MBBank'];
             DB::table('staffs')->insert([
                 'account_id' => $staff_account->id,
-                'full_name' => $is_male_staff ? $faker->lastName('vi_VN') . ' ' . $faker->firstNameMale('vi_VN')
-                    : $faker->lastName('vi_VN') . ' ' . $faker->firstNameFemale('vi_VN'),
+                'full_name' => $is_male_staff ? $faker->lastName() . ' ' . $faker->firstNameMale()
+                    : $faker->lastName() . ' ' . $faker->firstNameFemale(),
                 'gender' => $is_male_staff ? 'Male' : 'Female',
                 'birthdate' => $faker->dateTimeInInterval('-50 years', '+40 years', 'Asia/Ho_Chi_Minh')->format('Y-m-d'),
                 'CMND' => $faker->numerify('#########'),
-                'address' => $faker->city('vi_VN'),
+                'address' => $faker->city(),
                 'phone' => $faker->regexify('(0|3|5|7|8|9){1}([0-9]{8})'),
                 'account_bank' => $faker->numerify('##########'),
                 'name_bank' => $faker->randomElement($nameBanks),
@@ -226,12 +228,12 @@ class AccountSeeder extends Seeder
 
             DB::table('admins')->insert([
                 'account_id' => $admin_account->id,
-                'full_name' => $is_male_admin ? $faker->lastName('vi_VN') . ' ' . $faker->firstNameMale('vi_VN')
-                    : $faker->lastName('vi_VN') . ' ' . $faker->firstNameFemale('vi_VN'),
+                'full_name' => $is_male_admin ? $faker->lastName() . ' ' . $faker->firstNameMale()
+                    : $faker->lastName() . ' ' . $faker->firstNameFemale(),
                 'gender' => $is_male_admin ? 'Male' : 'Female',
                 'birthdate' => $faker->dateTimeInInterval('-20 years', '+2 years', 'Asia/Ho_Chi_Minh')->format('Y-m-d'),
                 'CMND' => $faker->numerify('#########'),
-                'address' => $faker->city('vi_VN'),
+                'address' => $faker->city(),
                 'phone' => $faker->regexify('0(3|5|7|8|9){1}([0-9]{8})'),
                 'image' => $faker->imageUrl(),
                 'status' => $faker->boolean(100),
