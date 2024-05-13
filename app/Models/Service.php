@@ -26,5 +26,8 @@ class Service extends Model
         'description',
         'price',
         'image',
+        'sold_quantity',
+        'medical_center_id',
+        'service_category_id',
     ];
 }

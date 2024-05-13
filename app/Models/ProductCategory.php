@@ -23,5 +23,7 @@ class ProductCategory extends Model
      */
     protected $fillable = [
         'name',
+        'target',
+        'type',
     ];
 }

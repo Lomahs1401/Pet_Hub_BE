@@ -33,7 +33,7 @@ class BlogSeeder extends Seeder
             Blog::factory()->create([
                 'title' => $faker->sentence(10),
                 'text' => $faker->paragraph(16),
-                'image' => 'gs://petshop-3d4ae.appspot.com/blog/blog_' . ($i+1) . '.jpg',
+                'image' => 'gs://petshop-3d4ae.appspot.com/blogs/blog_' . ($i+1) . '.jpg',
                 'account_id' => $faker->randomElement($customer_account_ids),
                 'category_id' => $faker->randomElement($blog_category_ids),
             ]);

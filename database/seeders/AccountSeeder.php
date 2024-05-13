@@ -25,11 +25,11 @@ class AccountSeeder extends Seeder
 
         // Customer Role
         $normal_customer_role = $role_model->where('role_name', 'Normal Customer')->first();
-        $vip_customer_role = $role_model->where('role_name', 'VIP Customer')->first();
-        $doctor_customer_role = $role_model->where('role_name', 'Doctor')->first();
+        $shop_manager_customer_role = $role_model->where('role_name', 'Shop Manager Customer')->first();
 
-        $role_customer = Role::where('role_type', 'Customer')->get();
-        $role_staff = $role_model->where('role_name', 'Staff')->first();
+        $normal_staff_role = $role_model->where('role_name', 'Normal Staff')->first();
+        $doctor_staff_role = $role_model->where('role_name', 'Doctor Staff')->first();
+
         $role_admin = $role_model->where('role_name', 'Admin')->first();
 
 
@@ -79,18 +79,10 @@ class AccountSeeder extends Seeder
         define('TOTAL_ADMIN_ACCOUNT', count($list_admin_avatars));
 
         // --------------------------      CUSTOMERS     --------------------------
-        $is_male_customer = $faker->boolean();
         $rankings = Ranking::all();
 
         // Define tỉ lệ cho mỗi role
         $normal_customer_rate = 0.7;
-        $vip_customer_rate = 0.2;
-        $doctor_rate = 0.1;
-
-        // Tính toán phạm vi cho từng role
-        $normal_customer_range = $normal_customer_rate;
-        $vip_customer_range = $normal_customer_range + $vip_customer_rate;
-        $doctor_range = $vip_customer_range + $doctor_rate;
 
         for ($i = 0; $i < TOTAL_CUSTOMER_ACCOUNT; $i++) {
             $customer_account = Account::factory()->create([
@@ -108,12 +100,12 @@ class AccountSeeder extends Seeder
             $random_number = $faker->randomFloat(2, 0, 1);
 
             // Xác định role_id dựa vào tỉ lệ
-            if ($random_number < $normal_customer_range) {
+            if ($random_number < $normal_customer_rate) {
                 $role_id = $normal_customer_role->id; // Normal Customer
-            } elseif ($random_number < $vip_customer_range) {
-                $role_id = $vip_customer_role->id; // VIP Customer
+                $certificate_url = null;
             } else {
-                $role_id = $doctor_customer_role->id; // Doctor
+                $role_id = $shop_manager_customer_role->id; // Shop Manager Customer
+                $certificate_url = $faker->imageUrl();
             }
 
             DB::table('account_has_roles')->insert([
@@ -136,17 +128,19 @@ class AccountSeeder extends Seeder
                 $ranking_id = 1; // Giá trị mặc định
             }
 
+            $is_male_customer = $faker->boolean(chanceOfGettingTrue: 50);
+
             DB::table('customers')->insert([
                 'account_id' => $customer_account->id,
-                'full_name' => $is_male_customer ? $faker->lastName('vi_VN') . ' ' . $faker->firstNameMale('vi_VN')
-                    : $faker->lastName('vi_VN') . ' ' . $faker->firstNameFemale('vi_VN'),
+                'full_name' => $is_male_customer ? $faker->lastName() . ' ' . $faker->firstNameMale()
+                    : $faker->lastName() . ' ' . $faker->firstNameFemale(),
                 'gender' => $is_male_customer ? 'Male' : 'Female',
                 'birthdate' => $faker->dateTimeInInterval('-20 years', '+2 years', 'Asia/Ho_Chi_Minh')->format('Y-m-d'),
                 'CMND' => $faker->numerify('#########'),
-                // 'address' => $faker->boolean() ? $faker->city('vi_VN') : $faker->province('vi_VN'),
+                'address' => $faker->city(),
                 'phone' => $faker->regexify('0(3|5|7|8|9){1}([0-9]{8})'),
                 'ranking_point' => $ranking_point,
-                'certificate' => $faker->imageUrl(),
+                'certificate' => $certificate_url,
                 // 'ranking_id' => $ranking_id,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -154,6 +148,8 @@ class AccountSeeder extends Seeder
         }
 
         // --------------------------      STAFFS     -------------------------- 
+        $normal_staff_rate = 0.6;
+
         for ($i = 0; $i < TOTAL_STAFF_ACCOUNT; $i++) {
             $staff_account = Account::factory()->create([
                 'username' => $faker->userName(),
@@ -166,24 +162,35 @@ class AccountSeeder extends Seeder
                 'reset_code_attempts' => null
             ]);
 
+            // Random một số từ 0 đến 1
+            $random_number = $faker->randomFloat(2, 0, 1);
+
+            // Xác định role_id dựa vào tỉ lệ
+            if ($random_number < $normal_staff_rate) {
+                $role_id = $normal_staff_role->id; // Normal Staff
+            } else {
+                $role_id = $doctor_staff_role->id; // Doctor Staff
+            }
+
             DB::table('account_has_roles')->insert([
                 'account_id' => $staff_account->id,
-                'role_id' => $role_staff->id,
+                'role_id' => $role_id,
                 'licensed' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
 
-            $is_male_staff = $faker->boolean();
+            $is_male_staff = $faker->boolean(chanceOfGettingTrue: 50);
+
             $nameBanks = ['Vietcombank', 'BIDV', 'Techcombank', 'Agribank', 'Vietinbank', 'Oceanbank', 'MBBank'];
             DB::table('staffs')->insert([
                 'account_id' => $staff_account->id,
-                'full_name' => $is_male_staff ? $faker->lastName('vi_VN') . ' ' . $faker->firstNameMale('vi_VN')
-                    : $faker->lastName('vi_VN') . ' ' . $faker->firstNameFemale('vi_VN'),
+                'full_name' => $is_male_staff ? $faker->lastName() . ' ' . $faker->firstNameMale()
+                    : $faker->lastName() . ' ' . $faker->firstNameFemale(),
                 'gender' => $is_male_staff ? 'Male' : 'Female',
                 'birthdate' => $faker->dateTimeInInterval('-50 years', '+40 years', 'Asia/Ho_Chi_Minh')->format('Y-m-d'),
                 'CMND' => $faker->numerify('#########'),
-                'address' => $faker->city('vi_VN'),
+                'address' => $faker->city(),
                 'phone' => $faker->regexify('(0|3|5|7|8|9){1}([0-9]{8})'),
                 'account_bank' => $faker->numerify('##########'),
                 'name_bank' => $faker->randomElement($nameBanks),
@@ -197,7 +204,6 @@ class AccountSeeder extends Seeder
         }
 
         // --------------------------      ADMINS     -------------------------- 
-        $is_male_admin = $faker->boolean();
         for ($i = 0; $i < TOTAL_ADMIN_ACCOUNT; $i++) {
             $admin_account = Account::factory()->create([
                 'username' => $faker->userName(),
@@ -218,14 +224,16 @@ class AccountSeeder extends Seeder
                 'updated_at' => now(),
             ]);
 
+            $is_male_admin = $faker->boolean(chanceOfGettingTrue: 50);
+
             DB::table('admins')->insert([
                 'account_id' => $admin_account->id,
-                'full_name' => $is_male_admin ? $faker->lastName('vi_VN') . ' ' . $faker->firstNameMale('vi_VN')
-                    : $faker->lastName('vi_VN') . ' ' . $faker->firstNameFemale('vi_VN'),
+                'full_name' => $is_male_admin ? $faker->lastName() . ' ' . $faker->firstNameMale()
+                    : $faker->lastName() . ' ' . $faker->firstNameFemale(),
                 'gender' => $is_male_admin ? 'Male' : 'Female',
                 'birthdate' => $faker->dateTimeInInterval('-20 years', '+2 years', 'Asia/Ho_Chi_Minh')->format('Y-m-d'),
                 'CMND' => $faker->numerify('#########'),
-                'address' => $faker->city('vi_VN'),
+                'address' => $faker->city(),
                 'phone' => $faker->regexify('0(3|5|7|8|9){1}([0-9]{8})'),
                 'image' => $faker->imageUrl(),
                 'status' => $faker->boolean(100),
