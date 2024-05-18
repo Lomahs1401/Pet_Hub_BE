@@ -37,7 +37,7 @@ class RatingProductSeeder extends Seeder
             // 12% xác suất cho rating 3 sao
             // 6% xác suất cho rating 2 sao
             // 12% xác suất cho rating 1 sao
-            $rating = $faker->randomElement([5, 4, 4, 3, 3, 2, 1, 1]);
+            $rating = $faker->randomElement([5.0, 4.0, 4.0, 3.0, 3.0, 2.0, 1.0, 1.0]);
 
             for ($i = 0; $i < $num_ratings_for_product; $i++) {
                 // Random một khách hàng chưa được chọn trước đó

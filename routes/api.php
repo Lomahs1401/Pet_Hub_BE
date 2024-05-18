@@ -57,7 +57,17 @@ Route::group([
     Route::get('/products/shop/{shop_id}/category/{category_id}', [ProductController::class, 'getListProductWithShopAndCategory']); // lấy ds các product được bán bởi shop và thuộc category_id
     Route::get('/products/shop/{shop_id}/category/{category_id}/total', [ProductController::class, 'getNumberOfProductWithShopAndCategory']); // lấy số lượng product được bán bởi shop và thuộc category_id
     Route::get('/products/sort/{order}', [ProductController::class, 'sortProductsByPrice']);
-    Route::get('/products/paginate', [ProductController::class, 'paging']);
+    // --------------     PAGINATION     --------------
+    Route::get('/products/paginate', [ProductController::class, 'paging']); // lấy ds product có phân trang (query param: page_number, num_of_page, target)
+    Route::get('/products/best-selling', [ProductController::class, 'getBestSellingProduct']); // lấy ds product bán chạy (ko ràng buộc bởi shop và category)
+    Route::get('/products/best-selling/shop/{shop_id}', [ProductController::class, 'getBestSellingProductByShop']); // lấy ds product bán chạy bởi shop
+    Route::get('/products/best-selling/category/{category_id}', [ProductController::class, 'getBestSellingProductByCategory']); // lấy ds product bán chạy thuộc category
+    Route::get('/products/best-selling/shop/{shop_id}/category/{category_id}', [ProductController::class, 'getBestSellingProductWithShopAndCategory']); // lấy ds product bán chạy bởi shop và thuộc category
+    Route::get('/products/highest-rating', [ProductController::class, 'getHighestRatingProduct']); // lấy ds product được đánh giá cao nhất (ko ràng buộc bởi shop và category)
+    Route::get('/products/highest-rating/shop/{shop_id}', [ProductController::class, 'getHighestRatingProductByShop']); // lấy ds product có điểm đánh giá cao nhất thuộc shop
+    Route::get('/products/highest-rating/category/{category_id}', [ProductController::class, 'getHighestRatingProductByCategory']); // lấy ds product có điểm đánh giá cao nhất thuộc category
+    Route::get('/products/highest-rating/shop/{shop_id}/category/{category_id}', [ProductController::class, 'getHighestRatingProductByCategory']); // lấy ds product có điểm đánh giá cao nhất thuộc shop và category
+    // ------------------------------------------------
     Route::get('/products/{id}', [ProductController::class, 'show']); // lấy chi tiết product by id
     Route::post('/products', [ProductController::class, 'store']);
     Route::put('/products/{id}', [ProductController::class, 'update']);
@@ -69,7 +79,6 @@ Route::group([
     Route::post('/blog-categories', [BlogController::class, 'store']);
     Route::put('/blog-categories/{id}', [BlogController::class, 'update']);
     Route::delete('/blog-categories/{id}', [BlogController::class, 'destroy']);
-
 
 });
 
