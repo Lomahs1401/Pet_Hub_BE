@@ -29,16 +29,25 @@ class Product extends Model
         'quantity',
         'sold_quantity',
         'status',
-        'product_category_id', 
-        'shop_id',  
+        'product_category_id',
+        'shop_id',
     ];
 
-    public function shop() {
+    public function shop()
+    {
         return $this->belongsTo(Shop::class, 'shop_id');
     }
 
-    public function category() {
+    public function category()
+    {
         return $this->belongsTo(ProductCategory::class, 'product_category_id');
+    }
+
+    public function printAverageRating()
+    {
+        // Sử dụng Eloquent ORM
+        $averageRatingEloquent = RatingProduct::avg('rating');
+        echo "Average Rating (Eloquent ORM): " . $averageRatingEloquent . PHP_EOL;
     }
 
     public function calculateProductRating()
@@ -61,7 +70,7 @@ class Product extends Model
         $averageRating = $totalRating / $count;
 
         // Làm tròn điểm trung bình đến một chữ số thập phân
-        $averageRating = round($averageRating, 1);
+        $averageRating = round($averageRating, 2);
 
         return $averageRating;
     }
