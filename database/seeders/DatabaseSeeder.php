@@ -21,10 +21,8 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $this->call(RoleSeeder::class);
-        $this->call(AccountSeeder::class);
-        $this->call(PermissionSeeder::class);
-        $this->call(RoleHasPermissionSeeder::class);
         $this->call(RankingSeeder::class);
+        $this->call(AccountSeeder::class);
         $this->call(BreedSeeder::class);
         $this->call(BlogCategorySeeder::class);
         $this->call(BlogSeeder::class);
@@ -32,12 +30,13 @@ class DatabaseSeeder extends Seeder
         $this->call(InteractSeeder::class);
         $this->call(ShopSeeder::class);
         $this->call(MedicalCenterSeeder::class);
+        $this->call(AppointmentSeeder::class);
+        $this->call(AidCenterSeeder::class);
         $this->call(PetSeeder::class);
         $this->call(ProductCategorySeeder::class);
         $this->call(ProductSeeder::class);
         $this->call(ServiceCategorySeeder::class);
         $this->call(ServiceSeeder::class);
-        $this->call(RatingPetSeeder::class);
         $this->call(RatingProductSeeder::class);
         $this->call(RatingServiceSeeder::class);
     }

@@ -21,15 +21,15 @@ class CommentSeeder extends Seeder
 
         $blogs = Blog::all();
 
-        $customer_accounts = Account::whereHas('roles', function ($query) {
-            $query->where('role_type', 'Customer');
+        $customer_accounts = Account::whereHas('role', function ($query) {
+            $query->where('role_name', 'ROLE_CUSTOMER');
         })->get();
 
         foreach ($blogs as $blog) {
             // Tạo số lượng comment ngẫu nhiên cho mỗi blog
-            $numberOfComments = $faker->numberBetween(2, 5);
+            $number_of_comments = $faker->numberBetween(2, 5);
 
-            for ($i = 0; $i < $numberOfComments; $i++) {
+            for ($i = 0; $i < $number_of_comments; $i++) {
                 $author = $faker->randomElement($customer_accounts);
 
                 Comment::factory()->create([

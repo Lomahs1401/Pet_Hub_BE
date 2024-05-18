@@ -18,8 +18,8 @@ class InteractSeeder extends Seeder
     public function __construct()
     {
         // Lấy danh sách các tài khoản customer hiện có trong cơ sở dữ liệu
-        $this->customer_accounts = Account::whereHas('roles', function ($query) {
-            $query->where('role_type', 'Customer');
+        $this->customer_accounts = Account::whereHas('role', function ($query) {
+            $query->where('role_name', 'ROLE_CUSTOMER');
         })->get();
     }
 

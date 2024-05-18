@@ -30,6 +30,7 @@ class Account extends Authenticatable implements JWTSubject
         'password', 
         'avatar', 
         'enabled',
+        'role_id',
         'reset_code',
         'reset_code_expired_at',
         'reset_code_attempts'
@@ -69,8 +70,27 @@ class Account extends Authenticatable implements JWTSubject
         return [];
     }
 
-    public function roles()
-    {
-        return $this->belongsToMany(Role::class, 'account_has_roles', 'account_id', 'role_id');
+    public function customer() {
+        return $this->hasOne(Customer::class, 'account_id');
+    }
+
+    public function admin() {
+        return $this->hasOne(Admin::class, 'account_id');
+    }
+
+    public function shop() {
+        return $this->hasOne(Shop::class, 'account_id');
+    }
+
+    public function medicalCenter() {
+        return $this->hasOne(MedicalCenter::class, 'account_id');
+    }
+
+    public function aidCenter() {
+        return $this->hasOne(AidCenter::class, 'account_id');
+    }
+
+    public function role() {
+        return $this->belongsTo(Role::class, 'role_id');
     }
 }

@@ -20,10 +20,9 @@ class RatingServiceSeeder extends Seeder
     {
         $faker = Faker::create();
 
-        $customer_role_ids = Role::where('role_type', 'Customer')->pluck('id')->toArray();
-        $customer_account_ids = Account::whereHas('roles', function ($query) use ($customer_role_ids) {
-            $query->whereIn('roles.id', $customer_role_ids);
-        })->pluck('accounts.id')->toArray();
+        $customer_account_ids = Account::whereHas('role', function ($query) {
+            $query->where('role_name', 'ROLE_CUSTOMER');
+        })->pluck('id')->toArray();
 
         $service_ids = Service::pluck('id')->toArray();
 
