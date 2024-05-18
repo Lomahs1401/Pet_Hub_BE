@@ -2,9 +2,12 @@
 
 namespace Database\Seeders;
 
+use App\Models\Account;
+use App\Models\Role;
 use App\Models\Shop;
 use Illuminate\Database\Seeder;
 use Faker\Factory as Faker;
+use Illuminate\Support\Facades\Hash;
 
 class ShopSeeder extends Seeder
 {
@@ -16,6 +19,8 @@ class ShopSeeder extends Seeder
     public function run()
     {
         $faker = Faker::create();
+
+        $role_shop = Role::where('role_name', 'ROLE_SHOP')->first()->id;
 
         $shops = [
             ['name' => 'Pet Mart Đà Nẵng', 'address' => '151 Nguyễn Văn Linh'],
@@ -40,9 +45,20 @@ class ShopSeeder extends Seeder
             $end_time = $faker->randomElement($end_time_options);
             $work_time = $start_time . ' : ' . $end_time;
 
+            $shop_account = Account::factory()->create([
+                'username' => $faker->userName(),
+                'email' => $faker->companyEmail(),
+                'password' => Hash::make('shop123'),
+                'avatar' => 'gs://petshop-3d4ae.appspot.com/avatars/shop/' . ($i+1) . '/',
+                'enabled' => $faker->boolean(100),
+                'role_id' => $role_shop,
+                'reset_code' => null,
+                'reset_code_expires_at' => null,
+                'reset_code_attempts' => null
+            ]);
+
             Shop::factory()->create([
                 'name' => $shop['name'],
-                'email' => $faker->companyEmail(),
                 'description' => $faker->paragraph(5),
                 'image' => 'gs://petshop-3d4ae.appspot.com/shops/' . ($i+1) . '/',
                 'phone' => $faker->phoneNumber(),
@@ -51,6 +67,7 @@ class ShopSeeder extends Seeder
                 'fanpage' => $faker->url(),
                 'work_time' => $work_time,
                 'establish_year' => $faker->year(),
+                'account_id' => $shop_account->id,
             ]);
         }
     }

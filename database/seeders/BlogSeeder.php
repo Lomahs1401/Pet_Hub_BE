@@ -21,10 +21,10 @@ class BlogSeeder extends Seeder
     {
         $faker = Faker::create();
 
-        $customer_role_ids = Role::where('role_type', 'Customer')->pluck('id')->toArray();
-        $customer_account_ids = Account::whereHas('roles', function ($query) use ($customer_role_ids) {
-            $query->whereIn('roles.id', $customer_role_ids);
-        })->pluck('accounts.id')->toArray();
+        $role_customer = Role::where('role_name', 'ROLE_CUSTOMER')->first()->id;
+        $role_shop = Role::where('role_name', 'ROLE_SHOP')->first()->id;
+        $role_medical_center = Role::where('role_name', 'ROLE_MEDICAL_CENTER')->first()->id;
+        $role_aid_center = Role::where('role_name', 'ROLE_AID_CENTER')->first()->id;
 
         $blog_category_model = new BlogCategory();
         $blog_category_ids = $blog_category_model->pluck('id')->toArray();
@@ -34,7 +34,7 @@ class BlogSeeder extends Seeder
                 'title' => $faker->sentence(10),
                 'text' => $faker->paragraph(16),
                 'image' => 'gs://petshop-3d4ae.appspot.com/blogs/blog_' . ($i+1) . '.jpg',
-                'account_id' => $faker->randomElement($customer_account_ids),
+                'account_id' => $faker->randomElement([$role_customer, $role_shop, $role_medical_center, $role_aid_center]),
                 'category_id' => $faker->randomElement($blog_category_ids),
             ]);
         }

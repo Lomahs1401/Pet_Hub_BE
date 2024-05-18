@@ -23,10 +23,9 @@ class Appointment extends Model
      */
     protected $fillable = [
         'start_time',
-        'end_time',
         'message',
         'address',
         'customer_id',
-        'staff_id',
+        'medical_center_id',
     ];
 }

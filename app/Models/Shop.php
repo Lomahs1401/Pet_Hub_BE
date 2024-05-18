@@ -32,5 +32,6 @@ class Shop extends Model
         'fanpage',
         'work_time',
         'establish_year',
+        'account_id',
     ];
 }

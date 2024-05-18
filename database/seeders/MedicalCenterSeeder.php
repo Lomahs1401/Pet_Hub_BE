@@ -2,9 +2,12 @@
 
 namespace Database\Seeders;
 
+use App\Models\Account;
 use App\Models\MedicalCenter;
+use App\Models\Role;
 use Illuminate\Database\Seeder;
 use Faker\Factory as Faker;
+use Illuminate\Support\Facades\Hash;
 
 class MedicalCenterSeeder extends Seeder
 {
@@ -16,6 +19,7 @@ class MedicalCenterSeeder extends Seeder
     public function run()
     {
         $faker = Faker::create();
+        $role_medical_center = Role::where('role_name', 'ROLE_MEDICAL_CENTER')->first()->id;
 
         $medical_centers = [
             ['name' => 'Phòng Khám Thú Y Titi Pet', 'address' => '330 Nguyễn Đình Tựu'],
@@ -38,9 +42,20 @@ class MedicalCenterSeeder extends Seeder
             $end_time = $faker->randomElement($end_time_options);
             $work_time = $start_time . ' : ' . $end_time;
 
+            $medical_center_account = Account::factory()->create([
+                'username' => $faker->userName(),
+                'email' => $faker->companyEmail(),
+                'password' => Hash::make('medicalcenter123'),
+                'avatar' => 'gs://petshop-3d4ae.appspot.com/avatars/medical_center/' . ($i+1) . '/',
+                'enabled' => $faker->boolean(100),
+                'role_id' => $role_medical_center,
+                'reset_code' => null,
+                'reset_code_expires_at' => null,
+                'reset_code_attempts' => null
+            ]);
+
             MedicalCenter::factory()->create([
                 'name' => $medical_center['name'],
-                'email' => $faker->companyEmail(),
                 'description' => $faker->paragraph(5),
                 'image' => 'gs://petshop-3d4ae.appspot.com/medical_centers/' . ($i+1) . '/',
                 'phone' => $faker->phoneNumber(),
@@ -49,6 +64,7 @@ class MedicalCenterSeeder extends Seeder
                 'fanpage' => $faker->url(),
                 'work_time' => $work_time,
                 'establish_year' => $faker->year(),
+                'account_id' => $medical_center_account->id,
             ]);
         }
     }
