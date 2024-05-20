@@ -23,6 +23,7 @@ class CreateServicesTable extends Migration
             $table->foreignId('service_category_id')->constrained('service_categories');
             $table->foreignId('medical_center_id')->constrained('medical_centers');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

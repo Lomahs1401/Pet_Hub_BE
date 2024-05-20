@@ -15,7 +15,7 @@ class CreateRatingProductsTable extends Migration
     {
         Schema::create('rating_products', function (Blueprint $table) {
             $table->id();
-            $table->float('rating');
+            $table->integer('rating');
             $table->text('description');
             $table->foreignId('customer_id')->constrained('customers');
             $table->foreignId('product_id')->constrained('products');

@@ -33,4 +33,8 @@ class MedicalCenter extends Model
         'establish_year',
         'account_id',
     ];
+
+    public function account() {
+        return $this->belongsTo(Account::class);
+    }
 }

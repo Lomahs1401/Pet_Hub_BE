@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     /**
      * The table associated with the model.
@@ -43,13 +44,6 @@ class Product extends Model
         return $this->belongsTo(ProductCategory::class, 'product_category_id');
     }
 
-    public function printAverageRating()
-    {
-        // Sử dụng Eloquent ORM
-        $averageRatingEloquent = RatingProduct::avg('rating');
-        echo "Average Rating (Eloquent ORM): " . $averageRatingEloquent . PHP_EOL;
-    }
-
     public function calculateProductRating()
     {
         // Lấy tất cả các đánh giá của sản phẩm
@@ -72,7 +66,7 @@ class Product extends Model
         // Làm tròn điểm trung bình đến một chữ số thập phân
         $averageRating = round($averageRating, 2);
 
-        return $averageRating;
+        return number_format($averageRating, 2, '.', '');
     }
 
     // Mối quan hệ một-nhiều với RatingProduct

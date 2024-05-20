@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
         $query = Product::query();
 
@@ -131,7 +131,7 @@ class ProductController extends Controller
             ], 404);
         }
 
-        $number_of_products = Product::where('shop_id', $shop_id)
+        $products = Product::where('shop_id', $shop_id)
             ->where('product_category_id', $product_category_id)
             ->with('shop', 'category')
             ->get();
@@ -139,7 +139,7 @@ class ProductController extends Controller
         return response()->json([
             'message' => 'Query successfully!',
             'status' => 200,
-            'data' => $number_of_products,
+            'data' => $products,
         ], 200);
     }
 
@@ -174,6 +174,14 @@ class ProductController extends Controller
 
     public function getNumberOfShopSellingByCategory($product_category_id)
     {
+        $category = ProductCategory::find($product_category_id);
+        if (!$category) {
+            return response()->json([
+                'message' => 'Product Category not found!',
+                'status' => 404
+            ], 404);
+        }
+
         $shops = Product::whereHas('category', function ($query) use ($product_category_id) {
             $query->where('id', $product_category_id);
         })
@@ -260,7 +268,7 @@ class ProductController extends Controller
                 'shop' => [
                     'id' => $product->shop->id,
                     'name' => $product->shop->name,
-                    'email' => $product->shop->email,
+                    'email' => $product->shop->account->email,
                     'description' => $product->shop->description,
                     'image' => $product->shop->image,
                     'phone' => $product->shop->phone,
@@ -367,7 +375,7 @@ class ProductController extends Controller
                 'shop' => [
                     'id' => $product->shop->id,
                     'name' => $product->shop->name,
-                    'email' => $product->shop->email,
+                    'email' => $product->shop->account->email,
                     'description' => $product->shop->description,
                     'image' => $product->shop->image,
                     'phone' => $product->shop->phone,
@@ -482,7 +490,7 @@ class ProductController extends Controller
                 'shop' => [
                     'id' => $product->shop->id,
                     'name' => $product->shop->name,
-                    'email' => $product->shop->email,
+                    'email' => $product->shop->account->email,
                     'description' => $product->shop->description,
                     'image' => $product->shop->image,
                     'phone' => $product->shop->phone,
@@ -531,7 +539,7 @@ class ProductController extends Controller
 
         // Lấy số lượng sản phẩm
         $total_products_query = Product::query()->where('product_category_id', $product_category_id);
-        
+
         // Tính tổng số trang
         $total_products = $total_products_query->count();
         $total_pages = ceil($total_products / $num_of_page);
@@ -564,7 +572,7 @@ class ProductController extends Controller
                 'shop' => [
                     'id' => $product->shop->id,
                     'name' => $product->shop->name,
-                    'email' => $product->shop->email,
+                    'email' => $product->shop->account->email,
                     'description' => $product->shop->description,
                     'image' => $product->shop->image,
                     'phone' => $product->shop->phone,
@@ -655,7 +663,7 @@ class ProductController extends Controller
                 'shop' => [
                     'id' => $product->shop->id,
                     'name' => $product->shop->name,
-                    'email' => $product->shop->email,
+                    'email' => $product->shop->account->email,
                     'description' => $product->shop->description,
                     'image' => $product->shop->image,
                     'phone' => $product->shop->phone,
@@ -691,105 +699,401 @@ class ProductController extends Controller
     }
 
     public function getHighestRatingProduct(Request $request)
-{
-    $categories = [];
+    {
+        $categories = [];
 
-    $page_number = intval($request->query('page_number', 1));
-    $num_of_page = intval($request->query('num_of_page', 10));
-    $target = $request->query('target') ?? 'all';
+        $page_number = intval($request->query('page_number', 1));
+        $num_of_page = intval($request->query('num_of_page', 10));
+        $target = $request->query('target') ?? 'all';
 
-    if ($target === 'all') {
-        $categories = DB::table('product_categories')
-            ->pluck('id')
-            ->toArray();
-    } else {
-        if ($target === 'dog' || $target === 'cat') {
+        if ($target === 'all') {
             $categories = DB::table('product_categories')
-                ->where('target', $target)
                 ->pluck('id')
                 ->toArray();
+        } else {
+            if ($target === 'dog' || $target === 'cat') {
+                $categories = DB::table('product_categories')
+                    ->where('target', $target)
+                    ->pluck('id')
+                    ->toArray();
 
-            if (empty($categories)) {
-                return response()->json([
-                    'message' => 'Query successfully!',
-                    'status' => 200,
-                    'data' => []
-                ]);
+                if (empty($categories)) {
+                    return response()->json([
+                        'message' => 'Query successfully!',
+                        'status' => 200,
+                        'data' => []
+                    ]);
+                }
             }
         }
+
+        $total_products_query = Product::query();
+
+        if (!empty($categories)) {
+            $total_products_query->whereIn('product_category_id', $categories);
+        }
+
+        $total_products = $total_products_query->count();
+        $total_pages = ceil($total_products / $num_of_page);
+        $offset = ($page_number - 1) * $num_of_page;
+
+        $averageRatings = DB::table('rating_products')
+            ->select('product_id', DB::raw('AVG(rating) as average_rating'))
+            ->groupBy('product_id');
+
+        $products = $total_products_query->with(['shop', 'category'])
+            ->leftJoinSub($averageRatings, 'average_ratings', function ($join) {
+                $join->on('products.id', '=', 'average_ratings.product_id');
+            })
+            ->select('products.*', 'average_ratings.average_rating')
+            ->whereIn('product_category_id', $categories)
+            ->orderBy('average_rating', 'desc')
+            ->offset($offset)
+            ->limit($num_of_page)
+            ->get();
+
+        $formatted_products = [];
+        foreach ($products as $product) {
+            $formatted_products[] = [
+                'id' => $product->id,
+                'name' => $product->name,
+                'description' => $product->description,
+                'price' => $product->price,
+                'image' => $product->image,
+                'quantity' => $product->quantity,
+                'sold_quantity' => $product->sold_quantity,
+                'status' => $product->status,
+                'product_category_id' => $product->product_category_id,
+                'rating' => number_format($product->average_rating, 2),
+                'created_at' => $product->created_at,
+                'updated_at' => $product->updated_at,
+                'shop' => [
+                    'id' => $product->shop->id,
+                    'name' => $product->shop->name,
+                    'email' => $product->shop->account->email,
+                    'description' => $product->shop->description,
+                    'image' => $product->shop->image,
+                    'phone' => $product->shop->phone,
+                    'address' => $product->shop->address,
+                    'website' => $product->shop->website,
+                    'fanpage' => $product->shop->fanpage,
+                    'work_time' => $product->shop->work_time,
+                    'establish_year' => $product->shop->establish_year,
+                    'created_at' => $product->shop->created_at,
+                    'updated_at' => $product->shop->updated_at,
+                ],
+                'category' => [
+                    'id' => $product->category->id,
+                    'name' => $product->category->name,
+                    'target' => $product->category->target,
+                    'type' => $product->category->type,
+                    'created_at' => $product->category->created_at,
+                    'updated_at' => $product->category->updated_at,
+                ],
+            ];
+        }
+
+        return response()->json([
+            'message' => 'Query successfully!',
+            'status' => 200,
+            'page_number' => $page_number,
+            'num_of_page' => $num_of_page,
+            'total_pages' => $total_pages,
+            'total_products' => $total_products,
+            'data' => $formatted_products,
+        ]);
     }
 
-    $total_products_query = Product::query();
+    public function getHighestRatingProductByShop(Request $request, $shop_id)
+    {
+        // Kiểm tra sự tồn tại của shop
+        if (!Shop::find($shop_id)) {
+            return response()->json([
+                'message' => 'Shop not found!',
+                'status' => 404
+            ], 404);
+        }
 
-    if (!empty($categories)) {
-        $total_products_query->whereIn('product_category_id', $categories);
+        $categories = [];
+
+        $page_number = intval($request->query('page_number', 1));
+        $num_of_page = intval($request->query('num_of_page', 10));
+        $target = $request->query('target') ?? 'all';
+
+        if ($target === 'all') {
+            $categories = DB::table('product_categories')
+                ->pluck('id')
+                ->toArray();
+        } else {
+            if ($target === 'dog' || $target === 'cat') {
+                $categories = DB::table('product_categories')
+                    ->where('target', $target)
+                    ->pluck('id')
+                    ->toArray();
+
+                if (empty($categories)) {
+                    return response()->json([
+                        'message' => 'Query successfully!',
+                        'status' => 200,
+                        'data' => []
+                    ]);
+                }
+            }
+        }
+
+        $total_products_query = Product::query()->where('shop_id', $shop_id);
+
+        if (!empty($categories)) {
+            $total_products_query->whereIn('product_category_id', $categories);
+        }
+
+        $total_products = $total_products_query->count();
+        $total_pages = ceil($total_products / $num_of_page);
+        $offset = ($page_number - 1) * $num_of_page;
+
+        $averageRatings = DB::table('rating_products')
+            ->select('product_id', DB::raw('AVG(rating) as average_rating'))
+            ->groupBy('product_id');
+
+        $products = $total_products_query->with(['shop', 'category'])
+            ->leftJoinSub($averageRatings, 'average_ratings', function ($join) {
+                $join->on('products.id', '=', 'average_ratings.product_id');
+            })
+            ->select('products.*', 'average_ratings.average_rating')
+            ->whereIn('product_category_id', $categories)
+            ->orderBy('average_rating', 'desc')
+            ->offset($offset)
+            ->limit($num_of_page)
+            ->get();
+
+        $formatted_products = [];
+        foreach ($products as $product) {
+            $formatted_products[] = [
+                'id' => $product->id,
+                'name' => $product->name,
+                'description' => $product->description,
+                'price' => $product->price,
+                'image' => $product->image,
+                'quantity' => $product->quantity,
+                'sold_quantity' => $product->sold_quantity,
+                'status' => $product->status,
+                'product_category_id' => $product->product_category_id,
+                'rating' => number_format($product->average_rating, 2),
+                'created_at' => $product->created_at,
+                'updated_at' => $product->updated_at,
+                'shop' => [
+                    'id' => $product->shop->id,
+                    'name' => $product->shop->name,
+                    'email' => $product->shop->account->email,
+                    'description' => $product->shop->description,
+                    'image' => $product->shop->image,
+                    'phone' => $product->shop->phone,
+                    'address' => $product->shop->address,
+                    'website' => $product->shop->website,
+                    'fanpage' => $product->shop->fanpage,
+                    'work_time' => $product->shop->work_time,
+                    'establish_year' => $product->shop->establish_year,
+                    'created_at' => $product->shop->created_at,
+                    'updated_at' => $product->shop->updated_at,
+                ],
+                'category' => [
+                    'id' => $product->category->id,
+                    'name' => $product->category->name,
+                    'target' => $product->category->target,
+                    'type' => $product->category->type,
+                    'created_at' => $product->category->created_at,
+                    'updated_at' => $product->category->updated_at,
+                ],
+            ];
+        }
+
+        return response()->json([
+            'message' => 'Query successfully!',
+            'status' => 200,
+            'page_number' => $page_number,
+            'num_of_page' => $num_of_page,
+            'total_pages' => $total_pages,
+            'total_products' => $total_products,
+            'data' => $formatted_products,
+        ]);
     }
 
-    $total_products = $total_products_query->count();
-    $total_pages = ceil($total_products / $num_of_page);
-    $offset = ($page_number - 1) * $num_of_page;
+    public function getHighestRatingProductByCategory(Request $request, $product_category_id)
+    {
+        if (!ProductCategory::find($product_category_id)) {
+            return response()->json([
+                'message' => 'Product category not found!',
+                'status' => 404
+            ], 404);
+        }
 
-    $products = $total_products_query->with(['shop', 'category'])
-        ->leftJoin('rating_products', 'products.id', '=', 'rating_products.product_id')
-        ->select('products.*', DB::raw('AVG(rating_products.rating) as average_rating'))
-        ->groupBy('products.id', 'products.name', 'products.description', 'products.price', 'products.image', 'products.quantity', 'products.sold_quantity', 'products.status', 'products.product_category_id', 'products.shop_id', 'products.created_at', 'products.updated_at')
-        ->orderBy('average_rating', 'desc')
-        ->offset($offset)
-        ->limit($num_of_page)
-        ->get();
+        $page_number = intval($request->query('page_number', 1));
+        $num_of_page = intval($request->query('num_of_page', 10));
 
-    $formatted_products = [];
-    foreach ($products as $product) {
-        $formatted_products[] = [
-            'id' => $product->id,
-            'name' => $product->name,
-            'description' => $product->description,
-            'price' => $product->price,
-            'image' => $product->image,
-            'quantity' => $product->quantity,
-            'sold_quantity' => $product->sold_quantity,
-            'status' => $product->status,
-            'product_category_id' => $product->product_category_id,
-            'rating' => $product->printAverageRating(),
-            'created_at' => $product->created_at,
-            'updated_at' => $product->updated_at,
-            'shop' => [
-                'id' => $product->shop->id,
-                'name' => $product->shop->name,
-                'email' => $product->shop->email,
-                'description' => $product->shop->description,
-                'image' => $product->shop->image,
-                'phone' => $product->shop->phone,
-                'address' => $product->shop->address,
-                'website' => $product->shop->website,
-                'fanpage' => $product->shop->fanpage,
-                'work_time' => $product->shop->work_time,
-                'establish_year' => $product->shop->establish_year,
-                'created_at' => $product->shop->created_at,
-                'updated_at' => $product->shop->updated_at,
-            ],
-            'category' => [
-                'id' => $product->category->id,
-                'name' => $product->category->name,
-                'target' => $product->category->target,
-                'type' => $product->category->type,
-                'created_at' => $product->category->created_at,
-                'updated_at' => $product->category->updated_at,
-            ],
-        ];
+        $total_products_query = Product::query()->where('product_category_id', $product_category_id);
+
+        $total_products = $total_products_query->count();
+        $total_pages = ceil($total_products / $num_of_page);
+        $offset = ($page_number - 1) * $num_of_page;
+
+        $averageRatings = DB::table('rating_products')
+            ->select('product_id', DB::raw('AVG(rating) as average_rating'))
+            ->groupBy('product_id');
+
+        $products = $total_products_query->with(['shop', 'category'])
+            ->leftJoinSub($averageRatings, 'average_ratings', function ($join) {
+                $join->on('products.id', '=', 'average_ratings.product_id');
+            })
+            ->select('products.*', 'average_ratings.average_rating')
+            ->orderBy('average_rating', 'desc')
+            ->offset($offset)
+            ->limit($num_of_page)
+            ->get();
+
+        $formatted_products = [];
+        foreach ($products as $product) {
+            $formatted_products[] = [
+                'id' => $product->id,
+                'name' => $product->name,
+                'description' => $product->description,
+                'price' => $product->price,
+                'image' => $product->image,
+                'quantity' => $product->quantity,
+                'sold_quantity' => $product->sold_quantity,
+                'status' => $product->status,
+                'product_category_id' => $product->product_category_id,
+                'rating' => number_format($product->average_rating, 2),
+                'created_at' => $product->created_at,
+                'updated_at' => $product->updated_at,
+                'shop' => [
+                    'id' => $product->shop->id,
+                    'name' => $product->shop->name,
+                    'email' => $product->shop->account->email,
+                    'description' => $product->shop->description,
+                    'image' => $product->shop->image,
+                    'phone' => $product->shop->phone,
+                    'address' => $product->shop->address,
+                    'website' => $product->shop->website,
+                    'fanpage' => $product->shop->fanpage,
+                    'work_time' => $product->shop->work_time,
+                    'establish_year' => $product->shop->establish_year,
+                    'created_at' => $product->shop->created_at,
+                    'updated_at' => $product->shop->updated_at,
+                ],
+                'category' => [
+                    'id' => $product->category->id,
+                    'name' => $product->category->name,
+                    'target' => $product->category->target,
+                    'type' => $product->category->type,
+                    'created_at' => $product->category->created_at,
+                    'updated_at' => $product->category->updated_at,
+                ],
+            ];
+        }
+
+        return response()->json([
+            'message' => 'Query successfully!',
+            'status' => 200,
+            'page_number' => $page_number,
+            'num_of_page' => $num_of_page,
+            'total_pages' => $total_pages,
+            'total_products' => $total_products,
+            'data' => $formatted_products,
+        ]);
     }
 
-    return response()->json([
-        'message' => 'Query successfully!',
-        'status' => 200,
-        'page_number' => $page_number,
-        'num_of_page' => $num_of_page,
-        'total_pages' => $total_pages,
-        'total_products' => $total_products,
-        'data' => $formatted_products,
-    ]);
-}
+    public function getHighestRatingProductWithShopAndCategory(Request $request, $shop_id, $product_category_id)
+    {
+        if (!Shop::find($shop_id)) {
+            return response()->json([
+                'message' => 'Shop not found!',
+                'status' => 404
+            ], 404);
+        }
 
+        if (!ProductCategory::find($product_category_id)) {
+            return response()->json([
+                'message' => 'Product category not found!',
+                'status' => 404
+            ], 404);
+        }
+
+        $page_number = intval($request->query('page_number', 1));
+        $num_of_page = intval($request->query('num_of_page', 10));
+
+        $total_products_query = Product::query()
+            ->where('shop_id', $shop_id)
+            ->where('product_category_id', $product_category_id);
+
+        $total_products = $total_products_query->count();
+        $total_pages = ceil($total_products / $num_of_page);
+        $offset = ($page_number - 1) * $num_of_page;
+
+        $averageRatings = DB::table('rating_products')
+            ->select('product_id', DB::raw('AVG(rating) as average_rating'))
+            ->groupBy('product_id');
+
+        $products = $total_products_query->with(['shop', 'category'])
+            ->leftJoinSub($averageRatings, 'average_ratings', function ($join) {
+                $join->on('products.id', '=', 'average_ratings.product_id');
+            })
+            ->select('products.*', 'average_ratings.average_rating')
+            ->orderBy('average_rating', 'desc')
+            ->offset($offset)
+            ->limit($num_of_page)
+            ->get();
+
+        $formatted_products = [];
+        foreach ($products as $product) {
+            $formatted_products[] = [
+                'id' => $product->id,
+                'name' => $product->name,
+                'description' => $product->description,
+                'price' => $product->price,
+                'image' => $product->image,
+                'quantity' => $product->quantity,
+                'sold_quantity' => $product->sold_quantity,
+                'status' => $product->status,
+                'product_category_id' => $product->product_category_id,
+                'rating' => number_format($product->average_rating, 2),
+                'created_at' => $product->created_at,
+                'updated_at' => $product->updated_at,
+                'shop' => [
+                    'id' => $product->shop->id,
+                    'name' => $product->shop->name,
+                    'email' => $product->shop->account->email,
+                    'description' => $product->shop->description,
+                    'image' => $product->shop->image,
+                    'phone' => $product->shop->phone,
+                    'address' => $product->shop->address,
+                    'website' => $product->shop->website,
+                    'fanpage' => $product->shop->fanpage,
+                    'work_time' => $product->shop->work_time,
+                    'establish_year' => $product->shop->establish_year,
+                    'created_at' => $product->shop->created_at,
+                    'updated_at' => $product->shop->updated_at,
+                ],
+                'category' => [
+                    'id' => $product->category->id,
+                    'name' => $product->category->name,
+                    'target' => $product->category->target,
+                    'type' => $product->category->type,
+                    'created_at' => $product->category->created_at,
+                    'updated_at' => $product->category->updated_at,
+                ],
+            ];
+        }
+
+        return response()->json([
+            'message' => 'Query successfully!',
+            'status' => 200,
+            'page_number' => $page_number,
+            'num_of_page' => $num_of_page,
+            'total_pages' => $total_pages,
+            'total_products' => $total_products,
+            'data' => $formatted_products,
+        ]);
+    }
 
     public function store(Request $request)
     {
@@ -798,8 +1102,11 @@ class ProductController extends Controller
             'description' => 'required|string',
             'price' => 'required|numeric',
             'image' => 'nullable|string|url',
+            'quantity' => 'required|numeric',
+            'sold_quantity' => 0,
             'status' => 'required|boolean',
             'product_category_id' => 'required|exists:product_categories,id',
+            'shop_id' => 'required|exists:shops,id',
         ]);
 
         $product = Product::create($data);
@@ -820,11 +1127,12 @@ class ProductController extends Controller
             'description' => 'string',
             'price' => 'numeric',
             'image' => 'nullable|string|url',
+            'quantity' => 'numeric',
             'status' => 'boolean',
             'product_category_id' => 'exists:product_categories,id',
         ]);
 
-        $product->update($request->all());
+        $product->update($data);
 
         return response()->json([
             'message' => 'Update product successfully!',
@@ -843,9 +1151,39 @@ class ProductController extends Controller
         ], 204);
     }
 
-    public function sortProductsByPrice(Request $request, $order)
-    {
-        $orderDirection = $order === 'desc' ? 'desc' : 'asc';
+    public function restore($id) {
+        $product = Product::onlyTrashed()->findOrFail($id);
+        $product->restore();
+        return response()->json([
+            'message' => 'Restore product successfully!',
+            'status' => 200,
+            'data' => $product,
+        ], 200);
+    }
+
+    public function getDeletedProducts() {
+        $products = Product::onlyTrashed()->get();
+        return response()->json([
+            'message' => 'Fetch deleted products successfully!',
+            'status' => 200,
+            'data' => $products,
+        ], 200);
+    }
+
+    public function sortProductsByPrice(Request $request) {
+        $orderDirection = $request->query('order');
+
+        if ($orderDirection == null) {
+            $orderDirection = 'asc';
+        }
+
+        if (!in_array($orderDirection, ['asc', 'desc'])) {
+            return response()->json([
+                'message' => 'Order direction must be "asc" or "desc".',
+                'status' => 400,
+            ], 400);
+        }
+
         $products = Product::orderBy('price', $orderDirection)->get();
         return response()->json($products);
     }

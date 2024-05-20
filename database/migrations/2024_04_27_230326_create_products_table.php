@@ -25,6 +25,7 @@ class CreateProductsTable extends Migration
             $table->foreignId('shop_id')->constrained('shops');
             $table->foreignId('product_category_id')->constrained('product_categories');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
