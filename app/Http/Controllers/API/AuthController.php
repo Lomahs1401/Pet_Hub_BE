@@ -28,8 +28,6 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
-        $faker = Faker::create();
-
         // validate form
         $validator = Validator::make($request->all(), [
             'username' => 'required',
@@ -54,29 +52,23 @@ class AuthController extends Controller
             return response()->json($response, 400);
         }
 
+        $default_avatar = 'gs://petshop-3d4ae.appspot.com/avatars/customer/png-transparent-default-avatar-thumbnail.png';
+
         // Create new account
         $account = Account::create([
             'username' => $request->username,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'avatar' => $request->avatar,
+            'avatar' => $default_avatar,
+            'role_id' => $request->role_id | '1',
             'enabled' => $request->enabled ?? '1',
         ]);
 
         $bronze_ranking_id = Ranking::where('ranking_name', 'Bronze')->value('id');
-        print($bronze_ranking_id);
         Customer::create([
             'ranking_point' => 0,
             'account_id' => $account->id,
             'ranking_id' => $bronze_ranking_id,
-        ]);
-
-        $role_customer_id = Role::where('role_name', 'Customer')->value('id');
-        print($role_customer_id);
-        AccountHasRole::created([
-            'account_id' => $account->id,
-            'role_id' => $role_customer_id,
-            'licensed' => 1,
         ]);
 
         // Get a JWT
