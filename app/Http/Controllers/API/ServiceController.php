@@ -199,17 +199,76 @@ class ServiceController extends Controller
 
     public function searchService(Request $request)
     {
-        $name = $request->input('name');
+        $name = $request->query('name');
 
-        $query = Service::query();
+        $page_number = intval($request->query('page_number', 1));
+        $num_of_page = intval($request->query('num_of_page', 8));
+
+        $query = Service::with(['medicalCenter.account', 'category']);
 
         if ($name) {
             $query->where('name', 'like', '%' . $name . '%');
         }
         
-        $products = $query->get();
+        $services = $query->paginate($num_of_page, ['*'], 'page', $page_number);
 
-        return response()->json($products);
+        $formatted_services = [];
+        foreach ($services as $service) {
+            $formatted_services[] = [
+                "id" => $service->id,
+                "name" => $service->name,
+                "description" => $service->description,
+                "price" => $service->price,
+                "image" => $service->image,
+                "sold_quantity" => $service->sold_quantity,
+                "rating" => $service->calculateServiceRating(),
+                "medical_center_id" => $service->medical_center_id,
+                "service_category_id" => $service->service_category_id,
+                "created_at" => $service->created_at,
+                "updated_at" => $service->updated_at,
+                "deleted_at" => $service->deleted_at,
+                "medical_center" => [
+                    "id" => $service->medicalCenter->id,
+                    "name" => $service->medicalCenter->name,
+                    "email" => $service->medicalCenter->account->email,
+                    "avatar" => $service->medicalCenter->account->avatar,
+                    "description" => $service->medicalCenter->description,
+                    "image" => $service->medicalCenter->image,
+                    "phone" => $service->medicalCenter->phone,
+                    "address" => $service->medicalCenter->address,
+                    "website" => $service->medicalCenter->website,
+                    "fanpage" => $service->medicalCenter->fanpage,
+                    "work_time" => $service->medicalCenter->work_time,
+                    "establish_year" => $service->medicalCenter->establish_year,
+                    "account_id" => $service->medicalCenter->account->id,
+                    "created_at" => $service->medicalCenter->created_at,
+                    "updated_at" => $service->medicalCenter->updated_at,
+                ],
+                "category" => [
+                    "id" => $service->category->id,
+                    "name" => $service->category->name,
+                    "target" => $service->category->target,
+                    "type" => $service->category->type,
+                    "created_at" => $service->category->created_at,
+                    "updated_at" => $service->category->updated_at,
+                ]
+            ];
+        }
+
+        // Định dạng JSON trả về
+        return response()->json([
+            'message' => 'Search services successfully!',
+            'status' => 200,
+            'pagination' => [
+                'total' => $services->total(),
+                'per_page' => $services->perPage(),
+                'current_page' => $services->currentPage(),
+                'last_page' => $services->lastPage(),
+                'from' => $services->firstItem(),
+                'to' => $services->lastItem(),
+            ],
+            'data' => $formatted_services,
+        ], 200);
     }
 
     public function paging(Request $request)
@@ -277,6 +336,7 @@ class ServiceController extends Controller
                     'id' => $service->medicalCenter->id,
                     'name' => $service->medicalCenter->name,
                     'email' => $service->medicalCenter->account->email,
+                    'avatar' => $service->medicalCenter->account->avatar,
                     'description' => $service->medicalCenter->description,
                     'image' => $service->medicalCenter->image,
                     'phone' => $service->medicalCenter->phone,
@@ -285,6 +345,7 @@ class ServiceController extends Controller
                     'fanpage' => $service->medicalCenter->fanpage,
                     'work_time' => $service->medicalCenter->work_time,
                     'establish_year' => $service->medicalCenter->establish_year,
+                    'account_id' => $service->medicalCenter->account->id,
                     'created_at' => $service->medicalCenter->created_at,
                     'updated_at' => $service->medicalCenter->updated_at,
                 ],
@@ -377,6 +438,7 @@ class ServiceController extends Controller
                     'id' => $service->medicalCenter->id,
                     'name' => $service->medicalCenter->name,
                     'email' => $service->medicalCenter->account->email,
+                    'avatar' => $service->medicalCenter->account->avatar,
                     'description' => $service->medicalCenter->description,
                     'image' => $service->medicalCenter->image,
                     'phone' => $service->medicalCenter->phone,
@@ -385,6 +447,7 @@ class ServiceController extends Controller
                     'fanpage' => $service->medicalCenter->fanpage,
                     'work_time' => $service->medicalCenter->work_time,
                     'establish_year' => $service->medicalCenter->establish_year,
+                    'account_id' => $service->medicalCenter->account->id,
                     'created_at' => $service->medicalCenter->created_at,
                     'updated_at' => $service->medicalCenter->updated_at,
                 ],
@@ -484,6 +547,7 @@ class ServiceController extends Controller
                     'id' => $service->medicalCenter->id,
                     'name' => $service->medicalCenter->name,
                     'email' => $service->medicalCenter->account->email,
+                    'avatar' => $service->medicalCenter->account->avatar,
                     'description' => $service->medicalCenter->description,
                     'image' => $service->medicalCenter->image,
                     'phone' => $service->medicalCenter->phone,
@@ -492,6 +556,7 @@ class ServiceController extends Controller
                     'fanpage' => $service->medicalCenter->fanpage,
                     'work_time' => $service->medicalCenter->work_time,
                     'establish_year' => $service->medicalCenter->establish_year,
+                    'account_id' => $service->medicalCenter->account->id,
                     'created_at' => $service->medicalCenter->created_at,
                     'updated_at' => $service->medicalCenter->updated_at,
                 ],
@@ -560,6 +625,7 @@ class ServiceController extends Controller
                     'id' => $service->medicalCenter->id,
                     'name' => $service->medicalCenter->name,
                     'email' => $service->medicalCenter->account->email,
+                    'avatar' => $service->medicalCenter->account->avatar,
                     'description' => $service->medicalCenter->description,
                     'image' => $service->medicalCenter->image,
                     'phone' => $service->medicalCenter->phone,
@@ -568,6 +634,7 @@ class ServiceController extends Controller
                     'fanpage' => $service->medicalCenter->fanpage,
                     'work_time' => $service->medicalCenter->work_time,
                     'establish_year' => $service->medicalCenter->establish_year,
+                    'account_id' => $service->medicalCenter->account->id,
                     'created_at' => $service->medicalCenter->created_at,
                     'updated_at' => $service->medicalCenter->updated_at,
                 ],
@@ -645,6 +712,7 @@ class ServiceController extends Controller
                     'id' => $service->medicalCenter->id,
                     'name' => $service->medicalCenter->name,
                     'email' => $service->medicalCenter->account->email,
+                    'avatar' => $service->medicalCenter->account->avatar,
                     'description' => $service->medicalCenter->description,
                     'image' => $service->medicalCenter->image,
                     'phone' => $service->medicalCenter->phone,
@@ -653,6 +721,7 @@ class ServiceController extends Controller
                     'fanpage' => $service->medicalCenter->fanpage,
                     'work_time' => $service->medicalCenter->work_time,
                     'establish_year' => $service->medicalCenter->establish_year,
+                    'account_id' => $service->medicalCenter->account->id,
                     'created_at' => $service->medicalCenter->created_at,
                     'updated_at' => $service->medicalCenter->updated_at,
                 ],
@@ -750,6 +819,7 @@ class ServiceController extends Controller
                     'id' => $service->medicalCenter->id,
                     'name' => $service->medicalCenter->name,
                     'email' => $service->medicalCenter->account->email,
+                    'avatar' => $service->medicalCenter->account->avatar,
                     'description' => $service->medicalCenter->description,
                     'image' => $service->medicalCenter->image,
                     'phone' => $service->medicalCenter->phone,
@@ -758,6 +828,7 @@ class ServiceController extends Controller
                     'fanpage' => $service->medicalCenter->fanpage,
                     'work_time' => $service->medicalCenter->work_time,
                     'establish_year' => $service->medicalCenter->establish_year,
+                    'account_id' => $service->medicalCenter->account->id,
                     'created_at' => $service->medicalCenter->created_at,
                     'updated_at' => $service->medicalCenter->updated_at,
                 ],
@@ -863,6 +934,7 @@ class ServiceController extends Controller
                     'id' => $service->medicalCenter->id,
                     'name' => $service->medicalCenter->name,
                     'email' => $service->medicalCenter->account->email,
+                    'avatar' => $service->medicalCenter->account->avatar,
                     'description' => $service->medicalCenter->description,
                     'image' => $service->medicalCenter->image,
                     'phone' => $service->medicalCenter->phone,
@@ -871,6 +943,7 @@ class ServiceController extends Controller
                     'fanpage' => $service->medicalCenter->fanpage,
                     'work_time' => $service->medicalCenter->work_time,
                     'establish_year' => $service->medicalCenter->establish_year,
+                    'account_id' => $service->medicalCenter->account->id,
                     'created_at' => $service->medicalCenter->created_at,
                     'updated_at' => $service->medicalCenter->updated_at,
                 ],
@@ -947,6 +1020,7 @@ class ServiceController extends Controller
                     'id' => $service->medicalCenter->id,
                     'name' => $service->medicalCenter->name,
                     'email' => $service->medicalCenter->account->email,
+                    'avatar' => $service->medicalCenter->account->avatar,
                     'description' => $service->medicalCenter->description,
                     'image' => $service->medicalCenter->image,
                     'phone' => $service->medicalCenter->phone,
@@ -955,6 +1029,7 @@ class ServiceController extends Controller
                     'fanpage' => $service->medicalCenter->fanpage,
                     'work_time' => $service->medicalCenter->work_time,
                     'establish_year' => $service->medicalCenter->establish_year,
+                    'account_id' => $service->medicalCenter->account->id,
                     'created_at' => $service->medicalCenter->created_at,
                     'updated_at' => $service->medicalCenter->updated_at,
                 ],
@@ -1040,6 +1115,7 @@ class ServiceController extends Controller
                     'id' => $service->medicalCenter->id,
                     'name' => $service->medicalCenter->name,
                     'email' => $service->medicalCenter->account->email,
+                    'avatar' => $service->medicalCenter->account->avatar,
                     'description' => $service->medicalCenter->description,
                     'image' => $service->medicalCenter->image,
                     'phone' => $service->medicalCenter->phone,
@@ -1048,6 +1124,7 @@ class ServiceController extends Controller
                     'fanpage' => $service->medicalCenter->fanpage,
                     'work_time' => $service->medicalCenter->work_time,
                     'establish_year' => $service->medicalCenter->establish_year,
+                    'account_id' => $service->medicalCenter->account->account_id,
                     'created_at' => $service->medicalCenter->created_at,
                     'updated_at' => $service->medicalCenter->updated_at,
                 ],
