@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateAccountHasRolesTable extends Migration
+class CreateRolesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,9 @@ class CreateAccountHasRolesTable extends Migration
      */
     public function up()
     {
-        Schema::create('account_has_roles', function (Blueprint $table) {
+        Schema::create('roles', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('account_id')->constrained('accounts');
-            $table->foreignId('role_id')->constrained('roles');
-            $table->boolean('licensed');
+            $table->string('role_name', 50);
             $table->timestamps();
         });
     }
@@ -29,6 +27,6 @@ class CreateAccountHasRolesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('account_has_roles');
+        Schema::dropIfExists('roles');
     }
 }

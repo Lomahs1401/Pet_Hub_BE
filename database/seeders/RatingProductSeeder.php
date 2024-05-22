@@ -20,10 +20,9 @@ class RatingProductSeeder extends Seeder
     {
         $faker = Faker::create();
 
-        $customer_role_ids = Role::where('role_type', 'Customer')->pluck('id')->toArray();
-        $customer_account_ids = Account::whereHas('roles', function ($query) use ($customer_role_ids) {
-            $query->whereIn('roles.id', $customer_role_ids);
-        })->pluck('accounts.id')->toArray();
+        $customer_account_ids = Account::whereHas('role', function ($query) {
+            $query->where('role_name', 'ROLE_CUSTOMER');
+        })->pluck('id')->toArray();
 
         $product_ids = Product::pluck('id')->toArray();
 
@@ -32,14 +31,21 @@ class RatingProductSeeder extends Seeder
 
             $selected_customer_ids = [];
 
-            // 25% xác suất cho rating 5 sao
-            // 45% xác suất cho rating 4 sao
-            // 12% xác suất cho rating 3 sao
-            // 6% xác suất cho rating 2 sao
-            // 12% xác suất cho rating 1 sao
-            $rating = $faker->randomElement([5, 4, 4, 3, 3, 2, 1, 1]);
-
             for ($i = 0; $i < $num_ratings_for_product; $i++) {
+                // 35% xác suất cho rating 5 sao
+                // 45% xác suất cho rating 4 sao
+                // 6% xác suất cho rating 3 sao
+                // 6% xác suất cho rating 2 sao
+                // 8% xác suất cho rating 1 sao
+                $ratings = array_merge(
+                    array_fill(0, 35, 5),
+                    array_fill(0, 45, 4),
+                    array_fill(0, 6, 3),
+                    array_fill(0, 6, 2),
+                    array_fill(0, 8, 1)
+                );
+                $rating = $faker->randomElement($ratings);
+
                 // Random một khách hàng chưa được chọn trước đó
                 do {
                     $random_customer_id = $faker->randomElement($customer_account_ids);

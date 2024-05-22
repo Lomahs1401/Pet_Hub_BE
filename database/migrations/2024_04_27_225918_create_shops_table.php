@@ -16,7 +16,6 @@ class CreateShopsTable extends Migration
         Schema::create('shops', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('email')->unique();
             $table->text('description');
             $table->string('image');
             $table->string('phone');
@@ -25,6 +24,7 @@ class CreateShopsTable extends Migration
             $table->string('fanpage');
             $table->string('work_time');
             $table->string('establish_year');
+            $table->foreignId('account_id')->constrained('accounts');
             $table->timestamps();
         });
     }

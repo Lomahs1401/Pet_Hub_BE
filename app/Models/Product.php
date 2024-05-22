@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     /**
      * The table associated with the model.
@@ -29,15 +30,17 @@ class Product extends Model
         'quantity',
         'sold_quantity',
         'status',
-        'product_category_id', 
-        'shop_id',  
+        'product_category_id',
+        'shop_id',
     ];
 
-    public function shop() {
+    public function shop()
+    {
         return $this->belongsTo(Shop::class, 'shop_id');
     }
 
-    public function category() {
+    public function category()
+    {
         return $this->belongsTo(ProductCategory::class, 'product_category_id');
     }
 
@@ -61,9 +64,9 @@ class Product extends Model
         $averageRating = $totalRating / $count;
 
         // Làm tròn điểm trung bình đến một chữ số thập phân
-        $averageRating = round($averageRating, 1);
+        $averageRating = round($averageRating, 2);
 
-        return $averageRating;
+        return number_format($averageRating, 2, '.', '');
     }
 
     // Mối quan hệ một-nhiều với RatingProduct

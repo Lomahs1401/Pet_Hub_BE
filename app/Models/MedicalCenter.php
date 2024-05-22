@@ -23,7 +23,6 @@ class MedicalCenter extends Model
      */
     protected $fillable = [
         'name',
-        'email',
         'description',
         'image',
         'phone',  
@@ -32,5 +31,10 @@ class MedicalCenter extends Model
         'fanpage',
         'work_time',
         'establish_year',
+        'account_id',
     ];
+
+    public function account() {
+        return $this->belongsTo(Account::class);
+    }
 }

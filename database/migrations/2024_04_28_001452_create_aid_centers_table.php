@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateMedicalCentersTable extends Migration
+class CreateAidCentersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,9 @@ class CreateMedicalCentersTable extends Migration
      */
     public function up()
     {
-        Schema::create('medical_centers', function (Blueprint $table) {
+        Schema::create('aid_centers', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('email')->unique();
             $table->text('description');
             $table->string('image');
             $table->string('phone');
@@ -25,6 +24,7 @@ class CreateMedicalCentersTable extends Migration
             $table->string('fanpage');
             $table->string('work_time');
             $table->string('establish_year');
+            $table->foreignId('account_id')->constrained('accounts');
             $table->timestamps();
         });
     }
@@ -36,6 +36,6 @@ class CreateMedicalCentersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('medical_centers');
+        Schema::dropIfExists('aid_centers');
     }
 }
