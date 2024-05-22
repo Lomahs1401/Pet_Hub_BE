@@ -199,17 +199,78 @@ class ProductController extends Controller
 
     public function searchProduct(Request $request)
     {
-        $name = $request->input('name');
+        $name = $request->query('name');
 
-        $query = Product::query();
+        // Phân trang mặc định
+        $page_number = intval($request->query('page_number', 1));
+        $num_of_page = intval($request->query('num_of_page', 8));
+
+        $query = Product::with(['shop.account', 'category']);
 
         if ($name) {
             $query->where('name', 'like', '%' . $name . '%');
         }
         
-        $products = $query->get();
+        $products = $query->paginate($num_of_page, ['*'], 'page', $page_number);
 
-        return response()->json($products);
+        $formatted_products = [];
+        foreach ($products as $product) {
+            $formatted_products[] = [
+                "id" => $product->id,
+                "name" => $product->name,
+                "description" => $product->description,
+                "price" => $product->price,
+                "image" => $product->image,
+                "quantity" => $product->quantity,
+                "sold_quantity" => $product->sold_quantity,
+                "rating" => $product->calculateProductRating($product->id),
+                "status" => $product->status,
+                "shop_id" => $product->shop_id,
+                "product_category_id" => $product->product_category_id,
+                "created_at" => $product->created_at,
+                "updated_at" => $product->updated_at,
+                "deleted_at" => $product->deleted_at,
+                "shop" => [
+                    "id" => $product->shop->id,
+                    "name" => $product->shop->name,
+                    "email" => $product->shop->account->email,
+                    "avatar" => $product->shop->account->avatar,
+                    "description" => $product->shop->description,
+                    "image" => $product->shop->image,
+                    "phone" => $product->shop->phone,
+                    "address" => $product->shop->address,
+                    "website" => $product->shop->website,
+                    "fanpage" => $product->shop->fanpage,
+                    "work_time" => $product->shop->work_time,
+                    "establish_year" => $product->shop->establish_year,
+                    "account_id" => $product->shop->account->id,
+                    "created_at" => $product->shop->created_at,
+                    "updated_at" => $product->shop->updated_at,
+                ],
+                "category" => [
+                    "id" => $product->category->id,
+                    "name" => $product->category->name,
+                    "target" => $product->category->target,
+                    "type" => $product->category->type,
+                    "created_at" => $product->category->created_at,
+                    "updated_at" => $product->category->updated_at,
+                ]
+            ];
+        }
+
+        return response()->json([
+            'message' => 'Search products successfully!',
+            'status' => 200,
+            'pagination' => [
+                'total' => $products->total(),
+                'per_page' => $products->perPage(),
+                'current_page' => $products->currentPage(),
+                'last_page' => $products->lastPage(),
+                'from' => $products->firstItem(),
+                'to' => $products->lastItem(),
+            ],
+            'data' => $formatted_products,
+        ], 200);
     }
 
     public function paging(Request $request)
@@ -284,6 +345,7 @@ class ProductController extends Controller
                     'id' => $product->shop->id,
                     'name' => $product->shop->name,
                     'email' => $product->shop->account->email,
+                    'avatar' => $product->shop->account->avatar,
                     'description' => $product->shop->description,
                     'image' => $product->shop->image,
                     'phone' => $product->shop->phone,
@@ -292,6 +354,7 @@ class ProductController extends Controller
                     'fanpage' => $product->shop->fanpage,
                     'work_time' => $product->shop->work_time,
                     'establish_year' => $product->shop->establish_year,
+                    'account_id' => $product->shop->account->id,
                     'created_at' => $product->shop->created_at,
                     'updated_at' => $product->shop->updated_at,
                 ],
@@ -391,6 +454,7 @@ class ProductController extends Controller
                     'id' => $product->shop->id,
                     'name' => $product->shop->name,
                     'email' => $product->shop->account->email,
+                    'avatar' => $product->shop->account->avatar,
                     'description' => $product->shop->description,
                     'image' => $product->shop->image,
                     'phone' => $product->shop->phone,
@@ -399,6 +463,7 @@ class ProductController extends Controller
                     'fanpage' => $product->shop->fanpage,
                     'work_time' => $product->shop->work_time,
                     'establish_year' => $product->shop->establish_year,
+                    'account_id' => $product->shop->account->id,
                     'created_at' => $product->shop->created_at,
                     'updated_at' => $product->shop->updated_at,
                 ],
@@ -506,6 +571,7 @@ class ProductController extends Controller
                     'id' => $product->shop->id,
                     'name' => $product->shop->name,
                     'email' => $product->shop->account->email,
+                    'avatar' => $product->shop->account->avatar,
                     'description' => $product->shop->description,
                     'image' => $product->shop->image,
                     'phone' => $product->shop->phone,
@@ -514,6 +580,7 @@ class ProductController extends Controller
                     'fanpage' => $product->shop->fanpage,
                     'work_time' => $product->shop->work_time,
                     'establish_year' => $product->shop->establish_year,
+                    'account_id' => $product->shop->account->id,
                     'created_at' => $product->shop->created_at,
                     'updated_at' => $product->shop->updated_at,
                 ],
@@ -588,6 +655,7 @@ class ProductController extends Controller
                     'id' => $product->shop->id,
                     'name' => $product->shop->name,
                     'email' => $product->shop->account->email,
+                    'avatar' => $product->shop->account->avatar,
                     'description' => $product->shop->description,
                     'image' => $product->shop->image,
                     'phone' => $product->shop->phone,
@@ -596,6 +664,7 @@ class ProductController extends Controller
                     'fanpage' => $product->shop->fanpage,
                     'work_time' => $product->shop->work_time,
                     'establish_year' => $product->shop->establish_year,
+                    'account_id' => $product->shop->account->id,
                     'created_at' => $product->shop->created_at,
                     'updated_at' => $product->shop->updated_at,
                 ],
@@ -679,6 +748,7 @@ class ProductController extends Controller
                     'id' => $product->shop->id,
                     'name' => $product->shop->name,
                     'email' => $product->shop->account->email,
+                    'avatar' => $product->shop->account->avatar,
                     'description' => $product->shop->description,
                     'image' => $product->shop->image,
                     'phone' => $product->shop->phone,
@@ -687,6 +757,7 @@ class ProductController extends Controller
                     'fanpage' => $product->shop->fanpage,
                     'work_time' => $product->shop->work_time,
                     'establish_year' => $product->shop->establish_year,
+                    'account_id' => $product->shop->account->id,
                     'created_at' => $product->shop->created_at,
                     'updated_at' => $product->shop->updated_at,
                 ],
@@ -786,6 +857,7 @@ class ProductController extends Controller
                     'id' => $product->shop->id,
                     'name' => $product->shop->name,
                     'email' => $product->shop->account->email,
+                    'avatar' => $product->shop->account->avatar,
                     'description' => $product->shop->description,
                     'image' => $product->shop->image,
                     'phone' => $product->shop->phone,
@@ -794,6 +866,7 @@ class ProductController extends Controller
                     'fanpage' => $product->shop->fanpage,
                     'work_time' => $product->shop->work_time,
                     'establish_year' => $product->shop->establish_year,
+                    'account_id' => $product->shop->account->id,
                     'created_at' => $product->shop->created_at,
                     'updated_at' => $product->shop->updated_at,
                 ],
@@ -900,6 +973,7 @@ class ProductController extends Controller
                     'id' => $product->shop->id,
                     'name' => $product->shop->name,
                     'email' => $product->shop->account->email,
+                    'avatar' => $product->shop->account->avatar,
                     'description' => $product->shop->description,
                     'image' => $product->shop->image,
                     'phone' => $product->shop->phone,
@@ -908,6 +982,7 @@ class ProductController extends Controller
                     'fanpage' => $product->shop->fanpage,
                     'work_time' => $product->shop->work_time,
                     'establish_year' => $product->shop->establish_year,
+                    'account_id' => $product->shop->account->id,
                     'created_at' => $product->shop->created_at,
                     'updated_at' => $product->shop->updated_at,
                 ],
@@ -984,6 +1059,7 @@ class ProductController extends Controller
                     'id' => $product->shop->id,
                     'name' => $product->shop->name,
                     'email' => $product->shop->account->email,
+                    'avatar' => $product->shop->account->avatar,
                     'description' => $product->shop->description,
                     'image' => $product->shop->image,
                     'phone' => $product->shop->phone,
@@ -992,6 +1068,7 @@ class ProductController extends Controller
                     'fanpage' => $product->shop->fanpage,
                     'work_time' => $product->shop->work_time,
                     'establish_year' => $product->shop->establish_year,
+                    'account_id' => $product->shop->account->id,
                     'created_at' => $product->shop->created_at,
                     'updated_at' => $product->shop->updated_at,
                 ],
@@ -1077,6 +1154,7 @@ class ProductController extends Controller
                     'id' => $product->shop->id,
                     'name' => $product->shop->name,
                     'email' => $product->shop->account->email,
+                    'avatar' => $product->shop->account->avatar,
                     'description' => $product->shop->description,
                     'image' => $product->shop->image,
                     'phone' => $product->shop->phone,
@@ -1085,6 +1163,7 @@ class ProductController extends Controller
                     'fanpage' => $product->shop->fanpage,
                     'work_time' => $product->shop->work_time,
                     'establish_year' => $product->shop->establish_year,
+                    'account_id' => $product->shop->account->id,
                     'created_at' => $product->shop->created_at,
                     'updated_at' => $product->shop->updated_at,
                 ],
