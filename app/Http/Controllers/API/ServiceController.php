@@ -197,6 +197,21 @@ class ServiceController extends Controller
         ], 200);
     }
 
+    public function searchService(Request $request)
+    {
+        $name = $request->input('name');
+
+        $query = Service::query();
+
+        if ($name) {
+            $query->where('name', 'like', '%' . $name . '%');
+        }
+        
+        $products = $query->get();
+
+        return response()->json($products);
+    }
+
     public function paging(Request $request)
     {
         $categories = [];
