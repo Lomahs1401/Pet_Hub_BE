@@ -197,6 +197,21 @@ class ProductController extends Controller
         ], 200);
     }
 
+    public function searchProduct(Request $request)
+    {
+        $name = $request->input('name');
+
+        $query = Product::query();
+
+        if ($name) {
+            $query->where('name', 'like', '%' . $name . '%');
+        }
+        
+        $products = $query->get();
+
+        return response()->json($products);
+    }
+
     public function paging(Request $request)
     {
         $categories = [];

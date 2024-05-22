@@ -58,6 +58,7 @@ Route::group([
     Route::get('/products/shop/{shop_id}/category/{category_id}', [ProductController::class, 'getListProductWithShopAndCategory']); // lấy ds các product được bán bởi shop và thuộc category_id
     Route::get('/products/shop/{shop_id}/category/{category_id}/total', [ProductController::class, 'getNumberOfProductWithShopAndCategory']); // lấy số lượng product được bán bởi shop và thuộc category_id
     Route::get('/products/sort', [ProductController::class, 'sortProductsByPrice']);
+    Route::get('/products/search', [ProductController::class, 'searchProduct']);
     // --------------     PRODUCT PAGINATION     --------------
     Route::get('/products/paginate', [ProductController::class, 'paging']); // lấy ds product có phân trang (query param: page_number, num_of_page, target)
     Route::get('/products/best-selling', [ProductController::class, 'getBestSellingProduct']); // lấy ds product bán chạy (ko ràng buộc bởi shop và category)
@@ -96,6 +97,7 @@ Route::group([
     Route::get('/services/medical-center/{medical_center_id}/category/{category_id}', [ServiceController::class, 'getListServiceWithMedicalCenterAndCategory']); // lấy ds các service được cung cấp bởi medical center và thuộc category_id
     Route::get('/services/medical-center/{medical_center_id}/category/{category_id}/total', [ServiceController::class, 'getNumberOfServiceWithMedicalCenterAndCategory']); // lấy số lượng service được cung cấp bởi medical center và thuộc category_id
     Route::get('/services/sort', [ServiceController::class, 'sortServicesByPrice']);
+    Route::get('/services/search', [ServiceController::class, 'searchService']);
     // --------------     SERVICE PAGINATION     --------------
     Route::get('/services/paginate', [ServiceController::class, 'paging']); // lấy ds service có phân trang (query param: page_number, num_of_page, target)
     Route::get('/services/best-selling', [ServiceController::class, 'getBestSellingService']); // lấy ds service bán chạy (ko ràng buộc bởi medical center và category)
