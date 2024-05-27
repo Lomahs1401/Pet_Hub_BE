@@ -20,8 +20,8 @@ class CreateShopsTable extends Migration
             $table->string('image');
             $table->string('phone');
             $table->string('address');
-            $table->string('website');
-            $table->string('fanpage');
+            $table->string('website')->nullable();
+            $table->string('fanpage')->nullable();
             $table->string('work_time');
             $table->string('establish_year');
             $table->foreignId('account_id')->constrained('accounts');

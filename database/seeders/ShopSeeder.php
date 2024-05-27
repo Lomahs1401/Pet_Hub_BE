@@ -49,7 +49,7 @@ class ShopSeeder extends Seeder
                 'username' => $faker->userName(),
                 'email' => $faker->companyEmail(),
                 'password' => Hash::make('shop123'),
-                'avatar' => 'gs://petshop-3d4ae.appspot.com/avatars/shop/' . ($i+1) . '/',
+                'avatar' => 'gs://petshop-3d4ae.appspot.com/avatars/shop/' . ($i+1) . '.jpg',
                 'enabled' => $faker->boolean(100),
                 'role_id' => $role_shop,
                 'reset_code' => null,
