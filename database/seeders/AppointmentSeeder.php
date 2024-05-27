@@ -32,7 +32,6 @@ class AppointmentSeeder extends Seeder
 
                 Appointment::factory()->create([
                     'message' => $faker->paragraph(),
-                    'address' => $faker->city(),
                     'start_time' => $start_time,
                     'customer_id' => $customer_account_id,
                     'medical_center_id' => $faker->randomElement($medical_center_ids),
