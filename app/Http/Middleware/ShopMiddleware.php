@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class AdminMiddleware
+class ShopMiddleware
 {
     /**
      * Handle an incoming request.
@@ -19,7 +19,7 @@ class AdminMiddleware
     {
         $role_user = DB::table('roles')->where('id', '=', auth()->user()->role_id)->value('role_name');
 
-        if ($role_user === 'ROLE_ADMIN') {
+        if ($role_user === 'ROLE_SHOP') {
             return $next($request);
         }
         

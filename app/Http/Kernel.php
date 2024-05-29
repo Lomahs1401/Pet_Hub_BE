@@ -68,7 +68,10 @@ class Kernel extends HttpKernel
         'force.json.response' => \App\Http\Middleware\ForceJsonResponseMiddleware::class,
         'auth' => \App\Http\Middleware\AuthMiddleware::class,
         'auth.customer' => \App\Http\Middleware\CustomerMiddleware::class,
-        'auth.employee' => \App\Http\Middleware\StaffMiddleware::class,
+        'auth.doctor' => \App\Http\Middleware\DoctorMiddleware::class,
+        'auth.shop' => \App\Http\Middleware\ShopMiddleware::class,
+        'auth.medical_center' => \App\Http\Middleware\MedicalCenterMiddleware::class,
+        'auth.aid_center' => \App\Http\Middleware\AidCenterMiddleware::class,
         'auth.admin' => \App\Http\Middleware\AdminMiddleware::class,
     ];
 }

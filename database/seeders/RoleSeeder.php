@@ -15,7 +15,7 @@ class RoleSeeder extends Seeder
      */
     public function run()
     {
-        $ALL_ROLES = ['ROLE_CUSTOMER', 'ROLE_SHOP', 'ROLE_MEDICAL_CENTER', 'ROLE_AID_CENTER', 'ROLE_ADMIN'];
+        $ALL_ROLES = ['ROLE_CUSTOMER', 'ROLE_DOCTOR', 'ROLE_SHOP', 'ROLE_MEDICAL_CENTER', 'ROLE_AID_CENTER', 'ROLE_ADMIN'];
 
         for ($i = 0; $i < count($ALL_ROLES); $i++) {
             Role::factory()->create([

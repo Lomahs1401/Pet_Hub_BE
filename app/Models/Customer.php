@@ -29,7 +29,6 @@ class Customer extends Model
         'address',  
         'phone',
         'ranking_point',
-        'certificate',
         'account_id',
         'ranking_id'
     ];

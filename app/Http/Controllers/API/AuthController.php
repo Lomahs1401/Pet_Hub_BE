@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Faker\Factory as Faker;
+use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
@@ -148,6 +149,16 @@ class AuthController extends Controller
     }
 
     /**
+     * Get the authenticated User.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function userProfile()
+    {
+        return response()->json(auth()->user());
+    }
+
+    /**
      * Log the user out (Invalidate the token).
      *
      * @return \Illuminate\Http\JsonResponse
@@ -181,10 +192,30 @@ class AuthController extends Controller
      */
     protected function respondWithToken($token)
     {
+        $role_user = DB::table('roles')->where('id', '=', auth()->user()->role_id)->value('role_name');
+        if ($role_user === "ROLE_CUSTOMER") {
+          $customer = Customer::where('account_id', auth()->user()->id)->first();
+          return response()->json([
+              'message' => 'Login successfully!',
+              'access_token' => $token,
+              'token_type' => 'bearer',
+              'expires_in' => auth()->factory()->getTTL() * 60,
+              'user' => array_merge(auth()->user()->toArray(), [
+                  'role_name' => $role_user,
+                  'customer_id' => $customer->id,
+                  'full_name' => $customer->full_name
+              ]),
+          ]);
+      } else {
         return response()->json([
+            'message' => 'Login successfully!',
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 60
+            'expires_in' => auth()->factory()->getTTL() * 60,
+            'user' => array_merge(auth()->user()->toArray(), [
+              'role_name' => $role_user,
+            ]),
         ]);
+      }
     }
 }

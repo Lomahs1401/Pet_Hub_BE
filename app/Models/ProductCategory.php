@@ -26,4 +26,12 @@ class ProductCategory extends Model
         'target',
         'type',
     ];
+
+    /**
+     * Get the products for the category.
+     */
+    public function products()
+    {
+        return $this->hasMany(Product::class, 'product_category_id');
+    }
 }
