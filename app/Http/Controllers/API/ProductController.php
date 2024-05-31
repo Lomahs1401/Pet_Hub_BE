@@ -91,7 +91,7 @@ class ProductController extends Controller
 				'updated_at' => $product->category->updated_at,
 			],
 		];
-	
+
 		return response()->json([
 			'message' => 'Query successfully!',
 			'status' => 200,
@@ -234,7 +234,7 @@ class ProductController extends Controller
 			$auth_shop_id = DB::table('shops')->where('account_id', '=', $user->id)->value('id');
 			$number_of_products = $query->where('shop_id', $auth_shop_id)
 				->whereNull('deleted_at')
-				->where('product_category_id', $product_category_id)	
+				->where('product_category_id', $product_category_id)
 				->count();
 		} else {
 			$shop = Shop::find($shop_id);
@@ -244,7 +244,7 @@ class ProductController extends Controller
 					'status' => 404
 				], 404);
 			}
-	
+
 			$category = ProductCategory::find($product_category_id);
 			if (!$category) {
 				return response()->json([
@@ -299,10 +299,60 @@ class ProductController extends Controller
 		// Phân trang mặc định
 		$page_number = intval($request->query('page_number', 1));
 		$num_of_page = intval($request->query('num_of_page', 8));
+		$category_type = $request->query('category') ?? 'all';
+		$target = $request->query('target') ?? 'all';
+
+		if ($target === 'all') {
+			// Nếu không có field 'target' được gửi đến, lấy tất cả các danh mục
+			if ($category_type === 'all') {
+				// Nếu category type cũng là 'all', lấy tất cả danh mục
+				$categories = DB::table('product_categories')
+					->pluck('id')
+					->toArray();
+			} else {
+				// Lọc theo category type
+				$categories = DB::table('product_categories')
+					->where('type', $category_type)
+					->pluck('id')
+					->toArray();
+			}
+		} else {
+			// Nếu 'target' là 'dog' hoặc 'cat' thì query dữ liệu từ bảng 'product_categories'
+			if ($target === 'dog' || $target === 'cat') {
+				if ($category_type === 'all') {
+					// Nếu category_type là 'all', chỉ lọc theo target
+					$categories = DB::table('product_categories')
+						->where('target', $target)
+						->pluck('id')
+						->toArray();
+				} else {
+					// Lọc danh mục theo cả hai điều kiện $target và $category_type
+					$categories = DB::table('product_categories')
+						->where('target', $target)
+						->where('type', $category_type)
+						->pluck('id')
+						->toArray();
+				}
+		
+				// Nếu không có danh mục nào phù hợp thì trả về mảng rỗng
+				if (empty($categories)) {
+					return response()->json([
+						'message' => 'Query successfully!',
+						'status' => 200,
+						'data' => []
+					]);
+				}
+			}
+		}
 
 		$query = Product::query()
 			->whereNull('deleted_at')
 			->with(['shop.account', 'category']);
+
+		// Nếu có danh mục, thêm điều kiện whereIn
+		if (!empty($categories)) {
+			$query->whereIn('product_category_id', $categories);
+		}
 
 		if ($name) {
 			$query->where('name', 'like', '%' . $name . '%');
@@ -322,7 +372,142 @@ class ProductController extends Controller
 		$formatted_products = [];
 		foreach ($products as $product) {
 			$ratingData = $product->calculateProductRating();
-			
+
+			$formatted_products[] = [
+				"id" => $product->id,
+				"name" => $product->name,
+				"description" => $product->description,
+				"price" => $product->price,
+				"image" => $product->image,
+				"quantity" => $product->quantity,
+				"sold_quantity" => $product->sold_quantity,
+				"rating" => $ratingData['average'],
+				"rating_count" => $ratingData['count'],
+				"status" => $product->status,
+				"shop_id" => $product->shop_id,
+				"product_category_id" => $product->product_category_id,
+				"created_at" => $product->created_at,
+				"updated_at" => $product->updated_at,
+				"deleted_at" => $product->deleted_at,
+				"shop" => [
+					"id" => $product->shop->id,
+					"name" => $product->shop->name,
+					"email" => $product->shop->account->email,
+					"avatar" => $product->shop->account->avatar,
+					"description" => $product->shop->description,
+					"image" => $product->shop->image,
+					"phone" => $product->shop->phone,
+					"address" => $product->shop->address,
+					"website" => $product->shop->website,
+					"fanpage" => $product->shop->fanpage,
+					"work_time" => $product->shop->work_time,
+					"establish_year" => $product->shop->establish_year,
+					"account_id" => $product->shop->account->id,
+					"created_at" => $product->shop->created_at,
+					"updated_at" => $product->shop->updated_at,
+				],
+				"category" => [
+					"id" => $product->category->id,
+					"name" => $product->category->name,
+					"target" => $product->category->target,
+					"type" => $product->category->type,
+					"created_at" => $product->category->created_at,
+					"updated_at" => $product->category->updated_at,
+				]
+			];
+		}
+
+		return response()->json([
+			'message' => 'Search products successfully!',
+			'status' => 200,
+			'pagination' => [
+				'total' => $products->total(),
+				'per_page' => $products->perPage(),
+				'current_page' => $products->currentPage(),
+				'last_page' => $products->lastPage(),
+				'from' => $products->firstItem(),
+				'to' => $products->lastItem(),
+			],
+			'data' => $formatted_products,
+		], 200);
+	}
+
+	public function searchDeletedProduct(Request $request)
+	{
+		$name = $request->query('name');
+
+		// Phân trang mặc định
+		$page_number = intval($request->query('page_number', 1));
+		$num_of_page = intval($request->query('num_of_page', 8));
+		$category_type = $request->query('category') ?? 'all';
+		$target = $request->query('target') ?? 'all';
+
+		if ($target === 'all') {
+			// Nếu không có field 'target' được gửi đến, lấy tất cả các danh mục
+			if ($category_type === 'all') {
+				// Nếu category type cũng là 'all', lấy tất cả danh mục
+				$categories = DB::table('product_categories')
+					->pluck('id')
+					->toArray();
+			} else {
+				// Lọc theo category type
+				$categories = DB::table('product_categories')
+					->where('type', $category_type)
+					->pluck('id')
+					->toArray();
+			}
+		} else {
+			// Nếu 'target' là 'dog' hoặc 'cat' thì query dữ liệu từ bảng 'product_categories'
+			if ($target === 'dog' || $target === 'cat') {
+				if ($category_type === 'all') {
+					// Nếu category_type là 'all', chỉ lọc theo target
+					$categories = DB::table('product_categories')
+						->where('target', $target)
+						->pluck('id')
+						->toArray();
+				} else {
+					// Lọc danh mục theo cả hai điều kiện $target và $category_type
+					$categories = DB::table('product_categories')
+						->where('target', $target)
+						->where('type', $category_type)
+						->pluck('id')
+						->toArray();
+				}
+		
+				// Nếu không có danh mục nào phù hợp thì trả về mảng rỗng
+				if (empty($categories)) {
+					return response()->json([
+						'message' => 'Query successfully!',
+						'status' => 200,
+						'data' => []
+					]);
+				}
+			}
+		}
+
+		$query = Product::query()
+			->onlyTrashed('deleted_at')
+			->with(['shop.account', 'category']);
+
+		// Nếu có danh mục, thêm điều kiện whereIn
+		if (!empty($categories)) {
+			$query->whereIn('product_category_id', $categories);
+		}
+
+		if ($name) {
+			$query->where('name', 'like', '%' . $name . '%');
+		}
+
+		$user = auth()->user();
+		$shop_id = DB::table('shops')->where('account_id', '=', $user->id)->value('id');
+		$products = $query
+					->where('shop_id', $shop_id)
+					->paginate($num_of_page, ['*'], 'page', $page_number);
+
+		$formatted_products = [];
+		foreach ($products as $product) {
+			$ratingData = $product->calculateProductRating();
+
 			$formatted_products[] = [
 				"id" => $product->id,
 				"name" => $product->name,
@@ -458,9 +643,10 @@ class ProductController extends Controller
 				'status' => $product->status,
 				'product_category_id' => $product->product_category_id,
 				"rating" => $ratingData['average'],
-            	"rating_count" => $ratingData['count'],
+				"rating_count" => $ratingData['count'],
 				'created_at' => $product->created_at,
 				'updated_at' => $product->updated_at,
+				"deleted_at" => $product->deleted_at,
 				'shop' => [
 					'id' => $product->shop->id,
 					'name' => $product->shop->name,
@@ -570,9 +756,10 @@ class ProductController extends Controller
 				'status' => $product->status,
 				'product_category_id' => $product->product_category_id,
 				"rating" => $ratingData['average'],
-            	"rating_count" => $ratingData['count'],
+				"rating_count" => $ratingData['count'],
 				'created_at' => $product->created_at,
 				'updated_at' => $product->updated_at,
+				"deleted_at" => $product->deleted_at,
 				'shop' => [
 					'id' => $product->shop->id,
 					'name' => $product->shop->name,
@@ -627,6 +814,8 @@ class ProductController extends Controller
 
 		$page_number = intval($request->query('page_number', 1));
 		$num_of_page = intval($request->query('num_of_page', 10));
+		$is_deleted = $request->query('deleted', false);
+
 		$target = $request->query('target') ?? 'all';
 
 		if ($target === 'all') {
@@ -653,8 +842,11 @@ class ProductController extends Controller
 			}
 		}
 
-		// Lấy số lượng sản phẩm
-		$total_products_query = Product::query()->whereNull('deleted_at');
+		if ($is_deleted) {
+			$total_products_query = Product::query()->onlyTrashed();
+		} else {
+			$total_products_query = Product::query()->whereNull('deleted_at');
+		}
 
 		// CHECK FOR ROLE_SHOP
 		$user = auth()->user();
@@ -703,6 +895,7 @@ class ProductController extends Controller
 				"rating_count" => $ratingData['count'],
 				'created_at' => $product->created_at,
 				'updated_at' => $product->updated_at,
+				"deleted_at" => $product->deleted_at,
 				'shop' => [
 					'id' => $product->shop->id,
 					'name' => $product->shop->name,
@@ -800,6 +993,7 @@ class ProductController extends Controller
 				"rating_count" => $ratingData['count'],
 				'created_at' => $product->created_at,
 				'updated_at' => $product->updated_at,
+				"deleted_at" => $product->deleted_at,
 				'shop' => [
 					'id' => $product->shop->id,
 					'name' => $product->shop->name,
@@ -882,7 +1076,7 @@ class ProductController extends Controller
 		$formatted_products = [];
 		foreach ($products as $product) {
 			$ratingData = $product->calculateProductRating();
-			
+
 			$formatted_products[] = [
 				'id' => $product->id,
 				'name' => $product->name,
@@ -897,6 +1091,7 @@ class ProductController extends Controller
 				"rating_count" => $ratingData['count'],
 				'created_at' => $product->created_at,
 				'updated_at' => $product->updated_at,
+				"deleted_at" => $product->deleted_at,
 				'shop' => [
 					'id' => $product->shop->id,
 					'name' => $product->shop->name,
@@ -994,7 +1189,7 @@ class ProductController extends Controller
 		$formatted_products = [];
 		foreach ($products as $product) {
 			$ratingData = $product->calculateProductRating();
-			
+
 			$formatted_products[] = [
 				'id' => $product->id,
 				'name' => $product->name,
@@ -1009,6 +1204,7 @@ class ProductController extends Controller
 				"rating_count" => $ratingData['count'],
 				'created_at' => $product->created_at,
 				'updated_at' => $product->updated_at,
+				"deleted_at" => $product->deleted_at,
 				'shop' => [
 					'id' => $product->shop->id,
 					'name' => $product->shop->name,
@@ -1062,6 +1258,7 @@ class ProductController extends Controller
 
 		$page_number = intval($request->query('page_number', 1));
 		$num_of_page = intval($request->query('num_of_page', 10));
+		$is_deleted = $request->query('deleted', false);
 		$target = $request->query('target') ?? 'all';
 
 		if ($target === 'all') {
@@ -1085,7 +1282,11 @@ class ProductController extends Controller
 			}
 		}
 
-		$total_products_query = Product::query()->whereNull('deleted_at');
+		if ($is_deleted) {
+			$total_products_query = Product::query()->onlyTrashed();
+		} else {
+			$total_products_query = Product::query()->whereNull('deleted_at');
+		}
 
 		// CHECK FOR ROLE_SHOP
 		$user = auth()->user();
@@ -1138,6 +1339,7 @@ class ProductController extends Controller
 				"rating_count" => $ratingData['count'],
 				'created_at' => $product->created_at,
 				'updated_at' => $product->updated_at,
+				"deleted_at" => $product->deleted_at,
 				'shop' => [
 					'id' => $product->shop->id,
 					'name' => $product->shop->name,
@@ -1237,6 +1439,7 @@ class ProductController extends Controller
 				"rating_count" => $ratingData['count'],
 				'created_at' => $product->created_at,
 				'updated_at' => $product->updated_at,
+				"deleted_at" => $product->deleted_at,
 				'shop' => [
 					'id' => $product->shop->id,
 					'name' => $product->shop->name,
@@ -1336,6 +1539,7 @@ class ProductController extends Controller
 				"rating_count" => $ratingData['count'],
 				'created_at' => $product->created_at,
 				'updated_at' => $product->updated_at,
+				"deleted_at" => $product->deleted_at,
 				'shop' => [
 					'id' => $product->shop->id,
 					'name' => $product->shop->name,
@@ -1484,6 +1688,8 @@ class ProductController extends Controller
 
 		$formatted_products = [];
 		foreach ($products as $product) {
+			$ratingData = $product->calculateProductRating();
+
 			$formatted_products[] = [
 				"id" => $product->id,
 				"name" => $product->name,
@@ -1492,7 +1698,8 @@ class ProductController extends Controller
 				"image" => $product->image,
 				"quantity" => $product->quantity,
 				"sold_quantity" => $product->sold_quantity,
-				"rating" => $product->calculateProductRating($product->id),
+				"rating" => $ratingData['average'],
+				"rating_count" => $ratingData['count'],
 				"status" => $product->status,
 				"shop_id" => $product->shop_id,
 				"product_category_id" => $product->product_category_id,
@@ -1544,12 +1751,16 @@ class ProductController extends Controller
 
 	public function sortProductsByPrice(Request $request)
 	{
-		$query = Product::query()
-			->whereNull('deleted_at')
-			->with(['shop.account', 'category']);
-
 		$page_number = intval($request->query('page_number', 1));
 		$num_of_page = intval($request->query('num_of_page', 10));
+		$is_deleted = $request->query('deleted', false);
+
+		if ($is_deleted) {
+			$query = Product::query()->onlyTrashed()->with(['shop.account', 'category']);
+		} else {
+			$query = Product::query()->whereNull('deleted_at')->with(['shop.account', 'category']);
+		}
+
 		$orderDirection = $request->query('order');
 
 		if ($orderDirection == null) {
@@ -1628,6 +1839,133 @@ class ProductController extends Controller
 
 		return response()->json([
 			'message' => 'Sort products successfully!',
+			'status' => 200,
+			'pagination' => [
+				'total' => $products->total(),
+				'per_page' => $products->perPage(),
+				'current_page' => $products->currentPage(),
+				'last_page' => $products->lastPage(),
+				'from' => $products->firstItem(),
+				'to' => $products->lastItem(),
+			],
+			'data' => $formatted_products,
+		], 200);
+	}
+
+	public function getProductsByRating(Request $request)
+	{
+		$page_number = intval($request->query('page_number', 1));
+		$num_of_page = intval($request->query('num_of_page', 10));
+		$rating = intval($request->query('rating', 5));
+		$is_deleted = $request->query('deleted', false);
+
+		// Xác định khoảng điểm rating dựa vào rating được chọn
+		switch ($rating) {
+			case 5:
+				$minRating = 4.5;
+				$maxRating = 5.0;
+				break;
+			case 4:
+				$minRating = 3.5;
+				$maxRating = 4.5;
+				break;
+			case 3:
+				$minRating = 2.5;
+				$maxRating = 3.5;
+				break;
+			case 2:
+				$minRating = 1.5;
+				$maxRating = 2.5;
+				break;
+			case 1:
+				$minRating = 0.0;
+				$maxRating = 1.5;
+				break;
+			default:
+				return response()->json([
+					'message' => 'Invalid rating value',
+					'status' => 400,
+				], 400);
+		}
+
+		if ($is_deleted) {
+			$query = Product::query()
+				->onlyTrashed()
+				->with(['shop.account', 'category'])
+				->whereHas('ratings', function ($q) use ($minRating, $maxRating) {
+					$q->havingRaw('AVG(rating) > ? AND AVG(rating) <= ?', [$minRating, $maxRating]);
+				});
+		} else {
+			$query = Product::query()
+				->whereNull('deleted_at')
+				->with(['shop.account', 'category'])
+				->whereHas('ratings', function ($q) use ($minRating, $maxRating) {
+					$q->havingRaw('AVG(rating) > ? AND AVG(rating) <= ?', [$minRating, $maxRating]);
+				});
+		}
+
+		// CHECK FOR ROLE_SHOP
+		$user = auth()->user();
+		$role_user = DB::table('roles')->where('id', '=', $user->role_id)->value('role_name');
+		if ($role_user === 'ROLE_SHOP') {
+			$shop_id = DB::table('shops')->where('account_id', '=', $user->id)->value('id');
+			$products = $query->where('shop_id', $shop_id)
+				->paginate($num_of_page, ['*'], 'page', $page_number);
+		} else {
+			$products = $query->paginate($num_of_page, ['*'], 'page', $page_number);
+		}
+
+		$formatted_products = [];
+
+		foreach ($products as $product) {
+			$ratingData = $product->calculateProductRating();
+
+			$formatted_products[] = [
+				"id" => $product->id,
+				"name" => $product->name,
+				"description" => $product->description,
+				"price" => $product->price,
+				"image" => $product->image,
+				"quantity" => $product->quantity,
+				"sold_quantity" => $product->sold_quantity,
+				"rating" => $ratingData['average'],
+				"rating_count" => $ratingData['count'],
+				"status" => $product->status,
+				"shop_id" => $product->shop_id,
+				"product_category_id" => $product->product_category_id,
+				"created_at" => $product->created_at,
+				"updated_at" => $product->updated_at,
+				"deleted_at" => $product->deleted_at,
+				"shop" => [
+					"id" => $product->shop->id,
+					"name" => $product->shop->name,
+					"email" => $product->shop->account->email,
+					"avatar" => $product->shop->account->avatar,
+					"description" => $product->shop->description,
+					"image" => $product->shop->image,
+					"phone" => $product->shop->phone,
+					"address" => $product->shop->address,
+					"website" => $product->shop->website,
+					"fanpage" => $product->shop->fanpage,
+					"work_time" => $product->shop->work_time,
+					"establish_year" => $product->shop->establish_year,
+					"account_id" => $product->shop->account->id,
+					"created_at" => $product->shop->created_at,
+					"updated_at" => $product->shop->updated_at,
+				],
+				"category" => [
+					"id" => $product->category->id,
+					"name" => $product->category->name,
+					"target" => $product->category->target,
+					"type" => $product->category->type,
+					"created_at" => $product->category->created_at,
+					"updated_at" => $product->category->updated_at,
+				]
+			];
+		}
+
+		return response()->json([
+			'message' => 'Get products by rating successfully!',
 			'status' => 200,
 			'pagination' => [
 				'total' => $products->total(),
