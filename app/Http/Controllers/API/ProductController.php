@@ -623,7 +623,9 @@ class ProductController extends Controller
 		$offset = ($page_number - 1) * $num_of_page;
 
 		// Lấy dữ liệu sản phẩm dựa trên trang hiện tại và số lượng sản phẩm trên mỗi trang
-		$products = $total_products_query->with(['shop', 'category']) // Sử dụng eager loading để lấy thông tin cửa hàng
+		$products = $total_products_query->with(['shop' => function($query) {
+			$query->withCount('ratingShop')->withAvg('ratingShop', 'rating');
+		}, 'category']) // Sử dụng eager loading để lấy thông tin cửa hàng
 			->offset($offset)
 			->limit($num_of_page)
 			->get();
@@ -631,6 +633,9 @@ class ProductController extends Controller
 		$formatted_products = [];
 		foreach ($products as $product) {
 			$ratingData = $product->calculateProductRating();
+
+			$shopRating = $product->shop->rating_shop_avg_rating ?? 0;
+        	$shopRatingCount = $product->shop->rating_shop_count ?? 0;
 
 			$formatted_products[] = [
 				'id' => $product->id,
@@ -660,6 +665,8 @@ class ProductController extends Controller
 					'fanpage' => $product->shop->fanpage,
 					'work_time' => $product->shop->work_time,
 					'establish_year' => $product->shop->establish_year,
+					'rating' => $shopRating,
+                	'rating_count' => $shopRatingCount,
 					'account_id' => $product->shop->account->id,
 					'created_at' => $product->shop->created_at,
 					'updated_at' => $product->shop->updated_at,
@@ -735,7 +742,9 @@ class ProductController extends Controller
 		$offset = ($page_number - 1) * $num_of_page;
 
 		// Lấy dữ liệu sản phẩm dựa trên trang hiện tại và số lượng sản phẩm trên mỗi trang
-		$products = $total_products_query->with(['shop', 'category']) // Sử dụng eager loading để lấy thông tin cửa hàng
+		$products = $total_products_query->with(['shop' => function($query) {
+			$query->withCount('ratingShop')->withAvg('ratingShop', 'rating');
+		}, 'category']) // Sử dụng eager loading để lấy thông tin cửa hàng
 			->orderBy('sold_quantity', 'desc')
 			->offset($offset)
 			->limit($num_of_page)
@@ -744,6 +753,9 @@ class ProductController extends Controller
 		$formatted_products = [];
 		foreach ($products as $product) {
 			$ratingData = $product->calculateProductRating();
+
+			$shopRating = $product->shop->rating_shop_avg_rating ?? 0;
+        	$shopRatingCount = $product->shop->rating_shop_count ?? 0;
 
 			$formatted_products[] = [
 				'id' => $product->id,
@@ -773,6 +785,8 @@ class ProductController extends Controller
 					'fanpage' => $product->shop->fanpage,
 					'work_time' => $product->shop->work_time,
 					'establish_year' => $product->shop->establish_year,
+					'rating' => $shopRating,
+                	'rating_count' => $shopRatingCount,
 					'account_id' => $product->shop->account->id,
 					'created_at' => $product->shop->created_at,
 					'updated_at' => $product->shop->updated_at,
@@ -871,7 +885,9 @@ class ProductController extends Controller
 		$offset = ($page_number - 1) * $num_of_page;
 
 		// Lấy dữ liệu sản phẩm dựa trên trang hiện tại và số lượng sản phẩm trên mỗi trang
-		$products = $total_products_query->with(['shop', 'category']) // Sử dụng eager loading để lấy thông tin cửa hàng->whereIn('product_category_id', $categories)
+		$products = $total_products_query->with(['shop' => function($query) {
+			$query->withCount('ratingShop')->withAvg('ratingShop', 'rating');
+		}, 'category']) // Sử dụng eager loading để lấy thông tin cửa hàng->whereIn('product_category_id', $categories)
 			->orderBy('sold_quantity', 'desc')
 			->offset($offset)
 			->limit($num_of_page)
@@ -880,6 +896,9 @@ class ProductController extends Controller
 		$formatted_products = [];
 		foreach ($products as $product) {
 			$ratingData = $product->calculateProductRating();
+
+			$shopRating = $product->shop->rating_shop_avg_rating ?? 0;
+        	$shopRatingCount = $product->shop->rating_shop_count ?? 0;
 
 			$formatted_products[] = [
 				'id' => $product->id,
@@ -909,6 +928,8 @@ class ProductController extends Controller
 					'fanpage' => $product->shop->fanpage,
 					'work_time' => $product->shop->work_time,
 					'establish_year' => $product->shop->establish_year,
+					'rating' => $shopRating,
+                	'rating_count' => $shopRatingCount,
 					'account_id' => $product->shop->account->id,
 					'created_at' => $product->shop->created_at,
 					'updated_at' => $product->shop->updated_at,
@@ -969,7 +990,9 @@ class ProductController extends Controller
 		$offset = ($page_number - 1) * $num_of_page;
 
 		// Lấy dữ liệu sản phẩm dựa trên trang hiện tại và số lượng sản phẩm trên mỗi trang
-		$products = $total_products_query->with(['shop', 'category']) // Sử dụng eager loading để lấy thông tin cửa hàng
+		$products = $total_products_query->with(['shop' => function($query) {
+			$query->withCount('ratingShop')->withAvg('ratingShop', 'rating');
+		}, 'category']) // Sử dụng eager loading để lấy thông tin cửa hàng
 			->orderBy('sold_quantity', 'desc')
 			->offset($offset)
 			->limit($num_of_page)
@@ -978,6 +1001,9 @@ class ProductController extends Controller
 		$formatted_products = [];
 		foreach ($products as $product) {
 			$ratingData = $product->calculateProductRating();
+
+			$shopRating = $product->shop->rating_shop_avg_rating ?? 0;
+        	$shopRatingCount = $product->shop->rating_shop_count ?? 0;
 
 			$formatted_products[] = [
 				'id' => $product->id,
@@ -1007,6 +1033,8 @@ class ProductController extends Controller
 					'fanpage' => $product->shop->fanpage,
 					'work_time' => $product->shop->work_time,
 					'establish_year' => $product->shop->establish_year,
+					'rating' => $shopRating,
+                	'rating_count' => $shopRatingCount,
 					'account_id' => $product->shop->account->id,
 					'created_at' => $product->shop->created_at,
 					'updated_at' => $product->shop->updated_at,
@@ -1029,6 +1057,114 @@ class ProductController extends Controller
 			'page_number' => $page_number,
 			'num_of_page' => $num_of_page,
 			'total_pages' => $total_pages,
+			'total_products' => $total_products,
+			'data' => $formatted_products,
+		]);
+	}
+
+	public function getBestSellingProductWithShopAndCategoryType(Request $request, $shop_id)
+	{
+		if (!Shop::find($shop_id)) {
+			return response()->json([
+				'message' => 'Shop not found!',
+				'status' => 404
+			], 404);
+		}
+
+		$page_number = intval($request->query('page_number', 1));
+		$num_of_page = intval($request->query('num_of_page', 10));
+		$category_type = $request->query('category_type', '');
+
+		// Lấy danh sách các ID của các category có cùng type
+		$category_ids = ProductCategory::where('type', $category_type)->pluck('id')->toArray();
+
+		if (empty($category_ids)) {
+			return response()->json([
+				'message' => 'No categories found for the given type!',
+				'status' => 404
+			], 404);
+		}
+
+		$total_products_query = Product::query()
+			->whereNull('deleted_at')
+			->where('shop_id', $shop_id)
+			->whereIn('product_category_id', $category_ids);
+
+		// Tính tổng số trang
+		$total_products = $total_products_query->count();
+		$total_pages = ceil($total_products / $num_of_page);
+
+		// Tính toán offset
+		$offset = ($page_number - 1) * $num_of_page;
+
+		// Lấy dữ liệu sản phẩm dựa trên trang hiện tại và số lượng sản phẩm trên mỗi trang
+		$products = $total_products_query->with(['shop' => function($query) {
+			$query->withCount('ratingShop')->withAvg('ratingShop', 'rating');
+		}, 'category']) // Sử dụng eager loading để lấy thông tin cửa hàng
+			->orderBy('sold_quantity', 'desc')
+			->offset($offset)
+			->limit($num_of_page)
+			->get();
+
+		$formatted_products = [];
+		foreach ($products as $product) {
+			$ratingData = $product->calculateProductRating();
+
+			$shopRating = $product->shop->rating_shop_avg_rating ?? 0;
+        	$shopRatingCount = $product->shop->rating_shop_count ?? 0;
+
+			$formatted_products[] = [
+				'id' => $product->id,
+				'name' => $product->name,
+				'description' => $product->description,
+				'price' => $product->price,
+				'image' => $product->image,
+				'quantity' => $product->quantity,
+				'sold_quantity' => $product->sold_quantity,
+				'status' => $product->status,
+				'product_category_id' => $product->product_category_id,
+				"rating" => $ratingData['average'],
+				"rating_count" => $ratingData['count'],
+				'created_at' => $product->created_at,
+				'updated_at' => $product->updated_at,
+				"deleted_at" => $product->deleted_at,
+				'shop' => [
+					'id' => $product->shop->id,
+					'name' => $product->shop->name,
+					'email' => $product->shop->account->email,
+					'avatar' => $product->shop->account->avatar,
+					'description' => $product->shop->description,
+					'image' => $product->shop->image,
+					'phone' => $product->shop->phone,
+					'address' => $product->shop->address,
+					'website' => $product->shop->website,
+					'fanpage' => $product->shop->fanpage,
+					'work_time' => $product->shop->work_time,
+					'establish_year' => $product->shop->establish_year,
+					'rating' => $shopRating,
+                	'rating_count' => $shopRatingCount,
+					'account_id' => $product->shop->account->id,
+					'created_at' => $product->shop->created_at,
+					'updated_at' => $product->shop->updated_at,
+				],
+				'category' => [
+					'id' => $product->category->id,
+					'name' => $product->category->name,
+					'target' => $product->category->target,
+					'type' => $product->category->type,
+					'created_at' => $product->category->created_at,
+					'updated_at' => $product->category->updated_at,
+				],
+			];
+		}
+
+		// Trả về JSON response
+		return response()->json([
+			'message' => 'Query successfully!',
+			'status' => 200,
+			'page_number' => $page_number,
+			'num_of_page' => $num_of_page,
+			'total_page' => $total_pages,
 			'total_products' => $total_products,
 			'data' => $formatted_products,
 		]);
@@ -1067,7 +1203,9 @@ class ProductController extends Controller
 		$offset = ($page_number - 1) * $num_of_page;
 
 		// Lấy dữ liệu sản phẩm dựa trên trang hiện tại và số lượng sản phẩm trên mỗi trang
-		$products = $total_products_query->with(['shop', 'category']) // Sử dụng eager loading để lấy thông tin cửa hàng
+		$products = $total_products_query->with(['shop' => function($query) {
+			$query->withCount('ratingShop')->withAvg('ratingShop', 'rating');
+		}, 'category']) // Sử dụng eager loading để lấy thông tin cửa hàng
 			->orderBy('sold_quantity', 'desc')
 			->offset($offset)
 			->limit($num_of_page)
@@ -1076,6 +1214,9 @@ class ProductController extends Controller
 		$formatted_products = [];
 		foreach ($products as $product) {
 			$ratingData = $product->calculateProductRating();
+
+			$shopRating = $product->shop->rating_shop_avg_rating ?? 0;
+        	$shopRatingCount = $product->shop->rating_shop_count ?? 0;
 
 			$formatted_products[] = [
 				'id' => $product->id,
@@ -1105,6 +1246,8 @@ class ProductController extends Controller
 					'fanpage' => $product->shop->fanpage,
 					'work_time' => $product->shop->work_time,
 					'establish_year' => $product->shop->establish_year,
+					'rating' => $shopRating,
+                	'rating_count' => $shopRatingCount,
 					'account_id' => $product->shop->account->id,
 					'created_at' => $product->shop->created_at,
 					'updated_at' => $product->shop->updated_at,
@@ -1175,7 +1318,9 @@ class ProductController extends Controller
 			->select('product_id', DB::raw('AVG(rating) as average_rating'))
 			->groupBy('product_id');
 
-		$products = $total_products_query->with(['shop', 'category'])
+		$products = $total_products_query->with(['shop' => function($query) {
+			$query->withCount('ratingShop')->withAvg('ratingShop', 'rating');
+		}, 'category'])
 			->leftJoinSub($averageRatings, 'average_ratings', function ($join) {
 				$join->on('products.id', '=', 'average_ratings.product_id');
 			})
@@ -1189,6 +1334,9 @@ class ProductController extends Controller
 		$formatted_products = [];
 		foreach ($products as $product) {
 			$ratingData = $product->calculateProductRating();
+
+			$shopRating = $product->shop->rating_shop_avg_rating ?? 0;
+        	$shopRatingCount = $product->shop->rating_shop_count ?? 0;
 
 			$formatted_products[] = [
 				'id' => $product->id,
@@ -1218,6 +1366,8 @@ class ProductController extends Controller
 					'fanpage' => $product->shop->fanpage,
 					'work_time' => $product->shop->work_time,
 					'establish_year' => $product->shop->establish_year,
+					'rating' => $shopRating,
+                	'rating_count' => $shopRatingCount,
 					'account_id' => $product->shop->account->id,
 					'created_at' => $product->shop->created_at,
 					'updated_at' => $product->shop->updated_at,
@@ -1310,7 +1460,9 @@ class ProductController extends Controller
 			->select('product_id', DB::raw('AVG(rating) as average_rating'))
 			->groupBy('product_id');
 
-		$products = $total_products_query->with(['shop', 'category'])
+		$products = $total_products_query->with(['shop' => function($query) {
+			$query->withCount('ratingShop')->withAvg('ratingShop', 'rating');
+		}, 'category'])
 			->leftJoinSub($averageRatings, 'average_ratings', function ($join) {
 				$join->on('products.id', '=', 'average_ratings.product_id');
 			})
@@ -1324,6 +1476,9 @@ class ProductController extends Controller
 		$formatted_products = [];
 		foreach ($products as $product) {
 			$ratingData = $product->calculateProductRating();
+
+			$shopRating = $product->shop->rating_shop_avg_rating ?? 0;
+        	$shopRatingCount = $product->shop->rating_shop_count ?? 0;
 
 			$formatted_products[] = [
 				'id' => $product->id,
@@ -1353,6 +1508,8 @@ class ProductController extends Controller
 					'fanpage' => $product->shop->fanpage,
 					'work_time' => $product->shop->work_time,
 					'establish_year' => $product->shop->establish_year,
+					'rating' => $shopRating,
+                	'rating_count' => $shopRatingCount,
 					'account_id' => $product->shop->account->id,
 					'created_at' => $product->shop->created_at,
 					'updated_at' => $product->shop->updated_at,
@@ -1411,7 +1568,9 @@ class ProductController extends Controller
 			->select('product_id', DB::raw('AVG(rating) as average_rating'))
 			->groupBy('product_id');
 
-		$products = $total_products_query->with(['shop', 'category'])
+		$products = $total_products_query->with(['shop' => function($query) {
+			$query->withCount('ratingShop')->withAvg('ratingShop', 'rating');
+		}, 'category'])
 			->leftJoinSub($averageRatings, 'average_ratings', function ($join) {
 				$join->on('products.id', '=', 'average_ratings.product_id');
 			})
@@ -1424,6 +1583,9 @@ class ProductController extends Controller
 		$formatted_products = [];
 		foreach ($products as $product) {
 			$ratingData = $product->calculateProductRating();
+
+			$shopRating = $product->shop->rating_shop_avg_rating ?? 0;
+        	$shopRatingCount = $product->shop->rating_shop_count ?? 0;
 
 			$formatted_products[] = [
 				'id' => $product->id,
@@ -1453,6 +1615,8 @@ class ProductController extends Controller
 					'fanpage' => $product->shop->fanpage,
 					'work_time' => $product->shop->work_time,
 					'establish_year' => $product->shop->establish_year,
+					'rating' => $shopRating,
+                	'rating_count' => $shopRatingCount,
 					'account_id' => $product->shop->account->id,
 					'created_at' => $product->shop->created_at,
 					'updated_at' => $product->shop->updated_at,
@@ -1511,12 +1675,617 @@ class ProductController extends Controller
 			->select('product_id', DB::raw('AVG(rating) as average_rating'))
 			->groupBy('product_id');
 
-		$products = $total_products_query->with(['shop', 'category'])
+		$products = $total_products_query->with(['shop' => function($query) {
+			$query->withCount('ratingShop')->withAvg('ratingShop', 'rating');
+		}, 'category'])
 			->leftJoinSub($averageRatings, 'average_ratings', function ($join) {
 				$join->on('products.id', '=', 'average_ratings.product_id');
 			})
 			->select('products.*', 'average_ratings.average_rating')
 			->orderBy('average_rating', 'desc')
+			->offset($offset)
+			->limit($num_of_page)
+			->get();
+
+		$formatted_products = [];
+		foreach ($products as $product) {
+			$ratingData = $product->calculateProductRating();
+
+			$shopRating = $product->shop->rating_shop_avg_rating ?? 0;
+        	$shopRatingCount = $product->shop->rating_shop_count ?? 0;
+
+			$formatted_products[] = [
+				'id' => $product->id,
+				'name' => $product->name,
+				'description' => $product->description,
+				'price' => $product->price,
+				'image' => $product->image,
+				'quantity' => $product->quantity,
+				'sold_quantity' => $product->sold_quantity,
+				'status' => $product->status,
+				'product_category_id' => $product->product_category_id,
+				"rating" => $ratingData['average'],
+				"rating_count" => $ratingData['count'],
+				'created_at' => $product->created_at,
+				'updated_at' => $product->updated_at,
+				"deleted_at" => $product->deleted_at,
+				'shop' => [
+					'id' => $product->shop->id,
+					'name' => $product->shop->name,
+					'email' => $product->shop->account->email,
+					'avatar' => $product->shop->account->avatar,
+					'description' => $product->shop->description,
+					'image' => $product->shop->image,
+					'phone' => $product->shop->phone,
+					'address' => $product->shop->address,
+					'website' => $product->shop->website,
+					'fanpage' => $product->shop->fanpage,
+					'work_time' => $product->shop->work_time,
+					'establish_year' => $product->shop->establish_year,
+					'rating' => $shopRating,
+                	'rating_count' => $shopRatingCount,
+					'account_id' => $product->shop->account->id,
+					'created_at' => $product->shop->created_at,
+					'updated_at' => $product->shop->updated_at,
+				],
+				'category' => [
+					'id' => $product->category->id,
+					'name' => $product->category->name,
+					'target' => $product->category->target,
+					'type' => $product->category->type,
+					'created_at' => $product->category->created_at,
+					'updated_at' => $product->category->updated_at,
+				],
+			];
+		}
+
+		return response()->json([
+			'message' => 'Query successfully!',
+			'status' => 200,
+			'page_number' => $page_number,
+			'num_of_page' => $num_of_page,
+			'total_pages' => $total_pages,
+			'total_products' => $total_products,
+			'data' => $formatted_products,
+		]);
+	}
+
+	public function getLowestRatingProduct(Request $request)
+	{
+		$categories = [];
+
+		$page_number = intval($request->query('page_number', 1));
+		$num_of_page = intval($request->query('num_of_page', 10));
+		$target = $request->query('target') ?? 'all';
+
+		if ($target === 'all') {
+			$categories = DB::table('product_categories')
+				->pluck('id')
+				->toArray();
+		} else {
+			if ($target === 'dog' || $target === 'cat') {
+				$categories = DB::table('product_categories')
+					->where('target', $target)
+					->pluck('id')
+					->toArray();
+
+				if (empty($categories)) {
+					return response()->json([
+						'message' => 'Query successfully!',
+						'status' => 200,
+						'data' => []
+					]);
+				}
+			}
+		}
+
+		$total_products_query = Product::query()->whereNull('deleted_at');
+
+		if (!empty($categories)) {
+			$total_products_query->whereIn('product_category_id', $categories);
+		}
+
+		$total_products = $total_products_query->count();
+		$total_pages = ceil($total_products / $num_of_page);
+		$offset = ($page_number - 1) * $num_of_page;
+
+		$averageRatings = DB::table('rating_products')
+			->select('product_id', DB::raw('AVG(rating) as average_rating'))
+			->groupBy('product_id');
+
+		$products = $total_products_query->with(['shop' => function($query) {
+			$query->withCount('ratingShop')->withAvg('ratingShop', 'rating');
+		}, 'category'])
+			->leftJoinSub($averageRatings, 'average_ratings', function ($join) {
+				$join->on('products.id', '=', 'average_ratings.product_id');
+			})
+			->select('products.*', 'average_ratings.average_rating')
+			->whereIn('product_category_id', $categories)
+			->orderBy('average_rating', 'asc')
+			->offset($offset)
+			->limit($num_of_page)
+			->get();
+
+		$formatted_products = [];
+		foreach ($products as $product) {
+			$ratingData = $product->calculateProductRating();
+
+			$shopRating = $product->shop->rating_shop_avg_rating ?? 0;
+        	$shopRatingCount = $product->shop->rating_shop_count ?? 0;
+
+			$formatted_products[] = [
+				'id' => $product->id,
+				'name' => $product->name,
+				'description' => $product->description,
+				'price' => $product->price,
+				'image' => $product->image,
+				'quantity' => $product->quantity,
+				'sold_quantity' => $product->sold_quantity,
+				'status' => $product->status,
+				'product_category_id' => $product->product_category_id,
+				"rating" => $ratingData['average'],
+				"rating_count" => $ratingData['count'],
+				'created_at' => $product->created_at,
+				'updated_at' => $product->updated_at,
+				"deleted_at" => $product->deleted_at,
+				'shop' => [
+					'id' => $product->shop->id,
+					'name' => $product->shop->name,
+					'email' => $product->shop->account->email,
+					'avatar' => $product->shop->account->avatar,
+					'description' => $product->shop->description,
+					'image' => $product->shop->image,
+					'phone' => $product->shop->phone,
+					'address' => $product->shop->address,
+					'website' => $product->shop->website,
+					'fanpage' => $product->shop->fanpage,
+					'work_time' => $product->shop->work_time,
+					'establish_year' => $product->shop->establish_year,
+					'rating' => $shopRating,
+                	'rating_count' => $shopRatingCount,
+					'account_id' => $product->shop->account->id,
+					'created_at' => $product->shop->created_at,
+					'updated_at' => $product->shop->updated_at,
+				],
+				'category' => [
+					'id' => $product->category->id,
+					'name' => $product->category->name,
+					'target' => $product->category->target,
+					'type' => $product->category->type,
+					'created_at' => $product->category->created_at,
+					'updated_at' => $product->category->updated_at,
+				],
+			];
+		}
+
+		return response()->json([
+			'message' => 'Query successfully!',
+			'status' => 200,
+			'page_number' => $page_number,
+			'num_of_page' => $num_of_page,
+			'total_pages' => $total_pages,
+			'total_products' => $total_products,
+			'data' => $formatted_products,
+		]);
+	}
+
+	public function getLowestRatingProductByShop(Request $request, $shop_id = null)
+	{
+		// Kiểm tra sự tồn tại của shop
+		if (!Shop::find($shop_id) && $shop_id != null) {
+			return response()->json([
+				'message' => 'Shop not found!',
+				'status' => 404
+			], 404);
+		}
+
+		$categories = [];
+
+		$page_number = intval($request->query('page_number', 1));
+		$num_of_page = intval($request->query('num_of_page', 10));
+		$is_deleted = $request->query('deleted', false);
+		$target = $request->query('target') ?? 'all';
+
+		if ($target === 'all') {
+			$categories = DB::table('product_categories')
+				->pluck('id')
+				->toArray();
+		} else {
+			if ($target === 'dog' || $target === 'cat') {
+				$categories = DB::table('product_categories')
+					->where('target', $target)
+					->pluck('id')
+					->toArray();
+
+				if (empty($categories)) {
+					return response()->json([
+						'message' => 'Query successfully!',
+						'status' => 200,
+						'data' => []
+					]);
+				}
+			}
+		}
+
+		if ($is_deleted) {
+			$total_products_query = Product::query()->onlyTrashed();
+		} else {
+			$total_products_query = Product::query()->whereNull('deleted_at');
+		}
+
+		// CHECK FOR ROLE_SHOP
+		$user = auth()->user();
+		$role_user = DB::table('roles')->where('id', '=', $user->role_id)->value('role_name');
+		if ($role_user === 'ROLE_SHOP') {
+			$auth_shop_id = DB::table('shops')->where('account_id', '=', $user->id)->value('id');
+			$total_products_query->where('shop_id', $auth_shop_id);
+		} else {
+			$total_products_query->where('shop_id', $shop_id);
+		}
+
+		if (!empty($categories)) {
+			$total_products_query->whereIn('product_category_id', $categories);
+		}
+
+		$total_products = $total_products_query->count();
+		$total_pages = ceil($total_products / $num_of_page);
+		$offset = ($page_number - 1) * $num_of_page;
+
+		$averageRatings = DB::table('rating_products')
+			->select('product_id', DB::raw('AVG(rating) as average_rating'))
+			->groupBy('product_id');
+
+		$products = $total_products_query->with(['shop' => function($query) {
+			$query->withCount('ratingShop')->withAvg('ratingShop', 'rating');
+		}, 'category'])
+			->leftJoinSub($averageRatings, 'average_ratings', function ($join) {
+				$join->on('products.id', '=', 'average_ratings.product_id');
+			})
+			->select('products.*', 'average_ratings.average_rating')
+			->whereIn('product_category_id', $categories)
+			->orderBy('average_rating', 'asc')
+			->offset($offset)
+			->limit($num_of_page)
+			->get();
+
+		$formatted_products = [];
+		foreach ($products as $product) {
+			$ratingData = $product->calculateProductRating();
+
+			$shopRating = $product->shop->rating_shop_avg_rating ?? 0;
+        	$shopRatingCount = $product->shop->rating_shop_count ?? 0;
+
+			$formatted_products[] = [
+				'id' => $product->id,
+				'name' => $product->name,
+				'description' => $product->description,
+				'price' => $product->price,
+				'image' => $product->image,
+				'quantity' => $product->quantity,
+				'sold_quantity' => $product->sold_quantity,
+				'status' => $product->status,
+				'product_category_id' => $product->product_category_id,
+				"rating" => $ratingData['average'],
+				"rating_count" => $ratingData['count'],
+				'created_at' => $product->created_at,
+				'updated_at' => $product->updated_at,
+				"deleted_at" => $product->deleted_at,
+				'shop' => [
+					'id' => $product->shop->id,
+					'name' => $product->shop->name,
+					'email' => $product->shop->account->email,
+					'avatar' => $product->shop->account->avatar,
+					'description' => $product->shop->description,
+					'image' => $product->shop->image,
+					'phone' => $product->shop->phone,
+					'address' => $product->shop->address,
+					'website' => $product->shop->website,
+					'fanpage' => $product->shop->fanpage,
+					'work_time' => $product->shop->work_time,
+					'establish_year' => $product->shop->establish_year,
+					'rating' => $shopRating,
+                	'rating_count' => $shopRatingCount,
+					'account_id' => $product->shop->account->id,
+					'created_at' => $product->shop->created_at,
+					'updated_at' => $product->shop->updated_at,
+				],
+				'category' => [
+					'id' => $product->category->id,
+					'name' => $product->category->name,
+					'target' => $product->category->target,
+					'type' => $product->category->type,
+					'created_at' => $product->category->created_at,
+					'updated_at' => $product->category->updated_at,
+				],
+			];
+		}
+
+		return response()->json([
+			'message' => 'Query successfully!',
+			'status' => 200,
+			'page_number' => $page_number,
+			'num_of_page' => $num_of_page,
+			'total_pages' => $total_pages,
+			'total_products' => $total_products,
+			'data' => $formatted_products,
+		]);
+	}
+
+	public function getLowestRatingProductByCategory(Request $request, $product_category_id)
+	{
+		if (!ProductCategory::find($product_category_id)) {
+			return response()->json([
+				'message' => 'Product category not found!',
+				'status' => 404
+			], 404);
+		}
+
+		$page_number = intval($request->query('page_number', 1));
+		$num_of_page = intval($request->query('num_of_page', 10));
+
+		$total_products_query = Product::query()
+			->whereNull('deleted_at')
+			->where('product_category_id', $product_category_id);
+
+		// CHECK FOR ROLE_SHOP
+		$user = auth()->user();
+		$role_user = DB::table('roles')->where('id', '=', $user->role_id)->value('role_name');
+		if ($role_user === 'ROLE_SHOP') {
+			$auth_shop_id = DB::table('shops')->where('account_id', '=', $user->id)->value('id');
+			$total_products_query->where('shop_id', $auth_shop_id);
+		}
+
+		$total_products = $total_products_query->count();
+		$total_pages = ceil($total_products / $num_of_page);
+		$offset = ($page_number - 1) * $num_of_page;
+
+		$averageRatings = DB::table('rating_products')
+			->select('product_id', DB::raw('AVG(rating) as average_rating'))
+			->groupBy('product_id');
+
+		$products = $total_products_query->with(['shop' => function($query) {
+			$query->withCount('ratingShop')->withAvg('ratingShop', 'rating');
+		}, 'category'])
+			->leftJoinSub($averageRatings, 'average_ratings', function ($join) {
+				$join->on('products.id', '=', 'average_ratings.product_id');
+			})
+			->select('products.*', 'average_ratings.average_rating')
+			->orderBy('average_rating', 'asc')
+			->offset($offset)
+			->limit($num_of_page)
+			->get();
+
+		$formatted_products = [];
+		foreach ($products as $product) {
+			$ratingData = $product->calculateProductRating();
+
+			$shopRating = $product->shop->rating_shop_avg_rating ?? 0;
+        	$shopRatingCount = $product->shop->rating_shop_count ?? 0;
+
+			$formatted_products[] = [
+				'id' => $product->id,
+				'name' => $product->name,
+				'description' => $product->description,
+				'price' => $product->price,
+				'image' => $product->image,
+				'quantity' => $product->quantity,
+				'sold_quantity' => $product->sold_quantity,
+				'status' => $product->status,
+				'product_category_id' => $product->product_category_id,
+				"rating" => $ratingData['average'],
+				"rating_count" => $ratingData['count'],
+				'created_at' => $product->created_at,
+				'updated_at' => $product->updated_at,
+				"deleted_at" => $product->deleted_at,
+				'shop' => [
+					'id' => $product->shop->id,
+					'name' => $product->shop->name,
+					'email' => $product->shop->account->email,
+					'avatar' => $product->shop->account->avatar,
+					'description' => $product->shop->description,
+					'image' => $product->shop->image,
+					'phone' => $product->shop->phone,
+					'address' => $product->shop->address,
+					'website' => $product->shop->website,
+					'fanpage' => $product->shop->fanpage,
+					'work_time' => $product->shop->work_time,
+					'establish_year' => $product->shop->establish_year,
+					'rating' => $shopRating,
+                	'rating_count' => $shopRatingCount,
+					'account_id' => $product->shop->account->id,
+					'created_at' => $product->shop->created_at,
+					'updated_at' => $product->shop->updated_at,
+				],
+				'category' => [
+					'id' => $product->category->id,
+					'name' => $product->category->name,
+					'target' => $product->category->target,
+					'type' => $product->category->type,
+					'created_at' => $product->category->created_at,
+					'updated_at' => $product->category->updated_at,
+				],
+			];
+		}
+
+		return response()->json([
+			'message' => 'Query successfully!',
+			'status' => 200,
+			'page_number' => $page_number,
+			'num_of_page' => $num_of_page,
+			'total_pages' => $total_pages,
+			'total_products' => $total_products,
+			'data' => $formatted_products,
+		]);
+	}
+
+	public function getLowestRatingProductWithShopAndCategory(Request $request, $shop_id, $product_category_id)
+	{
+		if (!Shop::find($shop_id)) {
+			return response()->json([
+				'message' => 'Shop not found!',
+				'status' => 404
+			], 404);
+		}
+
+		if (!ProductCategory::find($product_category_id)) {
+			return response()->json([
+				'message' => 'Product category not found!',
+				'status' => 404
+			], 404);
+		}
+
+		$page_number = intval($request->query('page_number', 1));
+		$num_of_page = intval($request->query('num_of_page', 10));
+
+		$total_products_query = Product::query()
+			->whereNull('deleted_at')
+			->where('shop_id', $shop_id)
+			->where('product_category_id', $product_category_id);
+
+		$total_products = $total_products_query->count();
+		$total_pages = ceil($total_products / $num_of_page);
+		$offset = ($page_number - 1) * $num_of_page;
+
+		$averageRatings = DB::table('rating_products')
+			->select('product_id', DB::raw('AVG(rating) as average_rating'))
+			->groupBy('product_id');
+
+		$products = $total_products_query->with(['shop' => function($query) {
+			$query->withCount('ratingShop')->withAvg('ratingShop', 'rating');
+		}, 'category'])
+			->leftJoinSub($averageRatings, 'average_ratings', function ($join) {
+				$join->on('products.id', '=', 'average_ratings.product_id');
+			})
+			->select('products.*', 'average_ratings.average_rating')
+			->orderBy('average_rating', 'asc')
+			->offset($offset)
+			->limit($num_of_page)
+			->get();
+
+		$formatted_products = [];
+		foreach ($products as $product) {
+			$ratingData = $product->calculateProductRating();
+
+			$shopRating = $product->shop->rating_shop_avg_rating ?? 0;
+        	$shopRatingCount = $product->shop->rating_shop_count ?? 0;
+
+			$formatted_products[] = [
+				'id' => $product->id,
+				'name' => $product->name,
+				'description' => $product->description,
+				'price' => $product->price,
+				'image' => $product->image,
+				'quantity' => $product->quantity,
+				'sold_quantity' => $product->sold_quantity,
+				'status' => $product->status,
+				'product_category_id' => $product->product_category_id,
+				"rating" => $ratingData['average'],
+				"rating_count" => $ratingData['count'],
+				'created_at' => $product->created_at,
+				'updated_at' => $product->updated_at,
+				"deleted_at" => $product->deleted_at,
+				'shop' => [
+					'id' => $product->shop->id,
+					'name' => $product->shop->name,
+					'email' => $product->shop->account->email,
+					'avatar' => $product->shop->account->avatar,
+					'description' => $product->shop->description,
+					'image' => $product->shop->image,
+					'phone' => $product->shop->phone,
+					'address' => $product->shop->address,
+					'website' => $product->shop->website,
+					'fanpage' => $product->shop->fanpage,
+					'work_time' => $product->shop->work_time,
+					'establish_year' => $product->shop->establish_year,
+					'rating' => $shopRating,
+                	'rating_count' => $shopRatingCount,
+					'account_id' => $product->shop->account->id,
+					'created_at' => $product->shop->created_at,
+					'updated_at' => $product->shop->updated_at,
+				],
+				'category' => [
+					'id' => $product->category->id,
+					'name' => $product->category->name,
+					'target' => $product->category->target,
+					'type' => $product->category->type,
+					'created_at' => $product->category->created_at,
+					'updated_at' => $product->category->updated_at,
+				],
+			];
+		}
+
+		return response()->json([
+			'message' => 'Query successfully!',
+			'status' => 200,
+			'page_number' => $page_number,
+			'num_of_page' => $num_of_page,
+			'total_pages' => $total_pages,
+			'total_products' => $total_products,
+			'data' => $formatted_products,
+		]);
+	}
+
+	public function getSoldOutProducts(Request $request)
+	{
+		$categories = [];
+
+		$page_number = intval($request->query('page_number', 1));
+		$num_of_page = intval($request->query('num_of_page', 10));
+		$target = $request->query('target') ?? 'all';
+		$is_deleted = $request->query('deleted', false);
+
+		if ($target === 'all') {
+			// Nếu không có field 'target' được gửi đến, lấy tất cả các danh mục
+			$categories = DB::table('product_categories')
+				->pluck('id')
+				->toArray();
+		} else {
+			// Nếu 'target' là 'dog' hoặc 'cat' thì query dữ liệu từ bảng 'product_categories'
+			if ($target === 'dog' || $target === 'cat') {
+				$categories = DB::table('product_categories')
+					->where('target', $target)
+					->pluck('id')
+					->toArray();
+
+				// Nếu không có danh mục nào phù hợp thì trả về mảng rỗng
+				if (empty($categories)) {
+					return response()->json([
+						'message' => 'Query successfully!',
+						'status' => 200,
+						'data' => []
+					]);
+				}
+			}
+		}
+
+		// CHECK FOR ROLE_SHOP
+		$user = auth()->user();
+		$shop_id = DB::table('shops')->where('account_id', '=', $user->id)->value('id');
+
+		$total_products_query = Product::query()
+			->where('quantity', 0)
+			->where('shop_id', $shop_id);
+
+		if ($is_deleted) {
+			$total_products_query->onlyTrashed();
+		} else {
+			$total_products_query->whereNull('deleted_at');
+		}
+
+		// Nếu có danh mục, thêm điều kiện whereIn
+		if (!empty($categories)) {
+			$total_products_query->whereIn('product_category_id', $categories);
+		}
+
+		// Tính tổng số trang
+		$total_products = $total_products_query->count();
+		$total_pages = ceil($total_products / $num_of_page);
+
+		// Tính toán offset
+		$offset = ($page_number - 1) * $num_of_page;
+
+		// Lấy dữ liệu sản phẩm dựa trên trang hiện tại và số lượng sản phẩm trên mỗi trang
+		$products = $total_products_query->with(['shop', 'category']) // Sử dụng eager loading để lấy thông tin cửa hàng
 			->offset($offset)
 			->limit($num_of_page)
 			->get();
@@ -1568,6 +2337,7 @@ class ProductController extends Controller
 			];
 		}
 
+		// Trả về JSON response
 		return response()->json([
 			'message' => 'Query successfully!',
 			'status' => 200,

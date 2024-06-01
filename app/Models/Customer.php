@@ -32,4 +32,14 @@ class Customer extends Model
         'account_id',
         'ranking_id'
     ];
+
+    public function ratings()
+    {
+        return $this->hasMany(RatingProduct::class);
+    }
+
+    public function account()
+    {
+        return $this->belongsTo(Account::class, 'account_id');
+    }
 }

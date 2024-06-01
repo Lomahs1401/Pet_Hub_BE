@@ -37,4 +37,8 @@ class Shop extends Model
     public function account() {
         return $this->belongsTo(Account::class);
     }
+
+    public function ratingShop() {
+        return $this->hasMany(RatingShop::class);
+    }
 }

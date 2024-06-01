@@ -5,6 +5,7 @@ use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\BlogController;
 use App\Http\Controllers\API\ProductCategoryController;
 use App\Http\Controllers\API\ProductController;
+use App\Http\Controllers\API\RatingProductController;
 use App\Http\Controllers\API\ServiceController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -65,11 +66,16 @@ Route::group([
     Route::get('/products/best-selling', [ProductController::class, 'getBestSellingProduct']); // lấy ds product bán chạy (ko ràng buộc bởi shop và category)
     Route::get('/products/best-selling/shop/{shop_id?}', [ProductController::class, 'getBestSellingProductByShop']); // lấy ds product bán chạy bởi shop
     Route::get('/products/best-selling/category/{product_category_id}', [ProductController::class, 'getBestSellingProductByCategory']); // lấy ds product bán chạy thuộc category
+    Route::get('/products/best-selling/shop/{shop_id}/category-type', [ProductController::class, 'getBestSellingProductWithShopAndCategoryType']); // lấy ds product bán chạy bởi shop và thuộc category type
     Route::get('/products/best-selling/shop/{shop_id?}/category/{product_category_id}', [ProductController::class, 'getBestSellingProductWithShopAndCategory']); // lấy ds product bán chạy bởi shop và thuộc category
     Route::get('/products/highest-rating', [ProductController::class, 'getHighestRatingProduct']); // lấy ds product được đánh giá cao nhất (ko ràng buộc bởi shop và category)
     Route::get('/products/highest-rating/shop/{shop_id?}', [ProductController::class, 'getHighestRatingProductByShop']); // lấy ds product có điểm đánh giá cao nhất thuộc shop
     Route::get('/products/highest-rating/category/{product_category_id}', [ProductController::class, 'getHighestRatingProductByCategory']); // lấy ds product có điểm đánh giá cao nhất thuộc category
     Route::get('/products/highest-rating/shop/{shop_id?}/category/{product_category_id}', [ProductController::class, 'getHighestRatingProductWithShopAndCategory']); // lấy ds product có điểm đánh giá cao nhất thuộc shop và category
+    Route::get('/products/lowest-rating', [ProductController::class, 'getLowestRatingProduct']); // lấy ds product được đánh giá thấp nhất (ko ràng buộc bởi shop và category)
+    Route::get('/products/lowest-rating/shop/{shop_id?}', [ProductController::class, 'getLowestRatingProductByShop']); // lấy ds product có điểm đánh giá thấp nhất thuộc shop
+    Route::get('/products/lowest-rating/category/{product_category_id}', [ProductController::class, 'getLowestRatingProductByCategory']); // lấy ds product có điểm đánh giá thấp nhất thuộc category
+    Route::get('/products/lowest-rating/shop/{shop_id?}/category/{product_category_id}', [ProductController::class, 'getLowestRatingProductWithShopAndCategory']); // lấy ds product có điểm đánh giá thấp nhất thuộc shop và category
     // ------------------------------------------------
     Route::get('/products/{id}', [ProductController::class, 'show']);
 
@@ -137,6 +143,7 @@ Route::group([
   Route::get('/products/best-selling/category/{product_category_id}', [ProductController::class, 'getBestSellingProductByCategory']); // lấy ds product bán chạy bởi shop và thuộc category
   Route::get('/products/highest-rating', [ProductController::class, 'getHighestRatingProductByShop']); // lấy ds product có điểm đánh giá cao nhất thuộc shop
   Route::get('/products/highest-rating/category/{product_category_id}', [ProductController::class, 'getHighestRatingProductByCategory']); // lấy ds product có điểm đánh giá cao nhất thuộc category
+  Route::get('/products/sold-out', [ProductController::class, 'getSoldOutProducts']); // lấy ds product đã bán hết
   Route::get('/products/rating', [ProductController::class, 'getProductsByRating']); // lấy ds product có điểm đánh giá cao nhất thuộc shop
   Route::get('/products/deleted', [ProductController::class, 'getDeletedProducts']);
   // --------------     PRODUCT SOFT DELETE     --------------
@@ -153,6 +160,13 @@ Route::group([
   Route::get('/product-categories/type', [ProductCategoryController::class, 'getDistinctCategoryTypes']); // lấy dsach category type
   Route::get('/product-categories/type/{target}', [ProductCategoryController::class, 'getDistinctCategoryTypesByTarget']); // lấy dsach category type theo target
 
+  // --------------     RATING     --------------
+  Route::get('/ratings/products', [RatingProductController::class, 'getProductCountsByCategory']); // lấy sl product của category và thuộc shop_id
+  Route::get('/ratings/type/products', [RatingProductController::class, 'getProductCountsByCategoryType']); // lấy sl product của category type và thuộc shop_id
+  Route::get('/ratings/type', [RatingProductController::class, 'getDistinctCategoryTypes']); // lấy dsach category type
+  Route::get('/ratings/type/{target}', [RatingProductController::class, 'getDistinctCategoryTypesByTarget']); // lấy dsach category type theo target
+  Route::get('/ratings/product/{product_id}', [RatingProductController::class, 'getCustomerRatingsOfProductId']); // lấy dsach rating của customer theo product id
+  Route::get('/ratings/product/{product_id}/detail', [RatingProductController::class, 'getDetailRating']); // lấy dsach các loại đánh giá (5,4,3,2,1 sao) của customer theo product id
 });
 
 

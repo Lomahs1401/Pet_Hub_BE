@@ -27,7 +27,7 @@ class RatingProductSeeder extends Seeder
         $product_ids = Product::pluck('id')->toArray();
 
         foreach ($product_ids as $product_id) {
-            $num_ratings_for_product = $faker->numberBetween(0, 5);
+            $num_ratings_for_product = $faker->numberBetween(0, 10);
 
             $selected_customer_ids = [];
 

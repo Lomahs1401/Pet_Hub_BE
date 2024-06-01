@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class RatingShop extends Model
+class RatingMedicalCenter extends Model
 {
 	use HasFactory;
 
@@ -14,7 +14,7 @@ class RatingShop extends Model
 	 *
 	 * @var string
 	 */
-	protected $table = 'rating_shops';
+	protected $table = 'rating_medical_centers';
 
 	/**
 	 * The attributes that are mass assignable.
@@ -25,10 +25,6 @@ class RatingShop extends Model
 		'rating',
 		'description',
 		'customer_id',
-		'shop_id',
+		'medical_center_id',
 	];
-
-	public function shop() {
-		return $this->belongsTo(Shop::class);
-	}
 }

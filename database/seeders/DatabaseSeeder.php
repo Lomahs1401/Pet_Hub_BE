@@ -39,5 +39,7 @@ class DatabaseSeeder extends Seeder
         $this->call(ServiceSeeder::class);
         $this->call(RatingProductSeeder::class);
         $this->call(RatingServiceSeeder::class);
+        $this->call(RatingShopSeeder::class);
+        $this->call(RatingMedicalCenterSeeder::class);
     }
 }

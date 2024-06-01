@@ -70,9 +70,9 @@ class Product extends Model
 		$averageRating = round($averageRating, 2);
 
 		return [
-            'average' => number_format($averageRating, 2, '.', ''),
-            'count' => $count
-        ];;
+			'average' => number_format($averageRating, 2, '.', ''),
+			'count' => $count
+		];;
 	}
 
 	// Mối quan hệ một-nhiều với RatingProduct

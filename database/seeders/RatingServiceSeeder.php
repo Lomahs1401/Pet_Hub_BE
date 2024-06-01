@@ -27,7 +27,7 @@ class RatingServiceSeeder extends Seeder
         $service_ids = Service::pluck('id')->toArray();
 
         foreach ($service_ids as $service_id) {
-            $num_ratings_for_service = $faker->numberBetween(0, 5);
+            $num_ratings_for_service = $faker->numberBetween(0, 10);
 
             $selected_customer_ids = [];
 
