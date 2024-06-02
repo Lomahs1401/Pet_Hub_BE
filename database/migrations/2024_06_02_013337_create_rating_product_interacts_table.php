@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCommentsTable extends Migration
+class CreateRatingProductInteractsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,13 @@ class CreateCommentsTable extends Migration
      */
     public function up()
     {
-        Schema::create('comments', function (Blueprint $table) {
+        Schema::create('rating_product_interacts', function (Blueprint $table) {
             $table->id();
-            $table->text('text');
+            $table->foreignId('rating_product_id')->constrained('rating_products');
             $table->foreignId('account_id')->constrained('accounts');
-            $table->foreignId('parent_comments_id')->nullable()->constrained('comments');
-            $table->foreignId('blog_id')->constrained('blogs');
             $table->timestamps();
             $table->softDeletes();
+            $table->unique(['rating_product_id', 'account_id']);
         });
     }
 
@@ -31,6 +30,6 @@ class CreateCommentsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('comments');
+        Schema::dropIfExists('rating_product_interacts');
     }
 }

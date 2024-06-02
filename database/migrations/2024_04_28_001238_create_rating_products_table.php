@@ -17,6 +17,8 @@ class CreateRatingProductsTable extends Migration
             $table->id();
             $table->integer('rating');
             $table->text('description');
+            $table->text('reply')->nullable();
+            $table->date('reply_date')->nullable();
             $table->foreignId('customer_id')->constrained('customers');
             $table->foreignId('product_id')->constrained('products');
             $table->timestamps();
