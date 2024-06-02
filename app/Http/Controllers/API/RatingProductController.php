@@ -13,38 +13,34 @@ use Illuminate\Support\Facades\DB;
 
 class RatingProductController extends Controller
 {
-	public function getCustomerRatingsOfProductId(Request $request, $product_id, $shop_id = null)
+	public function getCustomerRatingsOfProductId(Request $request, $product_id)
 	{
-		if (!Shop::find($shop_id) && $shop_id != null) {
-			return response()->json([
-				'message' => 'Shop not found!',
-				'status' => 404
-			], 404);
-		}
-
 		$user = auth()->user();
 		$role_user = DB::table('roles')->where('id', '=', $user->role_id)->value('role_name');
+		
+		// Lấy thông tin shop của user nếu role là shop
 		if ($role_user === 'ROLE_SHOP') {
 			$auth_shop_id = DB::table('shops')->where('account_id', '=', $user->id)->value('id');
-			// Lấy các sản phẩm thuộc shop hiện tại
-			$shopProductIds = DB::table('products')->where('shop_id', $auth_shop_id)->pluck('id')->toArray();
-		} else {
-			$shopProductIds = DB::table('products')->where('shop_id', $shop_id)->pluck('id')->toArray();
 		}
-
+	
+		// Kiểm tra sản phẩm thuộc về shop nào
+		$productShopId = DB::table('products')->where('id', $product_id)->value('shop_id');
+	
+		// Nếu role là shop và sản phẩm không thuộc shop của user, trả về lỗi
+		if ($role_user === 'ROLE_SHOP' && $auth_shop_id !== $productShopId) {
+			return response()->json([
+				'message' => 'You do not have access to this product.',
+			], 403); // 403 Forbidden
+		}
+	
 		// Lấy rating của sản phẩm cụ thể
 		$ratings = RatingProduct::with(['customer.account', 'customer.ratings', 'interacts.account'])
 			->where('product_id', $product_id)
 			->get()
-			->map(function ($rating) use ($shopProductIds, $user) {
+			->map(function ($rating) use ($user) {
 				$customer = $rating->customer;
 				$account = $customer->account;
-
-				// Lọc rating của customer đối với các sản phẩm thuộc shop hiện tại
-				$customerShopRatings = $customer->ratings->filter(function ($customerRating) use ($shopProductIds) {
-					return in_array($customerRating->product_id, $shopProductIds);
-				});
-
+	
 				// Lấy thông tin về lượt like
 				$likes = $rating->interacts->map(function ($interact) {
 					return [
@@ -53,10 +49,10 @@ class RatingProductController extends Controller
 						'avatar' => $interact->account->avatar,
 					];
 				});
-
+	
 				// Kiểm tra xem shop có nằm trong danh sách likes hay không
 				$shop_liked = $rating->interacts->contains('account_id', $user->id);
-
+	
 				return [
 					'rating_id' => $rating->id,
 					'rating_score' => $rating->rating,
@@ -67,7 +63,7 @@ class RatingProductController extends Controller
 					'customer_username' => $account->username,
 					'customer_avatar' => $account->avatar,
 					'account_creation_date' => $account->created_at,
-					'customer_rating_count' => $customerShopRatings->count(),
+					'customer_rating_count' => $customer->ratings->count(),
 					'customer_ranking_point' => $customer->ranking_point ?? 0,
 					'likes' => [
 						'total_likes' => $rating->interacts->count(),
@@ -76,16 +72,16 @@ class RatingProductController extends Controller
 					]
 				];
 			});
-
+	
 		// Tính tổng số ratings và tổng số trang
 		$totalRatings = $ratings->count();
 		$num_of_page = intval($request->query('num_of_page', 5));
 		$total_pages = ceil($totalRatings / $num_of_page);
 		$page_number = intval($request->query('page_number', 1));
-
+	
 		// Phân trang dữ liệu ratings
 		$paginatedRatings = $ratings->forPage($page_number, $num_of_page)->values();
-
+	
 		return response()->json([
 			'message' => 'Query successfully!',
 			'status' => 200,

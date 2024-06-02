@@ -126,8 +126,7 @@ Route::group([
 
 
     // --------------     RATING     --------------
-    Route::get('/ratings/product/{product_id}/shop/{shop_id?}', [RatingProductController::class, 'getCustomerRatingsOfProductId']); // lấy dsach rating của customer theo product id
-    Route::get('/ratings/product/{product_id}/detail', [RatingProductController::class, 'getDetailRating']); // lấy dsach các loại đánh giá (5,4,3,2,1 sao) của customer theo product id
+    Route::get('/ratings/product/{product_id}', [RatingProductController::class, 'getCustomerRatingsOfProductId']); // lấy dsach rating của customer theo product id
 });
 
 // Shop API
