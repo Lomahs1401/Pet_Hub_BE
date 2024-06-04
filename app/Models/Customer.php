@@ -7,39 +7,39 @@ use Illuminate\Database\Eloquent\Model;
 
 class Customer extends Model
 {
-    use HasFactory;
+  use HasFactory;
 
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'customers';
+  /**
+   * The table associated with the model.
+   *
+   * @var string
+   */
+  protected $table = 'customers';
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
-    protected $fillable = [
-        'full_name',
-        'gender',
-        'birthdate',
-        'CMND',
-        'address',  
-        'phone',
-        'ranking_point',
-        'account_id',
-        'ranking_id'
-    ];
+  /**
+   * The attributes that are mass assignable.
+   *
+   * @var array<int, string>
+   */
+  protected $fillable = [
+    'full_name',
+    'gender',
+    'birthdate',
+    'CMND',
+    'address',
+    'phone',
+    'ranking_point',
+    'account_id',
+    'ranking_id'
+  ];
 
-    public function ratings()
-    {
-        return $this->hasMany(RatingProduct::class);
-    }
+  public function ratings()
+  {
+    return $this->hasMany(RatingProduct::class);
+  }
 
-    public function account()
-    {
-        return $this->belongsTo(Account::class, 'account_id');
-    }
+  public function account()
+  {
+    return $this->belongsTo(Account::class, 'account_id');
+  }
 }

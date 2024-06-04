@@ -66,7 +66,7 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         // Register custom middleware
         'force.json.response' => \App\Http\Middleware\ForceJsonResponseMiddleware::class,
-        'auth' => \App\Http\Middleware\AuthMiddleware::class,
+        'auth.user' => \App\Http\Middleware\AuthMiddleware::class,
         'auth.customer' => \App\Http\Middleware\CustomerMiddleware::class,
         'auth.doctor' => \App\Http\Middleware\DoctorMiddleware::class,
         'auth.shop' => \App\Http\Middleware\ShopMiddleware::class,

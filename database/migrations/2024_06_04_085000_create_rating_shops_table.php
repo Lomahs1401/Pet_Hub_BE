@@ -17,9 +17,12 @@ class CreateRatingShopsTable extends Migration
 			$table->id();
 			$table->integer('rating');
 			$table->text('description');
+      $table->text('reply')->nullable();
+      $table->date('reply_date')->nullable();
 			$table->foreignId('customer_id')->constrained('customers');
 			$table->foreignId('shop_id')->constrained('shops');
 			$table->timestamps();
+      $table->softDeletes();
 		});
 	}
 

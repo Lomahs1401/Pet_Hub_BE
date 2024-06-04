@@ -3,14 +3,13 @@
 namespace Database\Seeders;
 
 use App\Models\Account;
-use App\Models\RatingService;
-use App\Models\RatingServiceInteract;
-use App\Models\Role;
-use App\Models\Service;
+use App\Models\Doctor;
+use App\Models\RatingDoctor;
+use App\Models\RatingDoctorInteract;
 use Illuminate\Database\Seeder;
 use Faker\Factory as Faker;
 
-class RatingServiceSeeder extends Seeder
+class RatingDoctorSeeder extends Seeder
 {
   /**
    * Run the database seeds.
@@ -25,14 +24,15 @@ class RatingServiceSeeder extends Seeder
       $query->where('role_name', 'ROLE_CUSTOMER');
     })->pluck('id')->toArray();
 
-    $service_ids = Service::pluck('id')->toArray();
+    $doctor_ids = Doctor::pluck('id')->toArray();
 
-    foreach ($service_ids as $service_id) {
-      $num_ratings_for_service = $faker->numberBetween(0, 10);
+    foreach ($doctor_ids as $doctor_id) {
+      // Random số lượng rating cho mỗi sản phẩm
+      $num_ratings_for_doctor = $faker->numberBetween(0, 10);
 
       $selected_customer_ids = [];
 
-      for ($i = 0; $i < $num_ratings_for_service; $i++) {
+      for ($i = 0; $i < $num_ratings_for_doctor; $i++) {
         // 35% xác suất cho rating 5 sao
         // 45% xác suất cho rating 4 sao
         // 6% xác suất cho rating 3 sao
@@ -62,39 +62,39 @@ class RatingServiceSeeder extends Seeder
         $reply = $faker->boolean(40) ? $faker->paragraph(6) : null;
         $reply_date = $reply ? $faker->dateTimeBetween($created_at, 'now') : null;
 
-        $ratingService = RatingService::create([
+        $ratingDoctor = RatingDoctor::create([
           'rating' => $rating,
           'description' => $faker->paragraph(8),
           'customer_id' => $random_customer_id,
-          'service_id' => $service_id,
+          'doctor_id' => $doctor_id,
           'reply' => $reply,
           'reply_date' => $reply_date,
           'created_at' => $created_at,
           'updated_at' => $created_at // giữ updated_at giống created_at cho consistency
         ]);
 
-        // Random số lượng liked cho rating service này từ các customer khác nhau
+        // Random số lượng liked cho rating doctor này từ các customer khác nhau
         $num_likes = $faker->numberBetween(0, 5);
         $liked_customer_ids = $faker->randomElements($customer_account_ids, $num_likes);
 
         foreach ($liked_customer_ids as $liked_customer_id) {
-          RatingServiceInteract::create([
-            'rating_service_id' => $ratingService->id,
+          RatingDoctorInteract::create([
+            'rating_doctor_id' => $ratingDoctor->id,
             'account_id' => $liked_customer_id,
           ]);
         }
 
-        // Nếu rating service có reply, quyết định liệu service có like hay không
-        if ($ratingService->reply) {
-          $service_like = $faker->boolean(50);
+        // Nếu rating doctor có reply, quyết định liệu doctor có like hay không
+        if ($ratingDoctor->reply) {
+          $doctor_like = $faker->boolean(50);
 
-          if ($service_like) {
-            // Lấy account_id của medical center cung cap service
-            $service_account_id = Service::find($service_id)->medicalCenter->account_id;
+          if ($doctor_like) {
+            // Lấy account_id của doctor
+            $doctor_account_id = Doctor::find($doctor_id)->account_id;
 
-            RatingServiceInteract::create([
-              'rating_service_id' => $ratingService->id,
-              'account_id' => $service_account_id,
+            RatingDoctorInteract::create([
+              'rating_doctor_id' => $ratingDoctor->id,
+              'account_id' => $doctor_account_id,
             ]);
           }
         }

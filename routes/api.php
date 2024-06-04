@@ -3,10 +3,14 @@
 use App\Http\Controllers\API\AccountController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\BlogController;
+use App\Http\Controllers\API\BreedController;
+use App\Http\Controllers\API\MedicalCenterController;
+use App\Http\Controllers\API\PetController;
 use App\Http\Controllers\API\ProductCategoryController;
 use App\Http\Controllers\API\ProductController;
 use App\Http\Controllers\API\RatingProductController;
 use App\Http\Controllers\API\ServiceController;
+use App\Models\MedicalCenter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -26,8 +30,9 @@ Route::group([
     'middleware' => ['force.json.response', 'api'],
     'prefix' => 'auth'
 ], function ($router) {
-    Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/refresh', [AuthController::class, 'refresh']);
     Route::patch('/reset-password/request', [AccountController::class, 'requestSendResetCode']);
     Route::patch('/reset-verify-code/request', [AccountController::class, 'resetVerifyCode']);
     Route::patch('/reset-password/{email}/{code}', [AccountController::class, 'resetPassword']);
@@ -35,19 +40,18 @@ Route::group([
 
 // Auth API
 Route::group([
-    'middleware' => ['force.json.response', 'api', 'auth'],
+    'middleware' => ['force.json.response', 'api', 'auth.user'],
     'prefix' => 'auth',
 ], function ($router) {
     // Authenticate
     Route::post('/logout', [AuthController::class, 'logout']);
-    Route::post('/refresh', [AuthController::class, 'refresh']);
-    Route::post('/me', [AuthController::class, 'me']);
+    Route::post('/profile', [AuthController::class, 'profile']);
     Route::patch('/changePassword', [AccountController::class, 'changePassword']);
 });
 
 // Customer API
 Route::group([
-    'middleware' => ['force.json.response', 'api', 'auth', 'auth.customer'],
+    'middleware' => ['force.json.response', 'api', 'auth.user', 'auth.customer'],
     'prefix' => 'customer',
 ], function ($router) {
     // --------------     PRODUCT     --------------
@@ -127,11 +131,45 @@ Route::group([
 
     // --------------     RATING     --------------
     Route::get('/ratings/product/{product_id}', [RatingProductController::class, 'getCustomerRatingsOfProductId']); // lấy dsach rating của customer theo product id
+
+    // --------------     MEDICAL CENTER　PAGINATION     --------------
+    Route::get('/medical-centers/paginate', [MedicalCenterController::class, 'paging']);
+    Route::get('/medical-centers/search', [MedicalCenterController::class, 'searchMedicalCenter']);
+    Route::get('/medical-centers/highest-rating', [MedicalCenterController::class, 'getHighestRatingMedicalCenter']);
+    // ------------------------------------------------
+    Route::get('/medical-centers/{medical_center_id}', [MedicalCenterController::class, 'show']);
+
+    // --------------     APPOINTMENT     --------------
+    Route::get('/medical-centers/paginate', [MedicalCenterController::class, 'paging']);
+    Route::get('/medical-centers/search', [MedicalCenterController::class, 'searchMedicalCenter']);
+    Route::get('/medical-centers/highest-rating', [MedicalCenterController::class, 'getHighestRatingMedicalCenter']);
+    // ------------------------------------------------
+    Route::get('/medical-centers/{medical_center_id}', [MedicalCenterController::class, 'show']);
+
+    // --------------     PET     --------------
+    Route::get('/pets/paginate', [PetController::class, 'paging']);
+    Route::get('/pets/adopt/paginate', [PetController::class, 'paging']);
+    Route::get('/pets/search', [PetController::class, 'store']);
+    Route::get('/pets/highest-rating', [PetController::class, 'getHighestRatingMedicalCenter']);
+    // ------------------------------------------------
+    Route::get('/pets/{medical_center_id}', [MedicalCenterController::class, 'show']);
+      // --------------     PET SOFT DELETE     --------------
+    Route::put('/pets/{id}/restore', [PetController::class, 'restore']);
+    Route::delete('/pets/{id}', [PetController::class, 'destroy']);
+    // ------------------------------------------------
+    Route::get('/pets/{id}', [PetController::class, 'show']);
+    Route::post('/pets', [PetController::class, 'store']);
+    Route::put('/pets/{id}', [PetController::class, 'update']);
+
+    // --------------     BREED     --------------
+    Route::get('/breeds', [BreedController::class, 'index']);
+    Route::get('/breeds/{breed_id}', [BreedController::class, 'show']);
+
 });
 
 // Shop API
 Route::group([
-  'middleware' => ['force.json.response', 'api', 'auth', 'auth.shop'],
+  'middleware' => ['force.json.response', 'api', 'auth.user', 'auth.shop'],
   'prefix' => 'shop',
 ], function ($router) {
   // --------------     PRODUCT     --------------

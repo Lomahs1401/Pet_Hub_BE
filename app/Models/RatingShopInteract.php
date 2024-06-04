@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class AidCenter extends Model
+class RatingShopInteract extends Model
 {
   use HasFactory, SoftDeletes;
 
@@ -15,7 +15,7 @@ class AidCenter extends Model
    *
    * @var string
    */
-  protected $table = 'aid_centers';
+  protected $table = 'rating_shop_interacts';
 
   /**
    * The attributes that are mass assignable.
@@ -23,16 +23,17 @@ class AidCenter extends Model
    * @var array<int, string>
    */
   protected $fillable = [
-    'name',
-    'description',
-    'image',
-    'phone',
-    'address',
-    'website',
-    'fanpage',
-    'work_time',
-    'establish_year',
-    'certificate',
     'account_id',
+    'rating_shop_id',
   ];
+
+  public function ratingShop()
+  {
+    return $this->belongsTo(RatingShop::class);
+  }
+
+  public function account()
+  {
+    return $this->belongsTo(Account::class);
+  }
 }

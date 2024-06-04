@@ -27,6 +27,7 @@ class CreateDoctorsTable extends Migration
           $table->foreignId('account_id')->constrained('accounts');
           $table->foreignId('medical_center_id')->constrained('medical_centers');
           $table->timestamps();
+          $table->softDeletes();
         });
     }
 

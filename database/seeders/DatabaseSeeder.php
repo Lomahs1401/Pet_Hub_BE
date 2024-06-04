@@ -41,5 +41,6 @@ class DatabaseSeeder extends Seeder
         $this->call(RatingServiceSeeder::class);
         $this->call(RatingShopSeeder::class);
         $this->call(RatingMedicalCenterSeeder::class);
+        $this->call(RatingDoctorSeeder::class);
     }
 }

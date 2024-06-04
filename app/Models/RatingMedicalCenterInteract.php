@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class RatingProduct extends Model
+class RatingMedicalCenterInteract extends Model
 {
 	use HasFactory, SoftDeletes;
 
@@ -15,7 +15,7 @@ class RatingProduct extends Model
 	 *
 	 * @var string
 	 */
-	protected $table = 'rating_products';
+	protected $table = 'rating_medical_center_interacts';
 
 	/**
 	 * The attributes that are mass assignable.
@@ -23,26 +23,17 @@ class RatingProduct extends Model
 	 * @var array<int, string>
 	 */
 	protected $fillable = [
-		'rating',
-		'description',
-		'reply',
-		'reply_date',
-		'customer_id',
-		'product_id',
+		'account_id',
+		'rating_medical_center_id',
 	];
 
-	public function customer()
+	public function ratingMedicalCenter()
 	{
-		return $this->belongsTo(Customer::class);
+		return $this->belongsTo(RatingMedicalCenter::class);
 	}
 
-	public function product()
+	public function account()
 	{
-		return $this->belongsTo(Product::class);
-	}
-
-	public function interacts()
-	{
-		return $this->hasMany(RatingProductInteract::class);
+		return $this->belongsTo(Account::class);
 	}
 }

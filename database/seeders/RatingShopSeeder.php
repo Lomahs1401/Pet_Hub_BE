@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Account;
 use App\Models\RatingShop;
+use App\Models\RatingShopInteract;
 use App\Models\Shop;
 use Illuminate\Database\Seeder;
 use Faker\Factory as Faker;
@@ -53,12 +54,49 @@ class RatingShopSeeder extends Seeder
 				// Thêm khách hàng vào danh sách đã chọn
 				$selected_customer_ids[] = $random_customer_id;
 
-				RatingShop::create([
+        // Random created_at trong khoảng từ 2 năm trước đến hiện tại
+				$created_at = $faker->dateTimeBetween('-2 years', 'now');
+
+        // Random reply và reply_date (nếu có reply)
+				$reply = $faker->boolean(40) ? $faker->paragraph(6) : null;
+				$reply_date = $reply ? $faker->dateTimeBetween($created_at, 'now') : null;
+
+				$ratingShop = RatingShop::create([
 					'rating' => $rating,
 					'description' => $faker->paragraph(8),
 					'customer_id' => $random_customer_id,
 					'shop_id' => $shop_id,
+          'reply' => $reply,
+					'reply_date' => $reply_date,
+					'created_at' => $created_at,
+					'updated_at' => $created_at // giữ updated_at giống created_at cho consistency
 				]);
+
+        // Random số lượng liked cho rating shop này từ các customer khác nhau
+				$num_likes = $faker->numberBetween(0, 5);
+				$liked_customer_ids = $faker->randomElements($customer_account_ids, $num_likes);
+
+				foreach ($liked_customer_ids as $liked_customer_id) {
+					RatingShopInteract::create([
+						'rating_shop_id' => $ratingShop->id,
+						'account_id' => $liked_customer_id,
+					]);
+				}
+
+        // Nếu rating shop có reply, quyết định liệu shop có like hay không
+				if ($ratingShop->reply) {
+					$shop_like = $faker->boolean(50);
+
+					if ($shop_like) {
+						// Lấy account_id của shop bán sản phẩm hiện tại
+						$shop_account_id = Shop::find($shop_id)->account_id;
+
+						RatingShopInteract::create([
+							'rating_shop_id' => $ratingShop->id,
+							'account_id' => $shop_account_id,
+						]);
+					}
+				}
 			}
 
 			$selected_customer_ids = [];

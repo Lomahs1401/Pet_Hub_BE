@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Account;
 use App\Models\MedicalCenter;
 use App\Models\RatingMedicalCenter;
+use App\Models\RatingMedicalCenterInteract;
 use Illuminate\Database\Seeder;
 use Faker\Factory as Faker;
 
@@ -53,12 +54,49 @@ class RatingMedicalCenterSeeder extends Seeder
 				// Thêm khách hàng vào danh sách đã chọn
 				$selected_customer_ids[] = $random_customer_id;
 
-				RatingMedicalCenter::create([
+        // Random created_at trong khoảng từ 2 năm trước đến hiện tại
+				$created_at = $faker->dateTimeBetween('-2 years', 'now');
+
+        // Random reply và reply_date (nếu có reply)
+				$reply = $faker->boolean(40) ? $faker->paragraph(6) : null;
+				$reply_date = $reply ? $faker->dateTimeBetween($created_at, 'now') : null;
+
+				$ratingMedicalCenter = RatingMedicalCenter::create([
 					'rating' => $rating,
 					'description' => $faker->paragraph(8),
 					'customer_id' => $random_customer_id,
 					'medical_center_id' => $medical_center_id,
+          'reply' => $reply,
+					'reply_date' => $reply_date,
+          'created_at' => $created_at,
+					'updated_at' => $created_at // giữ updated_at giống created_at cho consistency
 				]);
+
+        // Random số lượng liked cho rating medical center này từ các customer khác nhau
+				$num_likes = $faker->numberBetween(0, 5);
+				$liked_customer_ids = $faker->randomElements($customer_account_ids, $num_likes);
+
+        foreach ($liked_customer_ids as $liked_customer_id) {
+					RatingMedicalCenterInteract::create([
+						'rating_medical_center_id' => $ratingMedicalCenter->id,
+						'account_id' => $liked_customer_id,
+					]);
+				}
+
+        // Nếu rating medical center có reply, quyết định liệu medical center có like hay không
+				if ($ratingMedicalCenter->reply) {
+					$medical_center_like = $faker->boolean(50);
+
+					if ($medical_center_like) {
+						// Lấy account_id của medical center
+						$medical_center_account_id = MedicalCenter::find($medical_center_id)->account_id;
+
+						RatingMedicalCenterInteract::create([
+							'rating_medical_center_id' => $ratingMedicalCenter->id,
+							'account_id' => $medical_center_account_id,
+						]);
+					}
+				}
 			}
 
 			$selected_customer_ids = [];
