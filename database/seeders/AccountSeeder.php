@@ -12,125 +12,125 @@ use Illuminate\Support\Facades\DB;
 
 class AccountSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
-    public function run(): void
-    {
-        $faker = Faker::create();
+  /**
+   * Run the database seeds.
+   *
+   * @return void
+   */
+  public function run(): void
+  {
+    $faker = Faker::create();
 
-        $role_customer = Role::where('role_name', 'ROLE_CUSTOMER')->first()->id;
-        $role_admin = Role::where('role_name', 'ROLE_ADMIN')->first()->id;
+    $role_customer = Role::where('role_name', 'ROLE_CUSTOMER')->first()->id;
+    $role_admin = Role::where('role_name', 'ROLE_ADMIN')->first()->id;
 
-        $list_customer_avatars = [
-            'gs://petshop-3d4ae.appspot.com/avatars/customer/1.jpg',
-            'gs://petshop-3d4ae.appspot.com/avatars/customer/2.jpg',
-            'gs://petshop-3d4ae.appspot.com/avatars/customer/3.jpg',
-            'gs://petshop-3d4ae.appspot.com/avatars/customer/4.jpg',
-            'gs://petshop-3d4ae.appspot.com/avatars/customer/5.jpg',
-            'gs://petshop-3d4ae.appspot.com/avatars/customer/6.jpg',
-            'gs://petshop-3d4ae.appspot.com/avatars/customer/7.jpg',
-            'gs://petshop-3d4ae.appspot.com/avatars/customer/8.jpg',
-            'gs://petshop-3d4ae.appspot.com/avatars/customer/9.jpg',
-            'gs://petshop-3d4ae.appspot.com/avatars/customer/10.jpg',
-            'gs://petshop-3d4ae.appspot.com/avatars/customer/11.jpg',
-            'gs://petshop-3d4ae.appspot.com/avatars/customer/12.jpg',
-            'gs://petshop-3d4ae.appspot.com/avatars/customer/13.jpg',
-            'gs://petshop-3d4ae.appspot.com/avatars/customer/14.jpg',
-            'gs://petshop-3d4ae.appspot.com/avatars/customer/15.jpg',
-        ];
+    $list_customer_avatars = [
+      'gs://petshop-3d4ae.appspot.com/avatars/customer/1.jpg',
+      'gs://petshop-3d4ae.appspot.com/avatars/customer/2.jpg',
+      'gs://petshop-3d4ae.appspot.com/avatars/customer/3.jpg',
+      'gs://petshop-3d4ae.appspot.com/avatars/customer/4.jpg',
+      'gs://petshop-3d4ae.appspot.com/avatars/customer/5.jpg',
+      'gs://petshop-3d4ae.appspot.com/avatars/customer/6.jpg',
+      'gs://petshop-3d4ae.appspot.com/avatars/customer/7.jpg',
+      'gs://petshop-3d4ae.appspot.com/avatars/customer/8.jpg',
+      'gs://petshop-3d4ae.appspot.com/avatars/customer/9.jpg',
+      'gs://petshop-3d4ae.appspot.com/avatars/customer/10.jpg',
+      'gs://petshop-3d4ae.appspot.com/avatars/customer/11.jpg',
+      'gs://petshop-3d4ae.appspot.com/avatars/customer/12.jpg',
+      'gs://petshop-3d4ae.appspot.com/avatars/customer/13.jpg',
+      'gs://petshop-3d4ae.appspot.com/avatars/customer/14.jpg',
+      'gs://petshop-3d4ae.appspot.com/avatars/customer/15.jpg',
+    ];
 
-        $list_admin_avatars = [
-            'gs://petshop-3d4ae.appspot.com/avatars/admin/1.jpg',
-            'gs://petshop-3d4ae.appspot.com/avatars/admin/2.jpg',
-            'gs://petshop-3d4ae.appspot.com/avatars/admin/3.jpg',
-            'gs://petshop-3d4ae.appspot.com/avatars/admin/4.jpg',
-            'gs://petshop-3d4ae.appspot.com/avatars/admin/5.jpg',
-            'gs://petshop-3d4ae.appspot.com/avatars/admin/6.jpg',
-            'gs://petshop-3d4ae.appspot.com/avatars/admin/7.jpg',
-        ];
+    $list_admin_avatars = [
+      'gs://petshop-3d4ae.appspot.com/avatars/admin/1.jpg',
+      'gs://petshop-3d4ae.appspot.com/avatars/admin/2.jpg',
+      'gs://petshop-3d4ae.appspot.com/avatars/admin/3.jpg',
+      'gs://petshop-3d4ae.appspot.com/avatars/admin/4.jpg',
+      'gs://petshop-3d4ae.appspot.com/avatars/admin/5.jpg',
+      'gs://petshop-3d4ae.appspot.com/avatars/admin/6.jpg',
+      'gs://petshop-3d4ae.appspot.com/avatars/admin/7.jpg',
+    ];
 
-        define('TOTAL_CUSTOMER_ACCOUNT', count($list_customer_avatars));
-        define('TOTAL_ADMIN_ACCOUNT', count($list_admin_avatars));
+    define('TOTAL_CUSTOMER_ACCOUNT', count($list_customer_avatars));
+    define('TOTAL_ADMIN_ACCOUNT', count($list_admin_avatars));
 
-        // --------------------------      CUSTOMERS     --------------------------
-        $rankings = Ranking::all();
+    // --------------------------      CUSTOMERS     --------------------------
+    $rankings = Ranking::all();
 
-        for ($i = 0; $i < TOTAL_CUSTOMER_ACCOUNT; $i++) {
-            $customer_account = Account::factory()->create([
-                'username' => $faker->userName(),
-                'email' => $faker->safeEmail(),
-                'password' => Hash::make('customer123'),
-                'avatar' => $list_customer_avatars[$i],
-                'enabled' => $faker->boolean(100),
-                'role_id' => $role_customer,
-                'reset_code' => null,
-                'reset_code_expires_at' => null,
-                'reset_code_attempts' => null
-            ]);
+    for ($i = 0; $i < TOTAL_CUSTOMER_ACCOUNT; $i++) {
+      $customer_account = Account::factory()->create([
+        'username' => $faker->userName(),
+        'email' => $faker->safeEmail(),
+        'password' => Hash::make('customer123'),
+        'avatar' => $list_customer_avatars[$i],
+        'enabled' => $faker->boolean(100),
+        'role_id' => $role_customer,
+        'reset_code' => null,
+        'reset_code_expires_at' => null,
+        'reset_code_attempts' => null
+      ]);
 
-            $ranking_point = $faker->randomNumber(4);
-            foreach ($rankings as $ranking) {
-                if ($ranking_point >= $ranking->check_point) {
-                    $ranking_id = $ranking->id;
-                    break;
-                }
-            }
-
-            if (!isset($ranking_id)) {
-                $ranking_id = 1; // Giá trị mặc định
-            }
-
-            $is_male_customer = $faker->boolean(chanceOfGettingTrue: 50);
-
-            DB::table('customers')->insert([
-                'account_id' => $customer_account->id,
-                'full_name' => $is_male_customer ? $faker->lastName() . ' ' . $faker->firstNameMale()
-                    : $faker->lastName() . ' ' . $faker->firstNameFemale(),
-                'gender' => $is_male_customer ? 'Male' : 'Female',
-                'birthdate' => $faker->dateTimeInInterval('-20 years', '+2 years', 'Asia/Ho_Chi_Minh')->format('Y-m-d'),
-                'CMND' => $faker->numerify('#########'),
-                'address' => $faker->city(),
-                'phone' => $faker->regexify('0(3|5|7|8|9){1}([0-9]{8})'),
-                'ranking_point' => $ranking_point,
-                'ranking_id' => $ranking_id,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+      $ranking_point = $faker->randomNumber(4);
+      foreach ($rankings as $ranking) {
+        if ($ranking_point >= $ranking->check_point) {
+          $ranking_id = $ranking->id;
+          break;
         }
+      }
 
-        // --------------------------      ADMINS     -------------------------- 
-        for ($i = 0; $i < TOTAL_ADMIN_ACCOUNT; $i++) {
-            $admin_account = Account::factory()->create([
-                'username' => $faker->userName(),
-                'email' => $faker->safeEmail(),
-                'password' => Hash::make('admin123'),
-                'avatar' => $list_admin_avatars[$i],
-                'enabled' => $faker->boolean(100),
-                'role_id' => $role_admin,
-                'reset_code' => null,
-                'reset_code_expires_at' => null,
-                'reset_code_attempts' => null
-            ]);
+      if (!isset($ranking_id)) {
+        $ranking_id = 1; // Giá trị mặc định
+      }
 
-            $is_male_admin = $faker->boolean(chanceOfGettingTrue: 50);
+      $is_male_customer = $faker->boolean(chanceOfGettingTrue: 50);
 
-            DB::table('admins')->insert([
-                'account_id' => $admin_account->id,
-                'full_name' => $is_male_admin ? $faker->lastName() . ' ' . $faker->firstNameMale()
-                    : $faker->lastName() . ' ' . $faker->firstNameFemale(),
-                'gender' => $is_male_admin ? 'Male' : 'Female',
-                'birthdate' => $faker->dateTimeInInterval('-20 years', '+2 years', 'Asia/Ho_Chi_Minh')->format('Y-m-d'),
-                'CMND' => $faker->numerify('#########'),
-                'address' => $faker->city(),
-                'phone' => $faker->regexify('0(3|5|7|8|9){1}([0-9]{8})'),
-                'image' => $faker->imageUrl(),
-                'status' => $faker->boolean(100),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-        }
+      DB::table('customers')->insert([
+        'account_id' => $customer_account->id,
+        'full_name' => $is_male_customer ? $faker->lastName() . ' ' . $faker->firstNameMale()
+          : $faker->lastName() . ' ' . $faker->firstNameFemale(),
+        'gender' => $is_male_customer ? 'Male' : 'Female',
+        'birthdate' => $faker->dateTimeInInterval('-20 years', '+2 years', 'Asia/Ho_Chi_Minh')->format('Y-m-d'),
+        'CMND' => $faker->numerify('#########'),
+        'address' => $faker->city(),
+        'phone' => $faker->regexify('0(3|5|7|8|9){1}([0-9]{8})'),
+        'ranking_point' => $ranking_point,
+        'ranking_id' => $ranking_id,
+        'created_at' => now(),
+        'updated_at' => now(),
+      ]);
     }
+
+    // --------------------------      ADMINS     -------------------------- 
+    for ($i = 0; $i < TOTAL_ADMIN_ACCOUNT; $i++) {
+      $admin_account = Account::factory()->create([
+        'username' => $faker->userName(),
+        'email' => $faker->safeEmail(),
+        'password' => Hash::make('admin123'),
+        'avatar' => $list_admin_avatars[$i],
+        'enabled' => $faker->boolean(100),
+        'role_id' => $role_admin,
+        'reset_code' => null,
+        'reset_code_expires_at' => null,
+        'reset_code_attempts' => null
+      ]);
+
+      $is_male_admin = $faker->boolean(chanceOfGettingTrue: 50);
+
+      DB::table('admins')->insert([
+        'account_id' => $admin_account->id,
+        'full_name' => $is_male_admin ? $faker->lastName() . ' ' . $faker->firstNameMale()
+          : $faker->lastName() . ' ' . $faker->firstNameFemale(),
+        'gender' => $is_male_admin ? 'Male' : 'Female',
+        'birthdate' => $faker->dateTimeInInterval('-20 years', '+2 years', 'Asia/Ho_Chi_Minh')->format('Y-m-d'),
+        'CMND' => $faker->numerify('#########'),
+        'address' => $faker->city(),
+        'phone' => $faker->regexify('0(3|5|7|8|9){1}([0-9]{8})'),
+        'image' => $faker->imageUrl(),
+        'status' => $faker->boolean(100),
+        'created_at' => now(),
+        'updated_at' => now(),
+      ]);
+    }
+  }
 }

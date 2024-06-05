@@ -15,10 +15,10 @@ class CreateHistoryDiagnosisTable extends Migration
 	{
 		Schema::create('history_diagnosis', function (Blueprint $table) {
 			$table->id();
-			$table->string('reason');
-			$table->string('diagnosis');
-			$table->string('treament');
-			$table->string('health_condition');
+			$table->text('reason');
+			$table->text('diagnosis');
+			$table->text('treatment');
+			$table->text('health_condition');
 			$table->text('note')->nullable();
 			$table->foreignId('doctor_id')->constrained('doctors');
 			$table->foreignId('pet_id')->constrained('pets');

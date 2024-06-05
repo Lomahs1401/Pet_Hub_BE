@@ -30,4 +30,9 @@ class HistoryDiagnosis extends Model
 		'doctor_id',
 		'pet_id',
 	];
+
+  public function doctor()
+  {
+    return $this->belongsTo(Doctor::class);
+  }
 }

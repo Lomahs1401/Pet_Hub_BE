@@ -36,9 +36,12 @@ class PetSeeder extends Seeder
         $aid_center_id = $faker->randomElement($aid_center_ids);
         $customer_id = null;
       } else {
+        $adopted = null;
         $aid_center_id = null;
         $customer_id = $faker->randomElement($customer_ids);
       }
+
+      
 
       // Loại pet (dog hoặc cat)
       $type = $faker->randomElement(['dog', 'cat']);
@@ -49,12 +52,12 @@ class PetSeeder extends Seeder
       $pet = Pet::factory()->create([
         'name' => $faker->lastName(),
         'type' => $type,
-        'age' => $faker->numberBetween(1, 120),
+        'age' => $faker->numberBetween(1, 16),
         'gender' => $faker->randomElement(['male', 'female']),
         'description' => $faker->paragraph(3),
-        'image' => $faker->imageUrl(),
+        'image' => 'gs://petshop-3d4ae.appspot.com/pets/' . ($i + 1) . '.jpg',
         'is_purebred' => $faker->randomElement([true, false]),
-        'status' => $is_adopt_pet ? $adopted : null,
+        'status' => $adopted,
         'breed_id' => ($type == 'dog') ? $faker->randomElement($dog_breed_ids) : $faker->randomElement($cat_breed_ids),
         'aid_center_id' => $aid_center_id,
         'customer_id' => $customer_id,

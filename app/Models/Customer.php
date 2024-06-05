@@ -33,6 +33,16 @@ class Customer extends Model
     'ranking_id'
   ];
 
+  public function pets()
+  {
+    return $this->hasMany(Pet::class);
+  }
+
+  public function adoptedPets()
+  {
+    return $this->hasMany(HistoryAdopt::class);
+  }
+
   public function ratings()
   {
     return $this->hasMany(RatingProduct::class);
