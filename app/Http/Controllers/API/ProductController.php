@@ -318,7 +318,7 @@ class ProductController extends Controller
       }
     } else {
       // Nếu 'target' là 'dog' hoặc 'cat' thì query dữ liệu từ bảng 'product_categories'
-      if ($target === 'dog' || $target === 'cat') {
+      if ($target === 'dog' || $target === 'cat' || $target === 'bird') {
         if ($category_type === 'all') {
           // Nếu category_type là 'all', chỉ lọc theo target
           $categories = DB::table('product_categories')
@@ -458,7 +458,7 @@ class ProductController extends Controller
       }
     } else {
       // Nếu 'target' là 'dog' hoặc 'cat' thì query dữ liệu từ bảng 'product_categories'
-      if ($target === 'dog' || $target === 'cat') {
+      if ($target === 'dog' || $target === 'cat' || $target === 'bird') {
         if ($category_type === 'all') {
           // Nếu category_type là 'all', chỉ lọc theo target
           $categories = DB::table('product_categories')
@@ -582,7 +582,7 @@ class ProductController extends Controller
         ->toArray();
     } else {
       // Nếu 'target' là 'dog' hoặc 'cat' thì query dữ liệu từ bảng 'product_categories'
-      if ($target === 'dog' || $target === 'cat') {
+      if ($target === 'dog' || $target === 'cat' || $target === 'bird') {
         $categories = DB::table('product_categories')
           ->where('target', $target)
           ->pluck('id')
@@ -709,7 +709,7 @@ class ProductController extends Controller
         ->toArray();
     } else {
       // Nếu 'target' là 'dog' hoặc 'cat' thì query dữ liệu từ bảng 'product_categories'
-      if ($target === 'dog' || $target === 'cat') {
+      if ($target === 'dog' || $target === 'cat' || $target === 'bird') {
         $categories = DB::table('product_categories')
           ->where('target', $target)
           ->pluck('id')
@@ -839,7 +839,7 @@ class ProductController extends Controller
         ->toArray();
     } else {
       // Nếu 'target' là 'dog' hoặc 'cat' thì query dữ liệu từ bảng 'product_categories'
-      if ($target === 'dog' || $target === 'cat') {
+      if ($target === 'dog' || $target === 'cat' || $target === 'bird') {
         $categories = DB::table('product_categories')
           ->where('target', $target)
           ->pluck('id')
@@ -1288,7 +1288,7 @@ class ProductController extends Controller
         ->pluck('id')
         ->toArray();
     } else {
-      if ($target === 'dog' || $target === 'cat') {
+      if ($target === 'dog' || $target === 'cat' || $target === 'bird') {
         $categories = DB::table('product_categories')
           ->where('target', $target)
           ->pluck('id')
@@ -1416,7 +1416,7 @@ class ProductController extends Controller
         ->pluck('id')
         ->toArray();
     } else {
-      if ($target === 'dog' || $target === 'cat') {
+      if ($target === 'dog' || $target === 'cat' || $target === 'bird') {
         $categories = DB::table('product_categories')
           ->where('target', $target)
           ->pluck('id')
@@ -1763,7 +1763,7 @@ class ProductController extends Controller
         ->pluck('id')
         ->toArray();
     } else {
-      if ($target === 'dog' || $target === 'cat') {
+      if ($target === 'dog' || $target === 'cat' || $target === 'bird') {
         $categories = DB::table('product_categories')
           ->where('target', $target)
           ->pluck('id')
@@ -1891,7 +1891,7 @@ class ProductController extends Controller
         ->pluck('id')
         ->toArray();
     } else {
-      if ($target === 'dog' || $target === 'cat') {
+      if ($target === 'dog' || $target === 'cat' || $target === 'bird') {
         $categories = DB::table('product_categories')
           ->where('target', $target)
           ->pluck('id')
@@ -2241,7 +2241,7 @@ class ProductController extends Controller
         ->toArray();
     } else {
       // Nếu 'target' là 'dog' hoặc 'cat' thì query dữ liệu từ bảng 'product_categories'
-      if ($target === 'dog' || $target === 'cat') {
+      if ($target === 'dog' || $target === 'cat' || $target === 'bird') {
         $categories = DB::table('product_categories')
           ->where('target', $target)
           ->pluck('id')
