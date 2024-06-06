@@ -7,12 +7,24 @@ use App\Models\Customer;
 use App\Models\Pet;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Tymon\JWTAuth\Claims\Custom;
 
 class PetController extends Controller
 {
-  public function pagingCustomerPet(Request $request)
+  public function pagingCustomerPet(Request $request, $customer_id = null)
   {
-    $customerId = auth()->user()->id;
+    if ($customer_id != null) {
+      if (!Customer::find($customer_id)) {
+        return response()->json([
+          'message' => 'Customer not found!',
+          'status' => 404
+        ], 404);
+      }
+      $customerId = $customer_id;
+    } else {
+      $customerId = auth()->user()->id;   
+    }
+
     $page_number = intval($request->query('page_number', 1));
     $num_of_page = intval($request->query('num_of_page', 10));
 
@@ -65,9 +77,20 @@ class PetController extends Controller
     ]);
   }
 
-  public function pagingAdoptedPet(Request $request)
+  public function pagingAdoptedPet(Request $request, $customer_id = null)
   {
-    $customerId = auth()->user()->id;
+    if ($customer_id != null) {
+      if (!Customer::find($customer_id)) {
+        return response()->json([
+          'message' => 'Customer not found!',
+          'status' => 404
+        ], 404);
+      }
+      $customerId = $customer_id;
+    } else {
+      $customerId = auth()->user()->id;   
+    }
+
     $page_number = intval($request->query('page_number', 1));
     $num_of_page = intval($request->query('num_of_page', 10));
 
@@ -123,9 +146,20 @@ class PetController extends Controller
     ]);
   }
 
-  public function pagingAllPet(Request $request)
+  public function pagingAllPet(Request $request, $customer_id = null)
   {
-    $customerId = auth()->user()->id;
+    if ($customer_id != null) {
+      if (!Customer::find($customer_id)) {
+        return response()->json([
+          'message' => 'Customer not found!',
+          'status' => 404
+        ], 404);
+      }
+      $customerId = $customer_id;
+    } else {
+      $customerId = auth()->user()->id;   
+    }
+
     $page_number = intval($request->query('page_number', 1));
     $num_of_page = intval($request->query('num_of_page', 10));
 
@@ -364,6 +398,8 @@ class PetController extends Controller
 
   public function store(Request $request)
   {
+    $customer_id = auth()->user()->id;
+
     $data = $request->all();
 
     // Đảm bảo rằng status là true nếu không được cung cấp
@@ -380,8 +416,8 @@ class PetController extends Controller
       'status' => 'boolean',
       'breed_id' => 'required|exists:breeds,id',
       'aid_center_id' => 'nullable|exists:aid_centers,id',
-      'customer_id' => 'nullable|exists:customers,id',
     ]);
+    $validatedData['customer_id'] = $customer_id;
 
     $pet = Pet::create($validatedData);
 
@@ -423,8 +459,8 @@ class PetController extends Controller
       'status' => 'boolean',
       'breed_id' => 'required|exists:breeds,id',
       'aid_center_id' => 'nullable|exists:aid_centers,id',
-      'customer_id' => 'nullable|exists:customers,id',
     ]);
+    $validatedData['customer_id'] = $customer_id;
 
     $pet->update($validatedData);
 
@@ -460,11 +496,13 @@ class PetController extends Controller
 
   public function restore($id)
   {
+    $customer_id = auth()->user()->id;
+
     try {
-      $pet = Pet::onlyTrashed()->findOrFail($id);
+      $pet = Pet::where('customer_id', $customer_id)->onlyTrashed()->findOrFail($id);
     } catch (ModelNotFoundException $e) {
       return response()->json([
-        'message' => 'Pet not found!',
+        'message' => 'Pet not found or does not belong to the customer',
         'status' => 404
       ], 404);
     }
@@ -480,10 +518,12 @@ class PetController extends Controller
 
   public function getDeletedPet(Request $request)
   {
+    $customer_id = auth()->user()->id;
+
     $page_number = intval($request->query('page_number', 1));
     $num_of_page = intval($request->query('num_of_page', 10));
 
-    $query = Pet::query()->with(['breed', 'customer']);
+    $query = Pet::query()->with(['breed', 'customer'])->where('customer_id', $customer_id);
 
     $pets = $query->onlyTrashed()->paginate($num_of_page, ['*'], 'page', $page_number);
 

@@ -19,7 +19,6 @@ class CreateAppointmentsTable extends Migration
       $table->dateTime('start_time');
       $table->boolean('done')->default(false);
       $table->foreignId('customer_id')->constrained('customers');
-      $table->foreignId('medical_center_id')->constrained('medical_centers');
       $table->foreignId('doctor_id')->constrained('doctors');
       $table->foreignId('pet_id')->constrained('pets');
       $table->timestamps();

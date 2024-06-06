@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -80,5 +81,20 @@ class MedicalCenter extends Model
   public function doctors()
   {
     return $this->hasMany(Doctor::class, 'medical_center_id');
+  }
+
+  public function getWorkTimes()
+  {
+    // Giả sử work_time có định dạng "06:00 AM : 18:00 PM"
+    $times = explode(' : ', $this->work_time);
+
+    // Chuyển đổi thời gian từ định dạng 12 giờ sang định dạng 24 giờ
+    $work_start_time = Carbon::createFromFormat('h:i A', trim($times[0]))->format('H:i');
+    $work_end_time = Carbon::createFromFormat('h:i A', trim($times[1]))->format('H:i');
+
+    return [
+      'start' => $work_start_time,
+      'end' => $work_end_time,
+    ];
   }
 }

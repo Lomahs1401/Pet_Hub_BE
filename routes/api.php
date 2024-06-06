@@ -5,6 +5,7 @@ use App\Http\Controllers\API\AppointmentController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\BlogController;
 use App\Http\Controllers\API\BreedController;
+use App\Http\Controllers\API\DoctorController;
 use App\Http\Controllers\API\MedicalCenterController;
 use App\Http\Controllers\API\PetController;
 use App\Http\Controllers\API\ProductCategoryController;
@@ -146,6 +147,8 @@ Route::group([
   Route::get('/appointments/after-current-date', [AppointmentController::class, 'getAppointmentAfterCurrentDate']);
   Route::get('/appointments/done', [AppointmentController::class, 'getDoneAppointment']);
   Route::get('/appointments/deleted', [AppointmentController::class, 'getDeletedAppointment']);
+  Route::get('/appointments/free', [AppointmentController::class, 'getFreeAppointment']);
+
   // ------------------------------------------------
   Route::post('/appointments', [AppointmentController::class, 'store']);
   Route::get('/appointments/{appointment_id}', [AppointmentController::class, 'show']);
@@ -153,9 +156,9 @@ Route::group([
   Route::delete('/appointments/{appointment_id}', [AppointmentController::class, 'destroy']);
 
   // --------------     PET     --------------
-  Route::get('/pets/paginate', [PetController::class, 'pagingCustomerPet']);
-  Route::get('/pets/adopted/paginate', [PetController::class, 'pagingAdoptedPet']);
-  Route::get('/pets/all/paginate', [PetController::class, 'pagingAllPet']);
+  Route::get('/pets/paginate/{customer_id?}', [PetController::class, 'pagingCustomerPet']);
+  Route::get('/pets/adopted/paginate/{customer_id?}', [PetController::class, 'pagingAdoptedPet']);
+  Route::get('/pets/all/paginate/{customer_id?}', [PetController::class, 'pagingAllPet']);
   Route::get('/pets/search', [PetController::class, 'searchPet']);
   Route::get('/pets/deleted', [PetController::class, 'getDeletedPet']);
   // --------------     PET SOFT DELETE     --------------
@@ -169,6 +172,12 @@ Route::group([
   // --------------     BREED     --------------
   Route::get('/breeds', [BreedController::class, 'index']);
   Route::get('/breeds/{breed_id}', [BreedController::class, 'show']);
+
+  // --------------     DOCTOR     --------------
+  Route::get('/doctors/medical-center/{medical_center_id}/paging', [DoctorController::class, 'getDoctorsOfMedicalCenter']);
+  Route::get('/doctors/{doctor_id}', [DoctorController::class, 'show']);
+  Route::get('/doctors/{doctor_id}/appointments', [DoctorController::class, 'getAllAppointmentsOfDoctor']);
+  Route::get('/doctors/{doctor_id}/freetime', [DoctorController::class, 'getFreetimeOfDoctor']);
 });
 
 // Shop API
@@ -193,6 +202,8 @@ Route::group([
   Route::get('/products/sold-out', [ProductController::class, 'getSoldOutProducts']); // lấy ds product đã bán hết
   Route::get('/products/rating', [ProductController::class, 'getProductsByRating']); // lấy ds product có điểm đánh giá cao nhất thuộc shop
   Route::get('/products/deleted', [ProductController::class, 'getDeletedProducts']);
+  Route::get('/products/overview', [ProductController::class, 'getProductOverview']);
+
   // --------------     PRODUCT SOFT DELETE     --------------
   Route::put('/products/{id}/restore', [ProductController::class, 'restore']);
   Route::delete('/products/{id}', [ProductController::class, 'destroy']);

@@ -42,11 +42,6 @@ class Appointment extends Model
     return $this->belongsTo(Pet::class);
   }
 
-  public function medicalCenter()
-  {
-    return $this->belongsTo(MedicalCenter::class);
-  }
-
   public function doctor()
   {
     return $this->belongsTo(Doctor::class);

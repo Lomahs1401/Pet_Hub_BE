@@ -41,8 +41,6 @@ class PetSeeder extends Seeder
         $customer_id = $faker->randomElement($customer_ids);
       }
 
-      
-
       // Loại pet (dog hoặc cat)
       $type = $faker->randomElement(['dog', 'cat']);
 

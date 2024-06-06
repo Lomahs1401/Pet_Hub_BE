@@ -61,11 +61,11 @@ class AppointmentController extends Controller
           'phone' => $appointment->doctor->phone,
         ],
         'medical_center' => [
-          'name' => $appointment->medicalCenter->name,
-          'email' => $appointment->medicalCenter->email,
-          'image' => $appointment->medicalCenter->image,
-          'phone' => $appointment->medicalCenter->phone,
-          'address' => $appointment->medicalCenter->address,
+          'name' => $appointment->doctor->medicalCenter->name,
+          'email' => $appointment->doctor->medicalCenter->email,
+          'image' => $appointment->doctor->medicalCenter->image,
+          'phone' => $appointment->doctor->medicalCenter->phone,
+          'address' => $appointment->doctor->medicalCenter->address,
         ]
       ];
     }
@@ -142,19 +142,19 @@ class AppointmentController extends Controller
         'certificate' => $appointment->doctor->certificate,
       ],
       'medical_center' => [
-        'medical_center_id' => $appointment->medicalCenter->id,
-        'account_id' => $appointment->medicalCenter->account->id,
-        'name' => $appointment->medicalCenter->name,
-        'email' => $appointment->medicalCenter->account->email,
-        'description' => $appointment->medicalCenter->description,
-        'image' => $appointment->medicalCenter->image,
-        'phone' => $appointment->medicalCenter->phone,
-        'address' => $appointment->medicalCenter->address,
-        'website' => $appointment->medicalCenter->website,
-        'fanpage' => $appointment->medicalCenter->fanpage,
-        'work_time' => $appointment->medicalCenter->work_time,
-        'establish_year' => $appointment->medicalCenter->establish_year,
-        'certificate' => $appointment->medicalCenter->certificate,
+        'medical_center_id' => $appointment->doctor->medicalCenter->id,
+        'account_id' => $appointment->doctor->medicalCenter->account->id,
+        'name' => $appointment->doctor->medicalCenter->name,
+        'email' => $appointment->doctor->medicalCenter->account->email,
+        'description' => $appointment->doctor->medicalCenter->description,
+        'image' => $appointment->doctor->medicalCenter->image,
+        'phone' => $appointment->doctor->medicalCenter->phone,
+        'address' => $appointment->doctor->medicalCenter->address,
+        'website' => $appointment->doctor->medicalCenter->website,
+        'fanpage' => $appointment->doctor->medicalCenter->fanpage,
+        'work_time' => $appointment->doctor->medicalCenter->work_time,
+        'establish_year' => $appointment->doctor->medicalCenter->establish_year,
+        'certificate' => $appointment->doctor->medicalCenter->certificate,
       ],
       'customer' => [
         'customer_id' => $appointment->customer->id,
@@ -221,11 +221,11 @@ class AppointmentController extends Controller
           'phone' => $appointment->doctor->phone,
         ],
         'medical_center' => [
-          'name' => $appointment->medicalCenter->name,
-          'email' => $appointment->medicalCenter->email,
-          'image' => $appointment->medicalCenter->image,
-          'phone' => $appointment->medicalCenter->phone,
-          'address' => $appointment->medicalCenter->address,
+          'name' => $appointment->doctor->medicalCenter->name,
+          'email' => $appointment->doctor->medicalCenter->email,
+          'image' => $appointment->doctor->medicalCenter->image,
+          'phone' => $appointment->doctor->medicalCenter->phone,
+          'address' => $appointment->doctor->medicalCenter->address,
         ]
       ];
     }
@@ -284,11 +284,11 @@ class AppointmentController extends Controller
           'phone' => $appointment->doctor->phone,
         ],
         'medical_center' => [
-          'name' => $appointment->medicalCenter->name,
-          'email' => $appointment->medicalCenter->email,
-          'image' => $appointment->medicalCenter->image,
-          'phone' => $appointment->medicalCenter->phone,
-          'address' => $appointment->medicalCenter->address,
+          'name' => $appointment->doctor->medicalCenter->name,
+          'email' => $appointment->doctor->medicalCenter->email,
+          'image' => $appointment->doctor->medicalCenter->image,
+          'phone' => $appointment->doctor->medicalCenter->phone,
+          'address' => $appointment->doctor->medicalCenter->address,
         ]
       ];
     }
@@ -347,11 +347,11 @@ class AppointmentController extends Controller
           'phone' => $appointment->doctor->phone,
         ],
         'medical_center' => [
-          'name' => $appointment->medicalCenter->name,
-          'email' => $appointment->medicalCenter->email,
-          'image' => $appointment->medicalCenter->image,
-          'phone' => $appointment->medicalCenter->phone,
-          'address' => $appointment->medicalCenter->address,
+          'name' => $appointment->doctor->medicalCenter->name,
+          'email' => $appointment->doctor->medicalCenter->email,
+          'image' => $appointment->doctor->medicalCenter->image,
+          'phone' => $appointment->doctor->medicalCenter->phone,
+          'address' => $appointment->doctor->medicalCenter->address,
         ]
       ];
     }
@@ -408,11 +408,11 @@ class AppointmentController extends Controller
           'phone' => $deleted_appointment->doctor->phone,
         ],
         'medical_center' => [
-          'name' => $deleted_appointment->medicalCenter->name,
-          'email' => $deleted_appointment->medicalCenter->email,
-          'image' => $deleted_appointment->medicalCenter->image,
-          'phone' => $deleted_appointment->medicalCenter->phone,
-          'address' => $deleted_appointment->medicalCenter->address,
+          'name' => $deleted_appointment->doctor->medicalCenter->name,
+          'email' => $deleted_appointment->doctor->medicalCenter->email,
+          'image' => $deleted_appointment->doctor->medicalCenter->image,
+          'phone' => $deleted_appointment->doctor->medicalCenter->phone,
+          'address' => $deleted_appointment->doctor->medicalCenter->address,
         ]
       ];
     }
@@ -436,13 +436,12 @@ class AppointmentController extends Controller
       'message' => 'required|string',
       'start_time' => 'required|date',
       'doctor_id' => 'required|exists:doctors,id',
-      'medical_center_id' => 'required|exists:medical_centers,id',
       'pet_id' => 'required|exists:pets,id',
     ]);
+    $validatedData['customer_id'] = $customer_id;
 
     $pet_id = $validatedData['pet_id'];
     $doctor_id = $validatedData['doctor_id'];
-    $medical_center_id = $validatedData['medical_center_id'];
 
     // Kiểm tra xem pet_id có nằm trong danh sách các pet mà khách hàng nhận nuôi hoặc tạo ra hay không
     $isPetValid = Pet::where('id', $pet_id)
@@ -461,28 +460,16 @@ class AppointmentController extends Controller
       ], 404);
     }
 
-    // Kiểm tra xem medical_center_id có tồn tại trong hệ thống không
-    $isMedicalCenterValid = MedicalCenter::where('id', $medical_center_id)->exists();
-    if (!$isMedicalCenterValid) {
-      return response()->json([
-        'message' => 'Medical center not found',
-        'status' => 404,
-      ], 404);
-    }
-
     // Kiểm tra xem doctor_id có thuộc medical_center_id hay không
-    $isDoctorInMedicalCenter = Doctor::where('id', $doctor_id)
-      ->where('medical_center_id', $medical_center_id)
-      ->exists();
+    $isDoctorInMedicalCenter = Doctor::where('id', $doctor_id)->exists();
 
     if (!$isDoctorInMedicalCenter) {
       return response()->json([
-        'message' => 'Doctor does not belong to the specified medical center',
+        'message' => 'Doctor not found',
         'status' => 404,
       ], 404);
     }
 
-    $validatedData['customer_id'] = $customer_id;
 
     $appointment = Appointment::create($validatedData);
 
@@ -510,13 +497,12 @@ class AppointmentController extends Controller
       'message' => 'required|string',
       'start_time' => 'required|date',
       'doctor_id' => 'required|exists:doctors,id',
-      'medical_center_id' => 'required|exists:medical_centers,id',
       'pet_id' => 'required|exists:pets,id',
     ]);
+    $validatedData['customer_id'] = $customer_id;
 
     $pet_id = $validatedData['pet_id'];
     $doctor_id = $validatedData['doctor_id'];
-    $medical_center_id = $validatedData['medical_center_id'];
 
     // Kiểm tra xem pet_id có nằm trong danh sách các pet mà khách hàng nhận nuôi hoặc tạo ra hay không
     $isPetValid = Pet::where('id', $pet_id)
@@ -535,23 +521,12 @@ class AppointmentController extends Controller
       ], 404);
     }
 
-    // Kiểm tra xem medical_center_id có tồn tại trong hệ thống không
-    $isMedicalCenterValid = MedicalCenter::where('id', $medical_center_id)->exists();
-    if (!$isMedicalCenterValid) {
-      return response()->json([
-        'message' => 'Medical center not found',
-        'status' => 404,
-      ], 404);
-    }
-
     // Kiểm tra xem doctor_id có thuộc medical_center_id hay không
-    $isDoctorInMedicalCenter = Doctor::where('id', $doctor_id)
-      ->where('medical_center_id', $medical_center_id)
-      ->exists();
+    $isDoctorInMedicalCenter = Doctor::where('id', $doctor_id)->exists();
 
     if (!$isDoctorInMedicalCenter) {
       return response()->json([
-        'message' => 'Doctor does not belong to the specified medical center',
+        'message' => 'Doctor not found',
         'status' => 404,
       ], 404);
     }

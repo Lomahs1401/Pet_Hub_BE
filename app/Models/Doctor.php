@@ -41,6 +41,11 @@ class Doctor extends Model
     return $this->belongsTo(Account::class, 'account_id');
   }
 
+  public function medicalCenter()
+  {
+    return $this->belongsTo(MedicalCenter::class, 'medical_center_id');
+  }
+
   public function calculateDoctorRating()
 	{
 		// Lấy tất cả các đánh giá của sản phẩm

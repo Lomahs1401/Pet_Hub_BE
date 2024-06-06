@@ -49,8 +49,8 @@ class MedicalCenterSeeder extends Seeder
       'gs://petshop-3d4ae.appspot.com/doctors/10/',
     ];
 
-    $start_time_options = ['05:00 AM', '05:30 AM', '06:00 AM', '06:30 AM', '07:00 AM']; // Giờ bắt đầu làm việc (AM/PM format)
-    $end_time_options = ['22:00 PM', '22:30 PM', '23:00 PM', '23:30 PM', '24:00 PM']; // Giờ bắt đầu làm việc (AM/PM format)
+    $start_time_options = ['06:00 AM', '07:00 AM', '08:00 AM', '09:00 AM']; // Giờ bắt đầu làm việc (AM/PM format)
+    $end_time_options = ['06:00 PM', '07:00 PM', '08:00 PM', '09:00 PM']; // Giờ kết thúc làm việc (AM/PM format)
 
     foreach ($medical_centers as $i => $medical_center) {
       $start_time = $faker->randomElement($start_time_options);
