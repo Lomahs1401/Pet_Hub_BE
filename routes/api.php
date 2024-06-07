@@ -203,6 +203,7 @@ Route::group([
   Route::get('/products/rating', [ProductController::class, 'getProductsByRating']); // lấy ds product có điểm đánh giá cao nhất thuộc shop
   Route::get('/products/deleted', [ProductController::class, 'getDeletedProducts']);
   Route::get('/products/overview', [ProductController::class, 'getProductOverview']);
+  Route::get('/products/latest-id', [ProductController::class, 'getLatestProductId']);
 
   // --------------     PRODUCT SOFT DELETE     --------------
   Route::put('/products/{id}/restore', [ProductController::class, 'restore']);
@@ -213,6 +214,7 @@ Route::group([
   Route::put('/products/{id}', [ProductController::class, 'update']);
 
   // --------------     PRODUCT CATEGORY     --------------
+  Route::get('/product-categories', [ProductCategoryController::class, 'getProductCategories']);
   Route::get('/product-categories/products', [ProductCategoryController::class, 'getProductCountsByCategory']); // lấy sl product của category và thuộc shop_id
   Route::get('/product-categories/type/products', [ProductCategoryController::class, 'getProductCountsByCategoryType']); // lấy sl product của category type và thuộc shop_id
   Route::get('/product-categories/type', [ProductCategoryController::class, 'getDistinctCategoryTypes']); // lấy dsach category type

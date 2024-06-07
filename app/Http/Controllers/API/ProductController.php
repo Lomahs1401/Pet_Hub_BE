@@ -2351,10 +2351,7 @@ class ProductController extends Controller
 
   public function store(Request $request)
   {
-    $data = $request->all();
-
-    // Đảm bảo rằng sold_quantity là một số nguyên bằng 0 nếu không được cung cấp
-    $data['sold_quantity'] = $data['sold_quantity'] ?? 0;
+    $shop_id = auth()->user()->shop->id;
 
     $validatedData = $request->validate([
       'name' => 'required|string',
@@ -2365,8 +2362,9 @@ class ProductController extends Controller
       'sold_quantity' => 'numeric',
       'status' => 'required|boolean',
       'product_category_id' => 'required|exists:product_categories,id',
-      'shop_id' => 'required|exists:shops,id',
     ]);
+    $validatedData['shop_id'] = $shop_id;
+    $validatedData['sold_quantity'] = 0;
 
     $product = Product::create($validatedData);
 
@@ -2379,6 +2377,8 @@ class ProductController extends Controller
 
   public function update(Request $request, $id)
   {
+    $shop_id = auth()->user()->shop->id;
+
     try {
       $product = Product::findOrFail($id);
     } catch (ModelNotFoundException $e) {
@@ -2394,10 +2394,11 @@ class ProductController extends Controller
       'price' => 'required|numeric',
       'image' => 'nullable|string',
       'quantity' => 'required|numeric',
-      'sold_quantity' => 'numeric',
+      'sold_quantity' => 'required|numeric',
       'status' => 'required|boolean',
       'product_category_id' => 'exists:product_categories,id',
     ]);
+    $validatedData['shop_id'] = $shop_id;
 
     $product->update($validatedData);
 
@@ -2746,6 +2747,18 @@ class ProductController extends Controller
         'to' => $products->lastItem(),
       ],
       'data' => $formatted_products,
+    ], 200);
+  }
+
+  public function getLatestProductId()
+  {
+    // Lấy ID của sản phẩm mới nhất
+    $latestProductId = Product::max('id');
+
+    return response()->json([
+      'message' => 'Query successfully!',
+      'status' => 200,
+      'data' => $latestProductId,
     ], 200);
   }
 }
