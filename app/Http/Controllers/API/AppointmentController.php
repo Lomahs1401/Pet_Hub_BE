@@ -433,7 +433,7 @@ class AppointmentController extends Controller
     $customer_id = auth()->user()->id;
 
     $validatedData = $request->validate([
-      'message' => 'string',
+      'message' => 'nullable|string',
       'start_time' => 'required|date',
       'doctor_id' => 'required|exists:doctors,id',
       'pet_id' => 'required|exists:pets,id',
@@ -494,7 +494,7 @@ class AppointmentController extends Controller
     }
 
     $validatedData = $request->validate([
-      'message' => 'string',
+      'message' => 'nullable|string',
       'start_time' => 'required|date',
       'doctor_id' => 'required|exists:doctors,id',
       'pet_id' => 'required|exists:pets,id',
