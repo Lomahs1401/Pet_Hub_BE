@@ -54,13 +54,21 @@ class AppointmentSeeder extends Seeder
     ];
 
     foreach ($customer_account_ids as $customer_account_id) {
+      $customer = Customer::find($customer_account_id);
+      $customer_pets = $customer->pets;
+      $customer_adopted_pets = $customer->adoptedPets->pluck('pet_id');
+
+      // Kiểm tra xem khách hàng có thú cưng nào không
+      if ($customer_pets->count() === 0 && $customer_adopted_pets->count() === 0) {
+        continue; // Bỏ qua khách hàng này nếu không có thú cưng
+      }
+
       $random_amount_of_appointments = rand(0, 30);
 
       // Tạo danh sách các thời gian bắt đầu đã được sử dụng
       $used_start_times = [];
 
       for ($i = 0; $i < $random_amount_of_appointments; $i++) {
-        $customer = Customer::find($customer_account_id);
         $medical_center_id = $faker->randomElement($medical_center_ids);
         $medical_center = MedicalCenter::find($medical_center_id);
         $doctor_ids = $medical_center->doctors->pluck('id')->toArray();
@@ -109,16 +117,10 @@ class AppointmentSeeder extends Seeder
 
           $done = Carbon::now()->gt($valid_start_time) ? $faker->boolean(80) : false;
 
-          $customer_pets = $customer->pets;
-          $customer_adopted_pets = $customer->adoptedPets;
+          $all_pets = $customer_pets->pluck('id')->merge($customer_adopted_pets);
+          $pet_id = $all_pets->random();
 
-          $pet_id = null;
-          if ($customer_pets->count() > 0 || $customer_adopted_pets->count() > 0) {
-            $all_pets = $customer_pets->merge($customer_adopted_pets);
-            $pet_id = $all_pets->random()->id;
-          }
-
-          $appointment = Appointment::factory()->create([
+          Appointment::factory()->create([
             'message' => $faker->paragraph(),
             'start_time' => $valid_start_time,
             'customer_id' => $customer_account_id,

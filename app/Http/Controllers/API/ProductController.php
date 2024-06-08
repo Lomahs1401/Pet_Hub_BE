@@ -369,6 +369,14 @@ class ProductController extends Controller
       $products = $query->paginate($num_of_page, ['*'], 'page', $page_number);
     }
 
+    // Kiểm tra nếu không có sản phẩm nào được tìm thấy
+    if ($products->isEmpty()) {
+      return response()->json([
+          'message' => 'Product Not Found',
+          'status' => 404,
+      ], 404);
+    }
+
     $formatted_products = [];
     foreach ($products as $product) {
       $ratingData = $product->calculateProductRating();

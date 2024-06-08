@@ -442,6 +442,7 @@ class AppointmentController extends Controller
 
     $pet_id = $validatedData['pet_id'];
     $doctor_id = $validatedData['doctor_id'];
+    $start_time = $validatedData['start_time'];
 
     // Kiểm tra xem pet_id có nằm trong danh sách các pet mà khách hàng nhận nuôi hoặc tạo ra hay không
     $isPetValid = Pet::where('id', $pet_id)
@@ -470,6 +471,17 @@ class AppointmentController extends Controller
       ], 404);
     }
 
+    // Kiểm tra xem đã có cuộc hẹn nào vào thời gian đó với bác sĩ đó chưa
+    $isAppointmentConflict = Appointment::where('doctor_id', $doctor_id)
+      ->where('start_time', $start_time)
+      ->exists();
+
+    if ($isAppointmentConflict) {
+      return response()->json([
+        'message' => 'The doctor already has an appointment at this time',
+        'status' => 409,
+      ], 409);
+    }
 
     $appointment = Appointment::create($validatedData);
 
