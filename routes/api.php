@@ -12,6 +12,7 @@ use App\Http\Controllers\API\ProductCategoryController;
 use App\Http\Controllers\API\ProductController;
 use App\Http\Controllers\API\RatingProductController;
 use App\Http\Controllers\API\ServiceController;
+use App\Http\Controllers\API\ShopController;
 use App\Models\MedicalCenter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -185,6 +186,9 @@ Route::group([
   'middleware' => ['force.json.response', 'api', 'auth.user', 'auth.shop'],
   'prefix' => 'shop',
 ], function ($router) {
+  // --------------     PRODUCT     --------------
+  Route::get('/profile', [ShopController::class, 'getProfileOfShop']);
+
   // --------------     PRODUCT     --------------
   Route::get('/products/total', [ProductController::class, 'getNumberOfProductByShopId']); // lấy số lượng product mà shop đang bán
   Route::get('/products/category/{product_category_id}/total', [ProductController::class, 'getNumberOfProductWithShopAndCategory']); // lấy số lượng product được bán bởi shop và thuộc category_id

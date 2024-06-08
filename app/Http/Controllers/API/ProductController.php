@@ -512,6 +512,14 @@ class ProductController extends Controller
       ->where('shop_id', $shop_id)
       ->paginate($num_of_page, ['*'], 'page', $page_number);
 
+    // Kiểm tra nếu không có sản phẩm nào được tìm thấy
+    if ($products->isEmpty()) {
+      return response()->json([
+          'message' => 'Product Not Found',
+          'status' => 404,
+      ], 404);
+    }
+
     $formatted_products = [];
     foreach ($products as $product) {
       $ratingData = $product->calculateProductRating();
@@ -638,6 +646,14 @@ class ProductController extends Controller
       ->limit($num_of_page)
       ->get();
 
+    // Kiểm tra nếu không có sản phẩm nào được tìm thấy
+    if ($products->isEmpty()) {
+      return response()->json([
+          'message' => 'Product Not Found',
+          'status' => 404,
+      ], 404);
+    }
+
     $formatted_products = [];
     foreach ($products as $product) {
       $ratingData = $product->calculateProductRating();
@@ -757,6 +773,14 @@ class ProductController extends Controller
       ->offset($offset)
       ->limit($num_of_page)
       ->get();
+
+    // Kiểm tra nếu không có sản phẩm nào được tìm thấy
+    if ($products->isEmpty()) {
+      return response()->json([
+          'message' => 'Product Not Found',
+          'status' => 404,
+      ], 404);
+    }
 
     $formatted_products = [];
     foreach ($products as $product) {
@@ -901,6 +925,14 @@ class ProductController extends Controller
       ->limit($num_of_page)
       ->get();
 
+    // Kiểm tra nếu không có sản phẩm nào được tìm thấy
+    if ($products->isEmpty()) {
+      return response()->json([
+          'message' => 'Product Not Found',
+          'status' => 404,
+      ], 404);
+    }
+
     $formatted_products = [];
     foreach ($products as $product) {
       $ratingData = $product->calculateProductRating();
@@ -1005,6 +1037,14 @@ class ProductController extends Controller
       ->offset($offset)
       ->limit($num_of_page)
       ->get();
+
+    // Kiểm tra nếu không có sản phẩm nào được tìm thấy
+    if ($products->isEmpty()) {
+      return response()->json([
+          'message' => 'Product Not Found',
+          'status' => 404,
+      ], 404);
+    }
 
     $formatted_products = [];
     foreach ($products as $product) {
@@ -1114,6 +1154,14 @@ class ProductController extends Controller
       ->limit($num_of_page)
       ->get();
 
+    // Kiểm tra nếu không có sản phẩm nào được tìm thấy
+    if ($products->isEmpty()) {
+      return response()->json([
+          'message' => 'Product Not Found',
+          'status' => 404,
+      ], 404);
+    }
+
     $formatted_products = [];
     foreach ($products as $product) {
       $ratingData = $product->calculateProductRating();
@@ -1218,6 +1266,14 @@ class ProductController extends Controller
       ->offset($offset)
       ->limit($num_of_page)
       ->get();
+
+    // Kiểm tra nếu không có sản phẩm nào được tìm thấy
+    if ($products->isEmpty()) {
+      return response()->json([
+          'message' => 'Product Not Found',
+          'status' => 404,
+      ], 404);
+    }
 
     $formatted_products = [];
     foreach ($products as $product) {
@@ -1481,6 +1537,14 @@ class ProductController extends Controller
       ->limit($num_of_page)
       ->get();
 
+    // Kiểm tra nếu không có sản phẩm nào được tìm thấy
+    if ($products->isEmpty()) {
+      return response()->json([
+          'message' => 'Product Not Found',
+          'status' => 404,
+      ], 404);
+    }
+
     $formatted_products = [];
     foreach ($products as $product) {
       $ratingData = $product->calculateProductRating();
@@ -1588,6 +1652,14 @@ class ProductController extends Controller
       ->limit($num_of_page)
       ->get();
 
+    // Kiểm tra nếu không có sản phẩm nào được tìm thấy
+    if ($products->isEmpty()) {
+      return response()->json([
+          'message' => 'Product Not Found',
+          'status' => 404,
+      ], 404);
+    }
+
     $formatted_products = [];
     foreach ($products as $product) {
       $ratingData = $product->calculateProductRating();
@@ -1694,6 +1766,14 @@ class ProductController extends Controller
       ->offset($offset)
       ->limit($num_of_page)
       ->get();
+
+    // Kiểm tra nếu không có sản phẩm nào được tìm thấy
+    if ($products->isEmpty()) {
+      return response()->json([
+          'message' => 'Product Not Found',
+          'status' => 404,
+      ], 404);
+    }
 
     $formatted_products = [];
     foreach ($products as $product) {
@@ -1813,6 +1893,14 @@ class ProductController extends Controller
       ->offset($offset)
       ->limit($num_of_page)
       ->get();
+
+    // Kiểm tra nếu không có sản phẩm nào được tìm thấy
+    if ($products->isEmpty()) {
+      return response()->json([
+          'message' => 'Product Not Found',
+          'status' => 404,
+      ], 404);
+    }
 
     $formatted_products = [];
     foreach ($products as $product) {
@@ -1956,6 +2044,14 @@ class ProductController extends Controller
       ->limit($num_of_page)
       ->get();
 
+    // Kiểm tra nếu không có sản phẩm nào được tìm thấy
+    if ($products->isEmpty()) {
+      return response()->json([
+          'message' => 'Product Not Found',
+          'status' => 404,
+      ], 404);
+    }
+
     $formatted_products = [];
     foreach ($products as $product) {
       $ratingData = $product->calculateProductRating();
@@ -2063,6 +2159,14 @@ class ProductController extends Controller
       ->limit($num_of_page)
       ->get();
 
+    // Kiểm tra nếu không có sản phẩm nào được tìm thấy
+    if ($products->isEmpty()) {
+      return response()->json([
+          'message' => 'Product Not Found',
+          'status' => 404,
+      ], 404);
+    }
+
     $formatted_products = [];
     foreach ($products as $product) {
       $ratingData = $product->calculateProductRating();
@@ -2169,6 +2273,14 @@ class ProductController extends Controller
       ->offset($offset)
       ->limit($num_of_page)
       ->get();
+
+    // Kiểm tra nếu không có sản phẩm nào được tìm thấy
+    if ($products->isEmpty()) {
+      return response()->json([
+          'message' => 'Product Not Found',
+          'status' => 404,
+      ], 404);
+    }
 
     $formatted_products = [];
     foreach ($products as $product) {
@@ -2297,6 +2409,14 @@ class ProductController extends Controller
       ->offset($offset)
       ->limit($num_of_page)
       ->get();
+
+    // Kiểm tra nếu không có sản phẩm nào được tìm thấy
+    if ($products->isEmpty()) {
+      return response()->json([
+          'message' => 'Product Not Found',
+          'status' => 404,
+      ], 404);
+    }
 
     $formatted_products = [];
     foreach ($products as $product) {
@@ -2465,6 +2585,14 @@ class ProductController extends Controller
 
     $products = $query->onlyTrashed()->paginate($num_of_page, ['*'], 'page', $page_number);
 
+    // Kiểm tra nếu không có sản phẩm nào được tìm thấy
+    if ($products->isEmpty()) {
+      return response()->json([
+          'message' => 'Product Not Found',
+          'status' => 404,
+      ], 404);
+    }
+
     $formatted_products = [];
     foreach ($products as $product) {
       $ratingData = $product->calculateProductRating();
@@ -2565,6 +2693,14 @@ class ProductController extends Controller
       $products = $query
         ->orderBy('price', $orderDirection)
         ->paginate($num_of_page, ['*'], 'page', $page_number);
+    }
+
+    // Kiểm tra nếu không có sản phẩm nào được tìm thấy
+    if ($products->isEmpty()) {
+      return response()->json([
+          'message' => 'Product Not Found',
+          'status' => 404,
+      ], 404);
     }
 
     $formatted_products = [];
@@ -2692,6 +2828,14 @@ class ProductController extends Controller
         ->paginate($num_of_page, ['*'], 'page', $page_number);
     } else {
       $products = $query->paginate($num_of_page, ['*'], 'page', $page_number);
+    }
+
+    // Kiểm tra nếu không có sản phẩm nào được tìm thấy
+    if ($products->isEmpty()) {
+      return response()->json([
+          'message' => 'Product Not Found',
+          'status' => 404,
+      ], 404);
     }
 
     $formatted_products = [];
