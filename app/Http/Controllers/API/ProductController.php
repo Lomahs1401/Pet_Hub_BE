@@ -299,7 +299,7 @@ class ProductController extends Controller
     // Phân trang mặc định
     $page_number = intval($request->query('page_number', 1));
     $num_of_page = intval($request->query('num_of_page', 8));
-    $category_type = $request->query('category') ?? 'all';
+    $category_type = strtolower($request->query('category')) ?? 'all';
     $target = strtolower($request->query('target')) ?? 'all';
 
     if ($target === 'all') {
@@ -372,8 +372,8 @@ class ProductController extends Controller
     // Kiểm tra nếu không có sản phẩm nào được tìm thấy
     if ($products->isEmpty()) {
       return response()->json([
-          'message' => 'Product Not Found',
-          'status' => 404,
+        'message' => 'Product Not Found',
+        'status' => 404,
       ], 404);
     }
 
@@ -447,7 +447,7 @@ class ProductController extends Controller
     // Phân trang mặc định
     $page_number = intval($request->query('page_number', 1));
     $num_of_page = intval($request->query('num_of_page', 8));
-    $category_type = $request->query('category') ?? 'all';
+    $category_type = strtolower($request->query('category')) ?? 'all';
     $target = strtolower($request->query('target')) ?? 'all';
 
     if ($target === 'all') {
@@ -515,8 +515,8 @@ class ProductController extends Controller
     // Kiểm tra nếu không có sản phẩm nào được tìm thấy
     if ($products->isEmpty()) {
       return response()->json([
-          'message' => 'Product Not Found',
-          'status' => 404,
+        'message' => 'Product Not Found',
+        'status' => 404,
       ], 404);
     }
 
@@ -649,8 +649,8 @@ class ProductController extends Controller
     // Kiểm tra nếu không có sản phẩm nào được tìm thấy
     if ($products->isEmpty()) {
       return response()->json([
-          'message' => 'Product Not Found',
-          'status' => 404,
+        'message' => 'Product Not Found',
+        'status' => 404,
       ], 404);
     }
 
@@ -777,8 +777,8 @@ class ProductController extends Controller
     // Kiểm tra nếu không có sản phẩm nào được tìm thấy
     if ($products->isEmpty()) {
       return response()->json([
-          'message' => 'Product Not Found',
-          'status' => 404,
+        'message' => 'Product Not Found',
+        'status' => 404,
       ], 404);
     }
 
@@ -928,8 +928,8 @@ class ProductController extends Controller
     // Kiểm tra nếu không có sản phẩm nào được tìm thấy
     if ($products->isEmpty()) {
       return response()->json([
-          'message' => 'Product Not Found',
-          'status' => 404,
+        'message' => 'Product Not Found',
+        'status' => 404,
       ], 404);
     }
 
@@ -1041,8 +1041,8 @@ class ProductController extends Controller
     // Kiểm tra nếu không có sản phẩm nào được tìm thấy
     if ($products->isEmpty()) {
       return response()->json([
-          'message' => 'Product Not Found',
-          'status' => 404,
+        'message' => 'Product Not Found',
+        'status' => 404,
       ], 404);
     }
 
@@ -1157,8 +1157,8 @@ class ProductController extends Controller
     // Kiểm tra nếu không có sản phẩm nào được tìm thấy
     if ($products->isEmpty()) {
       return response()->json([
-          'message' => 'Product Not Found',
-          'status' => 404,
+        'message' => 'Product Not Found',
+        'status' => 404,
       ], 404);
     }
 
@@ -1270,8 +1270,8 @@ class ProductController extends Controller
     // Kiểm tra nếu không có sản phẩm nào được tìm thấy
     if ($products->isEmpty()) {
       return response()->json([
-          'message' => 'Product Not Found',
-          'status' => 404,
+        'message' => 'Product Not Found',
+        'status' => 404,
       ], 404);
     }
 
@@ -1540,8 +1540,8 @@ class ProductController extends Controller
     // Kiểm tra nếu không có sản phẩm nào được tìm thấy
     if ($products->isEmpty()) {
       return response()->json([
-          'message' => 'Product Not Found',
-          'status' => 404,
+        'message' => 'Product Not Found',
+        'status' => 404,
       ], 404);
     }
 
@@ -1655,8 +1655,8 @@ class ProductController extends Controller
     // Kiểm tra nếu không có sản phẩm nào được tìm thấy
     if ($products->isEmpty()) {
       return response()->json([
-          'message' => 'Product Not Found',
-          'status' => 404,
+        'message' => 'Product Not Found',
+        'status' => 404,
       ], 404);
     }
 
@@ -1770,8 +1770,8 @@ class ProductController extends Controller
     // Kiểm tra nếu không có sản phẩm nào được tìm thấy
     if ($products->isEmpty()) {
       return response()->json([
-          'message' => 'Product Not Found',
-          'status' => 404,
+        'message' => 'Product Not Found',
+        'status' => 404,
       ], 404);
     }
 
@@ -1897,8 +1897,8 @@ class ProductController extends Controller
     // Kiểm tra nếu không có sản phẩm nào được tìm thấy
     if ($products->isEmpty()) {
       return response()->json([
-          'message' => 'Product Not Found',
-          'status' => 404,
+        'message' => 'Product Not Found',
+        'status' => 404,
       ], 404);
     }
 
@@ -2047,8 +2047,8 @@ class ProductController extends Controller
     // Kiểm tra nếu không có sản phẩm nào được tìm thấy
     if ($products->isEmpty()) {
       return response()->json([
-          'message' => 'Product Not Found',
-          'status' => 404,
+        'message' => 'Product Not Found',
+        'status' => 404,
       ], 404);
     }
 
@@ -2162,8 +2162,8 @@ class ProductController extends Controller
     // Kiểm tra nếu không có sản phẩm nào được tìm thấy
     if ($products->isEmpty()) {
       return response()->json([
-          'message' => 'Product Not Found',
-          'status' => 404,
+        'message' => 'Product Not Found',
+        'status' => 404,
       ], 404);
     }
 
@@ -2277,8 +2277,8 @@ class ProductController extends Controller
     // Kiểm tra nếu không có sản phẩm nào được tìm thấy
     if ($products->isEmpty()) {
       return response()->json([
-          'message' => 'Product Not Found',
-          'status' => 404,
+        'message' => 'Product Not Found',
+        'status' => 404,
       ], 404);
     }
 
@@ -2413,8 +2413,8 @@ class ProductController extends Controller
     // Kiểm tra nếu không có sản phẩm nào được tìm thấy
     if ($products->isEmpty()) {
       return response()->json([
-          'message' => 'Product Not Found',
-          'status' => 404,
+        'message' => 'Product Not Found',
+        'status' => 404,
       ], 404);
     }
 
@@ -2588,8 +2588,8 @@ class ProductController extends Controller
     // Kiểm tra nếu không có sản phẩm nào được tìm thấy
     if ($products->isEmpty()) {
       return response()->json([
-          'message' => 'Product Not Found',
-          'status' => 404,
+        'message' => 'Product Not Found',
+        'status' => 404,
       ], 404);
     }
 
@@ -2698,8 +2698,8 @@ class ProductController extends Controller
     // Kiểm tra nếu không có sản phẩm nào được tìm thấy
     if ($products->isEmpty()) {
       return response()->json([
-          'message' => 'Product Not Found',
-          'status' => 404,
+        'message' => 'Product Not Found',
+        'status' => 404,
       ], 404);
     }
 
@@ -2833,8 +2833,8 @@ class ProductController extends Controller
     // Kiểm tra nếu không có sản phẩm nào được tìm thấy
     if ($products->isEmpty()) {
       return response()->json([
-          'message' => 'Product Not Found',
-          'status' => 404,
+        'message' => 'Product Not Found',
+        'status' => 404,
       ], 404);
     }
 

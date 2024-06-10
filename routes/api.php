@@ -5,6 +5,7 @@ use App\Http\Controllers\API\AppointmentController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\BlogController;
 use App\Http\Controllers\API\BreedController;
+use App\Http\Controllers\API\CustomerController;
 use App\Http\Controllers\API\DoctorController;
 use App\Http\Controllers\API\MedicalCenterController;
 use App\Http\Controllers\API\PetController;
@@ -57,6 +58,9 @@ Route::group([
   'middleware' => ['force.json.response', 'api', 'auth.user', 'auth.customer'],
   'prefix' => 'customer',
 ], function ($router) {
+  // --------------     CUSTOMER     --------------
+  Route::put('/profile', [CustomerController::class, 'updateCustomer']);
+
   // --------------     PRODUCT     --------------
   Route::get('/products', [ProductController::class, 'index']); // lấy tất cả product
   Route::get('/products/shop/{shop_id}', [ProductController::class, 'getListProductByShopId']); // lấy dsach các product được bán bởi shop
@@ -186,8 +190,9 @@ Route::group([
   'middleware' => ['force.json.response', 'api', 'auth.user', 'auth.shop'],
   'prefix' => 'shop',
 ], function ($router) {
-  // --------------     PRODUCT     --------------
+  // --------------     SHOP     --------------
   Route::get('/profile', [ShopController::class, 'getProfileOfShop']);
+  Route::put('/profile', [ShopController::class, 'updateShop']);
 
   // --------------     PRODUCT     --------------
   Route::get('/products/total', [ProductController::class, 'getNumberOfProductByShopId']); // lấy số lượng product mà shop đang bán
