@@ -45,8 +45,7 @@ class CartItemController extends Controller
 
     // Tính toán giá
     $quantity = $request->quantity;
-    $amount = $product->price;
-    $price = $amount * $quantity;
+    $amount = $product->price * $quantity;
 
     // Thêm sản phẩm vào giỏ hàng
     $cartItem = CartItem::create([
@@ -55,12 +54,12 @@ class CartItemController extends Controller
       'name' => $product->name,
       'description' => $product->description,
       'quantity' => $quantity,
+      'price' => $product->price,
       'amount' => $amount,
-      'price' => $price,
     ]);
 
     // Cập nhật tổng giá trị giỏ hàng
-    $cart->total_prices += $price;
+    $cart->total_prices += $amount;
     $cart->save();
 
     return response()->json([

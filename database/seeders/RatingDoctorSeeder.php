@@ -20,9 +20,9 @@ class RatingDoctorSeeder extends Seeder
   {
     $faker = Faker::create();
 
-    $customer_account_ids = Account::whereHas('role', function ($query) {
+    $customer_accounts = Account::whereHas('role', function ($query) {
       $query->where('role_name', 'ROLE_CUSTOMER');
-    })->pluck('id')->toArray();
+    })->get(['id', 'created_at']);
 
     $doctor_ids = Doctor::pluck('id')->toArray();
 
@@ -49,14 +49,14 @@ class RatingDoctorSeeder extends Seeder
 
         // Random một khách hàng chưa được chọn trước đó
         do {
-          $random_customer_id = $faker->randomElement($customer_account_ids);
-        } while (in_array($random_customer_id, $selected_customer_ids));
+          $random_customer = $faker->randomElement($customer_accounts);
+        } while (in_array($random_customer->id, $selected_customer_ids));
 
         // Thêm khách hàng vào danh sách đã chọn
-        $selected_customer_ids[] = $random_customer_id;
+        $selected_customer_ids[] = $random_customer->id;
 
         // Random created_at trong khoảng từ 2 năm trước đến hiện tại
-        $created_at = $faker->dateTimeBetween('-2 years', 'now');
+        $created_at = $faker->dateTimeBetween($random_customer->created_at, 'now');
 
         // Random reply và reply_date (nếu có reply)
         $reply = $faker->boolean(40) ? $faker->paragraph(6) : null;
@@ -65,7 +65,7 @@ class RatingDoctorSeeder extends Seeder
         $ratingDoctor = RatingDoctor::create([
           'rating' => $rating,
           'description' => $faker->paragraph(8),
-          'customer_id' => $random_customer_id,
+          'customer_id' => $random_customer->id,
           'doctor_id' => $doctor_id,
           'reply' => $reply,
           'reply_date' => $reply_date,
@@ -75,7 +75,7 @@ class RatingDoctorSeeder extends Seeder
 
         // Random số lượng liked cho rating doctor này từ các customer khác nhau
         $num_likes = $faker->numberBetween(0, 5);
-        $liked_customer_ids = $faker->randomElements($customer_account_ids, $num_likes);
+        $liked_customer_ids = $faker->randomElements($customer_accounts->pluck('id')->toArray(), $num_likes);
 
         foreach ($liked_customer_ids as $liked_customer_id) {
           RatingDoctorInteract::create([

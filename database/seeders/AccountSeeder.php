@@ -59,6 +59,8 @@ class AccountSeeder extends Seeder
     $rankings = Ranking::all();
 
     for ($i = 0; $i < TOTAL_CUSTOMER_ACCOUNT; $i++) {
+      $created_at = $faker->dateTimeBetween('-2 years', 'now');
+
       $customer_account = Account::factory()->create([
         'username' => $faker->userName(),
         'email' => $faker->safeEmail(),
@@ -68,7 +70,9 @@ class AccountSeeder extends Seeder
         'role_id' => $role_customer,
         'reset_code' => null,
         'reset_code_expires_at' => null,
-        'reset_code_attempts' => null
+        'reset_code_attempts' => null,
+        'created_at' => $created_at,
+        'updated_at' => $created_at,
       ]);
 
       $ranking_point = $faker->randomNumber(4);
@@ -95,13 +99,15 @@ class AccountSeeder extends Seeder
         'phone' => $faker->regexify('0(3|5|7|8|9){1}([0-9]{8})'),
         'ranking_point' => $ranking_point,
         'ranking_id' => $ranking_id,
-        'created_at' => now(),
-        'updated_at' => now(),
+        'created_at' => $created_at,
+        'updated_at' => $created_at,
       ]);
     }
 
     // --------------------------      ADMINS     -------------------------- 
     for ($i = 0; $i < TOTAL_ADMIN_ACCOUNT; $i++) {
+      $created_at = $faker->dateTimeBetween('-2 years', 'now');
+
       $admin_account = Account::factory()->create([
         'username' => $faker->userName(),
         'email' => $faker->safeEmail(),
@@ -111,7 +117,9 @@ class AccountSeeder extends Seeder
         'role_id' => $role_admin,
         'reset_code' => null,
         'reset_code_expires_at' => null,
-        'reset_code_attempts' => null
+        'reset_code_attempts' => null,
+        'created_at' => $created_at,
+        'updated_at' => $created_at,
       ]);
 
       $is_male_admin = $faker->boolean(chanceOfGettingTrue: 50);
@@ -127,8 +135,8 @@ class AccountSeeder extends Seeder
         'phone' => $faker->regexify('0(3|5|7|8|9){1}([0-9]{8})'),
         'image' => $faker->imageUrl(),
         'status' => $faker->boolean(100),
-        'created_at' => now(),
-        'updated_at' => now(),
+        'created_at' => $created_at,
+        'updated_at' => $created_at,
       ]);
     }
   }

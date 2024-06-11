@@ -36,6 +36,7 @@ class RatingProductController extends Controller
 		// Lấy rating của sản phẩm cụ thể
 		$ratings = RatingProduct::with(['customer.account', 'customer.ratings', 'interacts.account'])
 			->where('product_id', $product_id)
+      ->orderBy('created_at', 'desc')
 			->get()
 			->map(function ($rating) use ($user) {
 				$customer = $rating->customer;

@@ -36,12 +36,15 @@ class CartController extends Controller
         'name' => $cart_item->name,
         'description' => $cart_item->description,
         'quantity' => $cart_item->quantity,
-        'amount' => $cart_item->amount,
         'price' => $cart_item->price,
+        'amount' => $cart_item->amount,
         'product_id' => $cart_item->product_id,
-        'product_id' => $cart_item->product->image,
+        'product_image' => $cart_item->product->image,
         'rating' => $ratingData['average'],
         'rating_count' => $ratingData['count'],
+        'shop_id' => $cart_item->product->shop->id,
+        'shop_name' => $cart_item->product->shop->name,
+        'shop_image' => $cart_item->product->shop->image,
       ];
     }
 

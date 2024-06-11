@@ -159,7 +159,7 @@ class OrderController extends Controller
         foreach ($cart->cartItem->where('product.shop_id', $shopId) as $cartItem) {
           $product = $cartItem->product;
           $product->quantity -= $cartItem->quantity; // Trừ số lượng sản phẩm
-          $product->sold_quantity += $cartItem->quantity; // Trừ số lượng sản phẩm
+          $product->sold_quantity += $cartItem->quantity; // Cộng số lượng sản phẩm đã bán
           if ($product->quantity < 0) {
             throw new Exception('Product quantity not sufficient for product ID ' . $product->id);
           }
