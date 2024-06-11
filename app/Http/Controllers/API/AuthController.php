@@ -53,7 +53,7 @@ class AuthController extends Controller
       return response()->json($response, 400);
     }
 
-    $default_avatar = 'gs://petshop-3d4ae.appspot.com/avatars/customer/png-transparent-default-avatar-thumbnail.png';
+    $default_avatar = 'gs://new_petshop_bucket/avatars/customer/png-transparent-default-avatar-thumbnail.png';
 
     // Create new account
     $account = Account::create([

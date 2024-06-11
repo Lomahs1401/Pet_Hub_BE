@@ -19,7 +19,6 @@ class CreateCustomersTable extends Migration
       $table->string('gender')->nullable();
       $table->date('birthdate')->nullable();
       $table->string('address')->nullable();
-      $table->string('CMND')->unique()->nullable();
       $table->string('phone')->unique()->nullable();
       $table->integer('ranking_point');
       $table->foreignId('account_id')->constrained('accounts');

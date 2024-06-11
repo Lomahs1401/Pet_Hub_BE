@@ -91,7 +91,6 @@ class AccountSeeder extends Seeder
           : $faker->lastName() . ' ' . $faker->firstNameFemale(),
         'gender' => $is_male_customer ? 'Male' : 'Female',
         'birthdate' => $faker->dateTimeInInterval('-20 years', '+2 years', 'Asia/Ho_Chi_Minh')->format('Y-m-d'),
-        'CMND' => $faker->numerify('#########'),
         'address' => $faker->city(),
         'phone' => $faker->regexify('0(3|5|7|8|9){1}([0-9]{8})'),
         'ranking_point' => $ranking_point,

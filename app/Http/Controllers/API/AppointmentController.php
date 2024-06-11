@@ -19,7 +19,7 @@ class AppointmentController extends Controller
     $num_of_page = intval($request->query('num_of_page', 10));
     $sort_by = $request->query('sort_by', 'newest');
 
-    $query = Appointment::query()->where('customer_id', $customer_id)->whereNull('deleted_at');
+    $query = Appointment::query()->withTrashed()->where('customer_id', $customer_id);
 
     // Tính tổng số trang
     $total_appointments = $query->count();
