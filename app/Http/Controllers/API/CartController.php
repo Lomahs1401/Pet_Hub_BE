@@ -45,6 +45,8 @@ class CartController extends Controller
         'shop_id' => $cart_item->product->shop->id,
         'shop_name' => $cart_item->product->shop->name,
         'shop_image' => $cart_item->product->shop->image,
+        'shop_avatar' => $cart_item->product->shop->account->avatar,
+        'shop_address' => $cart_item->product->shop->address,
       ];
     }
 
