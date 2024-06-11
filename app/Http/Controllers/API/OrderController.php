@@ -118,8 +118,8 @@ class OrderController extends Controller
       // Kiểm tra trạng thái giỏ hàng
       if (!$cart->is_active) {
         return response()->json([
-            'message' => 'Cart is not active. Order already exists for this cart.',
-            'status' => 400,
+          'message' => 'Cart is not active. Order already exists for this cart.',
+          'status' => 400,
         ], 400);
       }
 
@@ -148,12 +148,23 @@ class OrderController extends Controller
         });
 
         // Tạo subOrder cho từng shop
-        $subOrder = SubOrder::create([
+        SubOrder::create([
           'sub_total_prices' => $subOrderTotalPrice,
           'status' => 'pending', // Có thể thay đổi trạng thái nếu cần
           'order_id' => $order->id,
           'shop_id' => $shopId,
         ]);
+
+        // Gắn sản phẩm vào subOrder và cập nhật số lượng sản phẩm trong kho
+        foreach ($cart->cartItem->where('product.shop_id', $shopId) as $cartItem) {
+          $product = $cartItem->product;
+          $product->quantity -= $cartItem->quantity; // Trừ số lượng sản phẩm
+          $product->sold_quantity += $cartItem->quantity; // Trừ số lượng sản phẩm
+          if ($product->quantity < 0) {
+            throw new Exception('Product quantity not sufficient for product ID ' . $product->id);
+          }
+          $product->save();
+        }
       }
 
       // Vô hiệu hoá giỏ hàng sau khi tạo đơn hàng

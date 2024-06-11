@@ -187,7 +187,7 @@ Route::group([
   Route::get('/doctors/{doctor_id}/appointments', [DoctorController::class, 'getAllAppointmentsOfDoctor']);
   Route::get('/doctors/{doctor_id}/freetime', [DoctorController::class, 'getFreetimeOfDoctor']);
 
-  // --------------     CART     --------------
+  // --------------     ORDER     --------------
   Route::get('/orders', [OrderController::class, 'getOrders']);
   Route::get('/orders/{order_id}', [OrderController::class, 'getOrderDetail']);
   Route::post('/orders', [OrderController::class, 'createOrder']);
@@ -253,4 +253,9 @@ Route::group([
   Route::post('/rating-products/{rating_product_id}/reply', [RatingProductController::class, 'replyToRatingProduct']);
   Route::put('/rating-products/{rating_product_id}/reply', [RatingProductController::class, 'updateReplyToRatingProduct']);
   Route::delete('/rating-products/{rating_product_id}/reply', [RatingProductController::class, 'deleteReplyToRatingProduct']);
+
+  // --------------     ORDER     --------------
+  Route::get('/orders', [OrderController::class, 'getOrders']);
+  Route::get('/orders/{order_id}', [OrderController::class, 'getOrderDetail']);
+  Route::post('/orders', [OrderController::class, 'createOrder']);
 });

@@ -41,7 +41,6 @@ class CustomerController extends Controller
       'gender' => 'required|string',
       'birthdate' => 'required',
       'address' => 'required|string',
-      'CMND' => ['required', 'string', Rule::unique('customers')->ignore($customer->id)],
       'phone' => ['required', 'string', Rule::unique('customers')->ignore($customer->id)],
       'avatar' => 'nullable|string',
       'username' => 'required|string',
@@ -54,7 +53,6 @@ class CustomerController extends Controller
       'gender' => $validatedData['gender'],
       'birthdate' => $validatedData['birthdate'],
       'address' => $validatedData['address'],
-      'CMND' => $validatedData['CMND'],
       'phone' => $validatedData['phone'],
     ]);
 
