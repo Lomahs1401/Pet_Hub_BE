@@ -146,35 +146,33 @@ class AccountController extends Controller
       'current_password' => 'required',
       'new_password' => 'required|min:6',
       'confirm_password' => 'required|same:new_password',
+    ], [
+      'current_password.required' => 'Current password is required.',
+      'new_password.required' => 'New password is required.',
+      'new_password.min' => 'New password must be at least 6 characters.',
+      'confirm_password.required' => 'Confirm password is required.',
+      'confirm_password.same' => 'Confirm password must match new password.',
     ]);
 
     if ($validator->fails()) {
-      return response()->json(['message' => $validator->errors()], 400);
+      return response()->json(['message' => $validator->errors()->first()], 400);
     }
 
     $data = Account::findOrFail($account->id);
     $currentPassword = $request->current_password;
     $newPassword = $request->new_password;
 
-    // Cập nhật mật khẩu mới cho người dùng
-    if ($data) {
-      // Kiểm tra mật khẩu hiện tại của người dùng
-      if (!Hash::check($currentPassword, $data->password)) {
-        return response()->json(['message' => 'Current password not match!'], 401);
-      }
-      $data->password = Hash::make($newPassword);
-      $data->save();
-      if ($data) {
-        return response()->json([
-          'message' => 'Change password successfully',
-          'account' => $data,
-        ], 200);
-      } else {
-        return response()->json([
-          'message' => 'Update password failed!',
-          'account' => $data,
-        ], 400);
-      }
+    // Kiểm tra mật khẩu hiện tại của người dùng
+    if (!Hash::check($currentPassword, $data->password)) {
+      return response()->json(['message' => 'Current password not match!'], 401);
     }
+
+    $data->password = Hash::make($newPassword);
+    $data->save();
+
+    return response()->json([
+      'message' => 'Change password successfully',
+      'account' => $data,
+    ], 200);
   }
 }

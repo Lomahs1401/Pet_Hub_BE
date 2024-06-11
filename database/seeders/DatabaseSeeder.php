@@ -35,6 +35,7 @@ class DatabaseSeeder extends Seeder
     $this->call(AppointmentSeeder::class);
     $this->call(ProductCategorySeeder::class);
     $this->call(ProductSeeder::class);
+    $this->call(CartSeeder::class);
     $this->call(ServiceCategorySeeder::class);
     $this->call(ServiceSeeder::class);
     $this->call(RatingProductSeeder::class);

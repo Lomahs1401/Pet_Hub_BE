@@ -53,7 +53,7 @@ class PetSeeder extends Seeder
         'age' => $faker->numberBetween(1, 16),
         'gender' => $faker->randomElement(['male', 'female']),
         'description' => $faker->paragraph(3),
-        'image' => 'gs://petshop-3d4ae.appspot.com/pets/' . ($i + 1) . '.jpg',
+        'image' => 'gs://new_petshop_bucket/pets/' . ($i + 1) . '.jpg',
         'is_purebred' => $faker->randomElement([true, false]),
         'status' => $adopted,
         'breed_id' => ($type == 'dog') ? $faker->randomElement($dog_breed_ids) : $faker->randomElement($cat_breed_ids),

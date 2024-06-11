@@ -25,31 +25,31 @@ class AccountSeeder extends Seeder
     $role_admin = Role::where('role_name', 'ROLE_ADMIN')->first()->id;
 
     $list_customer_avatars = [
-      'gs://petshop-3d4ae.appspot.com/avatars/customer/1.jpg',
-      'gs://petshop-3d4ae.appspot.com/avatars/customer/2.jpg',
-      'gs://petshop-3d4ae.appspot.com/avatars/customer/3.jpg',
-      'gs://petshop-3d4ae.appspot.com/avatars/customer/4.jpg',
-      'gs://petshop-3d4ae.appspot.com/avatars/customer/5.jpg',
-      'gs://petshop-3d4ae.appspot.com/avatars/customer/6.jpg',
-      'gs://petshop-3d4ae.appspot.com/avatars/customer/7.jpg',
-      'gs://petshop-3d4ae.appspot.com/avatars/customer/8.jpg',
-      'gs://petshop-3d4ae.appspot.com/avatars/customer/9.jpg',
-      'gs://petshop-3d4ae.appspot.com/avatars/customer/10.jpg',
-      'gs://petshop-3d4ae.appspot.com/avatars/customer/11.jpg',
-      'gs://petshop-3d4ae.appspot.com/avatars/customer/12.jpg',
-      'gs://petshop-3d4ae.appspot.com/avatars/customer/13.jpg',
-      'gs://petshop-3d4ae.appspot.com/avatars/customer/14.jpg',
-      'gs://petshop-3d4ae.appspot.com/avatars/customer/15.jpg',
+      'gs://new_petshop_bucket/avatars/customer/1.jpg',
+      'gs://new_petshop_bucket/avatars/customer/2.jpg',
+      'gs://new_petshop_bucket/avatars/customer/3.jpg',
+      'gs://new_petshop_bucket/avatars/customer/4.jpg',
+      'gs://new_petshop_bucket/avatars/customer/5.jpg',
+      'gs://new_petshop_bucket/avatars/customer/6.jpg',
+      'gs://new_petshop_bucket/avatars/customer/7.jpg',
+      'gs://new_petshop_bucket/avatars/customer/8.jpg',
+      'gs://new_petshop_bucket/avatars/customer/9.jpg',
+      'gs://new_petshop_bucket/avatars/customer/10.jpg',
+      'gs://new_petshop_bucket/avatars/customer/11.jpg',
+      'gs://new_petshop_bucket/avatars/customer/12.jpg',
+      'gs://new_petshop_bucket/avatars/customer/13.jpg',
+      'gs://new_petshop_bucket/avatars/customer/14.jpg',
+      'gs://new_petshop_bucket/avatars/customer/15.jpg',
     ];
 
     $list_admin_avatars = [
-      'gs://petshop-3d4ae.appspot.com/avatars/admin/1.jpg',
-      'gs://petshop-3d4ae.appspot.com/avatars/admin/2.jpg',
-      'gs://petshop-3d4ae.appspot.com/avatars/admin/3.jpg',
-      'gs://petshop-3d4ae.appspot.com/avatars/admin/4.jpg',
-      'gs://petshop-3d4ae.appspot.com/avatars/admin/5.jpg',
-      'gs://petshop-3d4ae.appspot.com/avatars/admin/6.jpg',
-      'gs://petshop-3d4ae.appspot.com/avatars/admin/7.jpg',
+      'gs://new_petshop_bucket/avatars/admin/1.jpg',
+      'gs://new_petshop_bucket/avatars/admin/2.jpg',
+      'gs://new_petshop_bucket/avatars/admin/3.jpg',
+      'gs://new_petshop_bucket/avatars/admin/4.jpg',
+      'gs://new_petshop_bucket/avatars/admin/5.jpg',
+      'gs://new_petshop_bucket/avatars/admin/6.jpg',
+      'gs://new_petshop_bucket/avatars/admin/7.jpg',
     ];
 
     define('TOTAL_CUSTOMER_ACCOUNT', count($list_customer_avatars));

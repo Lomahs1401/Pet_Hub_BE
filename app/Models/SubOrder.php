@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Cart extends Model
+class SubOrder extends Model
 {
   use HasFactory;
 
@@ -14,7 +14,7 @@ class Cart extends Model
    *
    * @var string
    */
-  protected $table = 'carts';
+  protected $table = 'sub_orders';
 
   /**
    * The attributes that are mass assignable.
@@ -22,20 +22,19 @@ class Cart extends Model
    * @var array<int, string>
    */
   protected $fillable = [
-    'total_prices',
-    'is_active',
-    'customer_id',
+    'sub_total_prices',
+    'status',
+    'order_id',
+    'shop_id',
   ];
 
-  // Quan hệ với Customer
-  public function customer()
+  public function shop()
   {
-    return $this->belongsTo(Customer::class);
+    return $this->belongsTo(Shop::class);
   }
 
-  // Quan hệ với CartItem
-  public function cartItem()
+  public function order()
   {
-    return $this->hasMany(CartItem::class);
+    return $this->belongsTo(Order::class);
   }
 }

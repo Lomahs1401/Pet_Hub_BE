@@ -37,16 +37,16 @@ class MedicalCenterSeeder extends Seeder
     ];
 
     $list_doctors_avatars = [
-      'gs://petshop-3d4ae.appspot.com/doctors/1/',
-      'gs://petshop-3d4ae.appspot.com/doctors/2/',
-      'gs://petshop-3d4ae.appspot.com/doctors/3/',
-      'gs://petshop-3d4ae.appspot.com/doctors/4/',
-      'gs://petshop-3d4ae.appspot.com/doctors/5/',
-      'gs://petshop-3d4ae.appspot.com/doctors/6/',
-      'gs://petshop-3d4ae.appspot.com/doctors/7/',
-      'gs://petshop-3d4ae.appspot.com/doctors/8/',
-      'gs://petshop-3d4ae.appspot.com/doctors/9/',
-      'gs://petshop-3d4ae.appspot.com/doctors/10/',
+      'gs://new_petshop_bucket/doctors/1/',
+      'gs://new_petshop_bucket/doctors/2/',
+      'gs://new_petshop_bucket/doctors/3/',
+      'gs://new_petshop_bucket/doctors/4/',
+      'gs://new_petshop_bucket/doctors/5/',
+      'gs://new_petshop_bucket/doctors/6/',
+      'gs://new_petshop_bucket/doctors/7/',
+      'gs://new_petshop_bucket/doctors/8/',
+      'gs://new_petshop_bucket/doctors/9/',
+      'gs://new_petshop_bucket/doctors/10/',
     ];
 
     $start_time_options = ['06:00 AM', '07:00 AM', '08:00 AM', '09:00 AM']; // Giờ bắt đầu làm việc (AM/PM format)
@@ -61,7 +61,7 @@ class MedicalCenterSeeder extends Seeder
         'username' => $faker->userName(),
         'email' => $faker->companyEmail(),
         'password' => Hash::make('medicalcenter123'),
-        'avatar' => 'gs://petshop-3d4ae.appspot.com/avatars/medical_center/' . ($i + 1) . '.jpg',
+        'avatar' => 'gs://new_petshop_bucket/avatars/medical_center/' . ($i + 1) . '.jpg',
         'enabled' => $faker->boolean(100),
         'role_id' => $role_medical_center,
         'reset_code' => null,
@@ -72,7 +72,7 @@ class MedicalCenterSeeder extends Seeder
       $medical_center = MedicalCenter::factory()->create([
         'name' => $medical_center['name'],
         'description' => $faker->paragraph(5),
-        'image' => 'gs://petshop-3d4ae.appspot.com/medical_centers/' . ($i + 1) . '/',
+        'image' => 'gs://new_petshop_bucket/medical_centers/' . ($i + 1) . '/',
         'phone' => $faker->phoneNumber(),
         'address' => $medical_center['address'],
         'website' => $faker->url(),
@@ -86,7 +86,7 @@ class MedicalCenterSeeder extends Seeder
         'username' => $faker->userName(),
         'email' => $faker->safeEmail(),
         'password' => Hash::make('doctor123'),
-        'avatar' => 'gs://petshop-3d4ae.appspot.com/avatars/doctor/' . ($i + 1) . '.jpg',
+        'avatar' => 'gs://new_petshop_bucket/avatars/doctor/' . ($i + 1) . '.jpg',
         'enabled' => $faker->boolean(100),
         'role_id' => $role_doctor,
         'reset_code' => null,

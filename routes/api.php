@@ -5,9 +5,12 @@ use App\Http\Controllers\API\AppointmentController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\BlogController;
 use App\Http\Controllers\API\BreedController;
+use App\Http\Controllers\API\CartController;
+use App\Http\Controllers\API\CartItemController;
 use App\Http\Controllers\API\CustomerController;
 use App\Http\Controllers\API\DoctorController;
 use App\Http\Controllers\API\MedicalCenterController;
+use App\Http\Controllers\API\OrderController;
 use App\Http\Controllers\API\PetController;
 use App\Http\Controllers\API\ProductCategoryController;
 use App\Http\Controllers\API\ProductController;
@@ -50,7 +53,7 @@ Route::group([
   // Authenticate
   Route::post('/logout', [AuthController::class, 'logout']);
   Route::post('/profile', [AuthController::class, 'profile']);
-  Route::patch('/changePassword', [AccountController::class, 'changePassword']);
+  Route::patch('/change-password', [AccountController::class, 'changePassword']);
 });
 
 // Customer API
@@ -183,6 +186,19 @@ Route::group([
   Route::get('/doctors/{doctor_id}', [DoctorController::class, 'show']);
   Route::get('/doctors/{doctor_id}/appointments', [DoctorController::class, 'getAllAppointmentsOfDoctor']);
   Route::get('/doctors/{doctor_id}/freetime', [DoctorController::class, 'getFreetimeOfDoctor']);
+
+  // --------------     CART     --------------
+  Route::get('/orders', [OrderController::class, 'getOrders']);
+  Route::get('/orders/{order_id}', [OrderController::class, 'getOrderDetail']);
+  Route::post('/orders', [OrderController::class, 'createOrder']);
+
+  // --------------     CART     --------------
+  Route::get('/carts', [CartController::class, 'getCurrentCart']);
+  Route::post('/carts', [CartController::class, 'createNewCart']);
+  Route::put('/carts/{cart_id}', [CartController::class, 'updateCart']);
+  // --------------     CART ITEM    --------------
+  Route::post('/cart-items/{cart_id}', [CartItemController::class, 'addProductIntoCart']);
+  Route::post('/cart-items/{cart_item_id}/deleted', [CartItemController::class, 'removeProductFromCart']);
 });
 
 // Shop API

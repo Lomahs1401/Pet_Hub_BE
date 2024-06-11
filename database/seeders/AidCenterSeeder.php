@@ -38,7 +38,7 @@ class AidCenterSeeder extends Seeder
                 'username' => $faker->userName(),
                 'email' => $faker->companyEmail(),
                 'password' => Hash::make('aidcenter123'),
-                'avatar' => 'gs://petshop-3d4ae.appspot.com/avatars/aid_center/' . ($i+1) . '.jpg',
+                'avatar' => 'gs://new_petshop_bucket/avatars/aid_center/' . ($i+1) . '.jpg',
                 'enabled' => $faker->boolean(100),
                 'role_id' => $role_aid_center,
                 'reset_code' => null,
@@ -49,7 +49,7 @@ class AidCenterSeeder extends Seeder
             AidCenter::factory()->create([
                 'name' => $aid_center['name'],
                 'description' => $faker->paragraph(5),
-                'image' => 'gs://petshop-3d4ae.appspot.com/aid_centers/' . ($i+1) . '/',
+                'image' => 'gs://new_petshop_bucket/aid_centers/' . ($i+1) . '/',
                 'phone' => $faker->phoneNumber(),
                 'address' => $aid_center['address'],
                 'website' => $faker->url(),
