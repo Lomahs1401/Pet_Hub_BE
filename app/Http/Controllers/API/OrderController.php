@@ -99,12 +99,11 @@ class OrderController extends Controller
     $validatedData = $request->validate([
       'address' => 'required|string',
       'payment_method' => 'required|string',
-      'transaction_order_id' => 'required|unique:orders,transaction_order_id',
+      'transaction_order_id' => 'sometimes|unique:orders,transaction_order_id',
       'cart_id' => 'required|exists:carts,id',
     ], [
       'address.required' => 'Address is required',
       'payment_method.required' => 'Payment method is required',
-      'transaction_order_id.required' => 'Transaction order ID is required',
       'transaction_order_id.unique' => 'Transaction order ID is already taken',
       'cart_id.required' => 'Cart ID is required',
     ]);
@@ -128,12 +127,19 @@ class OrderController extends Controller
         return $item->quantity * $item->price;
       });
 
+      // Kiểm tra và tạo transaction_order_id nếu không có
+      if (isset($validatedData['transaction_order_id'])) {
+        $transactionOrderId = $validatedData['transaction_order_id'];
+      } else {
+        $transactionOrderId = strtoupper(uniqid($customer_id . $cart->id . now()->format('YmdHis')));
+      }
+
       // Tạo đơn hàng
       $order = Order::create([
         'total_prices' => $totalPrices,
         'address' => $validatedData['address'],
         'payment_method' => $validatedData['payment_method'],
-        'transaction_order_id' => $validatedData['transaction_order_id'],
+        'transaction_order_id' => $transactionOrderId,
         'customer_id' => $customer_id,
         'cart_id' => $cart->id,
       ]);
@@ -147,10 +153,17 @@ class OrderController extends Controller
           return $item->quantity * $item->price;
         });
 
+        // Xác định trạng thái dựa trên phương thức thanh toán
+        if ($validatedData['payment_method'] == 'Paypal' || $validatedData['payment_method'] == 'paypal') {
+          $status = 'Paid';
+        } else {
+          $status = 'Created';
+        }
+
         // Tạo subOrder cho từng shop
         SubOrder::create([
           'sub_total_prices' => $subOrderTotalPrice,
-          'status' => 'pending', // Có thể thay đổi trạng thái nếu cần
+          'status' => $status,
           'order_id' => $order->id,
           'shop_id' => $shopId,
         ]);

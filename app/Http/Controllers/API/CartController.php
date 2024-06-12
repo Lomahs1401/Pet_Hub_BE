@@ -24,14 +24,16 @@ class CartController extends Controller
     }
 
     // Lấy tất cả các sản phẩm trong giỏ hàng
-    $cartItems = $cart->cartItem()->with('product')->get();
+    $cartItems = $cart->cartItem()->with('product.shop.account')->get();
 
-    $formatted_cart_items = [];
+    // Tạo một danh sách các shop
+    $shops = [];
 
     foreach ($cartItems as $cart_item) {
+      $shop = $cart_item->product->shop;
       $ratingData = $cart_item->product->calculateProductRating();
 
-      $formatted_cart_items[] = [
+      $formatted_cart_item = [
         'id' => $cart_item->id,
         'name' => $cart_item->name,
         'description' => $cart_item->description,
@@ -42,19 +44,36 @@ class CartController extends Controller
         'product_image' => $cart_item->product->image,
         'rating' => $ratingData['average'],
         'rating_count' => $ratingData['count'],
-        'shop_id' => $cart_item->product->shop->id,
-        'shop_name' => $cart_item->product->shop->name,
-        'shop_image' => $cart_item->product->shop->image,
-        'shop_avatar' => $cart_item->product->shop->account->avatar,
-        'shop_address' => $cart_item->product->shop->address,
       ];
+
+      // Kiểm tra xem shop đã tồn tại trong danh sách chưa
+      if (!isset($shops[$shop->id])) {
+        $shops[$shop->id] = [
+          'shop_id' => $shop->id,
+          'shop_name' => $shop->name,
+          'shop_image' => $shop->image,
+          'shop_avatar' => $shop->account->avatar,
+          'shop_address' => $shop->address,
+          'cart_items' => [],
+        ];
+      }
+
+      // Thêm sản phẩm vào shop tương ứng
+      $shops[$shop->id]['cart_items'][] = $formatted_cart_item;
     }
+
+    // Chuyển danh sách các shop từ associative array sang indexed array
+    $shops = array_values($shops);
 
     return response()->json([
       'message' => 'Query cart successfully',
       'status' => 200,
-      'cart' => $cart,
-      'cart_items' => $formatted_cart_items,
+      'cart' => [
+        'id' => $cart->id,
+        'total_prices' => $cart->total_prices,
+        'is_active' => $cart->is_active,
+      ],
+      'shops' => $shops,
     ], 200);
   }
 

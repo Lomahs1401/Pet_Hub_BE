@@ -28,12 +28,12 @@ class CartSeeder extends Seeder
 
     foreach ($customers as $customer) {
       // Random số lượt mà khách hàng có giỏ hàng
-      $numberOfCarts = rand(1, 10);
+      $numberOfCarts = rand(1, 30);
 
       for ($n = 0; $n < $numberOfCarts; $n++) {
         // Random 50% khách hàng có giỏ hàng
         if (rand(0, 1) == 1) {
-          $isActive = rand(0, 100) < 30; // 30% true (gio hang dang hoat dong), 70% false (da thanh toan)
+          $isActive = rand(0, 100) < 20; // 20% true (gio hang dang hoat dong), 70% false (da thanh toan)
 
           // Tạo giỏ hàng cho khách hàng
           $cart = Cart::create([
@@ -76,16 +76,17 @@ class CartSeeder extends Seeder
           $cart->save();
 
           // Random order_date từ 2 thang trước đến thời điểm hiện tại
-          $order_date = $faker->dateTimeBetween('-2 months', 'now');
+          $order_date = $faker->dateTimeBetween('-4 months', 'now');
 
           if (!$isActive) {
+            $paymentMethod = (rand(0, 1) == 1) ? 'COD' : 'Paypal';
             // Tạo đơn hàng nếu giỏ hàng không còn hoạt động
             $order = Order::create([
               'customer_id' => $customer->id,
               'cart_id' => $cart->id,
               'total_prices' => $totalPrices,
               'address' => $customer->address,
-              'payment_method' => (rand(0, 1) == 1) ? 'COD' : 'Paypal',
+              'payment_method' => $paymentMethod,
               'transaction_order_id' => strtoupper(uniqid()),
               'created_at' => $order_date,
               'updated_at' => $order_date,
@@ -94,11 +95,21 @@ class CartSeeder extends Seeder
             // Tạo SubOrder cho mỗi shop
             foreach ($shopIds as $shopId => $prices) {
               $subTotalPrices = array_sum($prices);
+
+              // Xác định trạng thái dựa trên phương thức thanh toán
+              if ($paymentMethod == 'Paypal') {
+                $statuses = ['Paid', 'Delivering', 'Done'];
+              } else {
+                $statuses = ['Created', 'Delivering', 'Done'];
+              }
+
+              $status = $statuses[array_rand($statuses)];
+
               SubOrder::create([
                 'order_id' => $order->id,
                 'shop_id' => $shopId,
                 'sub_total_prices' => $subTotalPrices,
-                'status' => (rand(0, 1) == 1) ? 'Delivered' : 'Shipped', // hoặc bất kỳ trạng thái nào phù hợp
+                'status' => $status,
                 'created_at' => $order_date,
                 'updated_at' => $order_date,
               ]);

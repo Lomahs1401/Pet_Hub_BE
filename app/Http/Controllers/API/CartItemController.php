@@ -127,7 +127,6 @@ class CartItemController extends Controller
   {
     $request->validate([
       'product_id' => 'required|integer',
-      'quantity' => 'required|integer|min:1',
     ]);
 
     $customer_id = auth()->user()->customer->id;
@@ -145,7 +144,7 @@ class CartItemController extends Controller
       return response()->json(['message' => 'Cannot modify an inactive cart'], 400);
     }
 
-    // Kiểm tra sản phẩm
+    // Kiểm tra sản phẩm trong giỏ hàng
     $cartItem = CartItem::where('cart_id', $cart->id)
       ->where('product_id', $request->product_id)
       ->first();
@@ -156,17 +155,21 @@ class CartItemController extends Controller
 
     // Kiểm tra số lượng sản phẩm còn lại
     $product = Product::find($request->product_id);
-    if ($product->quantity < ($cartItem->quantity + $request->quantity)) {
+    if (!$product) {
+      return response()->json(['message' => 'Product not found'], 404);
+    }
+
+    if ($product->quantity < ($cartItem->quantity + 1)) {
       return response()->json(['message' => 'Insufficient product quantity'], 400);
     }
 
-    // Tăng số lượng sản phẩm trong giỏ hàng
-    $cartItem->quantity += $request->quantity;
+    // Tăng số lượng sản phẩm trong giỏ hàng lên 1
+    $cartItem->quantity += 1;
     $cartItem->amount = $cartItem->quantity * $product->price;
     $cartItem->save();
 
     // Cập nhật tổng giá trị giỏ hàng
-    $cart->total_prices += $request->quantity * $product->price;
+    $cart->total_prices += $product->price;
     $cart->save();
 
     return response()->json([
@@ -180,7 +183,6 @@ class CartItemController extends Controller
   {
     $request->validate([
       'product_id' => 'required|integer',
-      'quantity' => 'required|integer|min:1',
     ]);
 
     $customer_id = auth()->user()->customer->id;
@@ -198,7 +200,7 @@ class CartItemController extends Controller
       return response()->json(['message' => 'Cannot modify an inactive cart'], 400);
     }
 
-    // Kiểm tra sản phẩm
+    // Kiểm tra sản phẩm trong giỏ hàng
     $cartItem = CartItem::where('cart_id', $cart->id)
       ->where('product_id', $request->product_id)
       ->first();
@@ -208,12 +210,12 @@ class CartItemController extends Controller
     }
 
     // Kiểm tra nếu số lượng giảm vượt quá số lượng hiện tại
-    if ($cartItem->quantity < $request->quantity) {
+    if ($cartItem->quantity < 1) {
       return response()->json(['message' => 'Insufficient quantity to decrease'], 400);
     }
 
-    // Giảm số lượng sản phẩm trong giỏ hàng
-    $cartItem->quantity -= $request->quantity;
+    // Giảm số lượng sản phẩm trong giỏ hàng đi 1
+    $cartItem->quantity -= 1;
     $cartItem->amount = $cartItem->quantity * $cartItem->price;
 
     // Nếu số lượng sản phẩm bằng 0, xóa sản phẩm khỏi giỏ hàng
@@ -224,7 +226,7 @@ class CartItemController extends Controller
     }
 
     // Cập nhật tổng giá trị giỏ hàng
-    $cart->total_prices -= $request->quantity * $cartItem->price;
+    $cart->total_prices -= $cartItem->price;
     $cart->save();
 
     return response()->json([
