@@ -49,7 +49,8 @@ class ProductController extends Controller
       ], 404);
     }
 
-    $ratingData = $product->calculateProductRating();
+    $ratingProduct = $product->calculateProductRating();
+    $shopRatingData = $product->shop->calculateShopRating();
 
     $formatted_product = [
       'id' => $product->id,
@@ -62,8 +63,8 @@ class ProductController extends Controller
       'status' => $product->status,
       'shop_id' => $product->shop_id,
       'product_category_id' => $product->product_category_id,
-      "rating" => $ratingData['average'],
-      "rating_count" => $ratingData['count'],
+      "rating" => $ratingProduct['average'],
+      "rating_count" => $ratingProduct['count'],
       'created_at' => $product->created_at,
       'updated_at' => $product->updated_at,
       'deleted_at' => $product->deleted_at,
@@ -79,6 +80,8 @@ class ProductController extends Controller
         'work_time' => $product->shop->work_time,
         'establish_year' => $product->shop->establish_year,
         'account_id' => $product->shop->account_id,
+        'rating' => $shopRatingData['average'],
+        'rating_count' => $shopRatingData['count'],
         'created_at' => $product->shop->created_at,
         'updated_at' => $product->shop->updated_at,
       ],
