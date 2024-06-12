@@ -17,6 +17,7 @@ use App\Http\Controllers\API\ProductController;
 use App\Http\Controllers\API\RatingProductController;
 use App\Http\Controllers\API\ServiceController;
 use App\Http\Controllers\API\ShopController;
+use App\Http\Controllers\API\ShopDashboardController;
 use App\Models\MedicalCenter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -199,6 +200,8 @@ Route::group([
   // --------------     CART ITEM    --------------
   Route::post('/cart-items/{cart_id}', [CartItemController::class, 'addProductIntoCart']);
   Route::post('/cart-items/{cart_item_id}/deleted', [CartItemController::class, 'removeProductFromCart']);
+  Route::post('/cart-items/{cart_id}/increase', [CartItemController::class, 'increaseQuantityOfProductInCart']);
+  Route::post('/cart-items/{cart_id}/decrease', [CartItemController::class, 'decreaseQuantityOfProductInCart']);
 });
 
 // Shop API
@@ -206,6 +209,13 @@ Route::group([
   'middleware' => ['force.json.response', 'api', 'auth.user', 'auth.shop'],
   'prefix' => 'shop',
 ], function ($router) {
+  // --------------     DASHBOARD     --------------
+  Route::get('/banner/reviews', [ShopDashboardController::class, 'getReviewsComparison']);
+  Route::get('/banner/replies', [ShopDashboardController::class, 'getRepliesComparison']);
+  Route::get('/banner/products', [ShopDashboardController::class, 'getProductsComparison']);
+  Route::get('/banner/orders', [ShopDashboardController::class, 'getOrdersComparison']);
+  Route::get('/banner/sales', [ShopDashboardController::class, 'getSalesomparison']);
+
   // --------------     SHOP     --------------
   Route::get('/profile', [ShopController::class, 'getProfileOfShop']);
   Route::put('/profile', [ShopController::class, 'updateShop']);
