@@ -267,4 +267,47 @@ class ShopDashboardController extends Controller
       ],
     ], 200);
   }
+
+  public function getSalesComparison(Request $request)
+  {
+    // Lấy shop_id của shop hiện tại (giả sử shop_id được lưu trong session hoặc lấy từ authenticated user)
+    $shop_id = auth()->user()->shop->id;
+
+    if (!$shop_id) {
+      return response()->json([
+        'message' => 'Shop not found for the current user!',
+        'status' => 404,
+      ], 404);
+    }
+
+    // Lấy thời gian hiện tại và thời gian 7 ngày trước
+    $endDate = Carbon::now();
+    $startDate = $endDate->copy()->subDays(7);
+
+    // Khởi tạo mảng chứa doanh thu theo ngày
+    $salesData = [];
+
+    // Lấy doanh thu theo từng ngày trong khoảng thời gian 7 ngày
+    for ($date = $startDate; $date <= $endDate; $date->addDay()) {
+      // Tính tổng doanh thu trong ngày
+      $totalSales = SubOrder::where('shop_id', $shop_id)
+        ->whereDate('created_at', $date)
+        ->sum('sub_total_prices');
+
+      // Lấy tên của thứ trong tuần
+      $dayName = $date->format('D'); // 'D' format sẽ trả về tên thứ ngắn (Mon, Tue, Wed, ...)
+
+      // Thêm dữ liệu vào mảng
+      $salesData[] = [
+        'name' => $dayName,
+        'sale' => $totalSales,
+      ];
+    }
+
+    return response()->json([
+      'message' => 'Sales fetched successfully!',
+      'status' => 200,
+      'data' => $salesData,
+    ], 200);
+  }
 }

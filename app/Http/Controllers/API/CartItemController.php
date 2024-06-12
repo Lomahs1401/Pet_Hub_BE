@@ -61,6 +61,10 @@ class CartItemController extends Controller
       if ($cartItem->trashed()) {
         // Khôi phục lại mục giỏ hàng nếu đã bị xóa mềm
         $cartItem->restore();
+
+        $cartItem->quantity = 1;
+        $cartItem->amount = $cartItem->quantity * $product->price;
+        $cartItem->save();
       }
       // Tăng số lượng sản phẩm trong giỏ hàng nếu đã tồn tại
       $cartItem->quantity = $newQuantity;

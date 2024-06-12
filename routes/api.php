@@ -214,7 +214,7 @@ Route::group([
   Route::get('/banner/replies', [ShopDashboardController::class, 'getRepliesComparison']);
   Route::get('/banner/products', [ShopDashboardController::class, 'getProductsComparison']);
   Route::get('/banner/orders', [ShopDashboardController::class, 'getOrdersComparison']);
-  Route::get('/banner/sales', [ShopDashboardController::class, 'getSalesomparison']);
+  Route::get('/banner/sales', [ShopDashboardController::class, 'getSalesComparison']);
 
   // --------------     SHOP     --------------
   Route::get('/profile', [ShopController::class, 'getProfileOfShop']);
