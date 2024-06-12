@@ -52,24 +52,26 @@ class CartItemController extends Controller
     $newQuantity = $request->quantity;
 
     if ($cartItem) {
-      $newQuantity += $cartItem->quantity;
-
-      // Kiểm tra số lượng sản phẩm còn lại
-      if ($product->quantity < $newQuantity) {
-        return response()->json(['message' => 'Insufficient product quantity'], 400);
-      }
+      // Nếu sản phẩm đã bị xóa mềm, khôi phục lại và reset quantity về 1
       if ($cartItem->trashed()) {
-        // Khôi phục lại mục giỏ hàng nếu đã bị xóa mềm
         $cartItem->restore();
-
         $cartItem->quantity = 1;
         $cartItem->amount = $cartItem->quantity * $product->price;
         $cartItem->save();
+      } else {
+        // Nếu sản phẩm đã tồn tại trong giỏ hàng, cộng thêm số lượng mới vào quantity hiện tại
+        $newQuantity += $cartItem->quantity;
+
+        // Kiểm tra số lượng sản phẩm còn lại
+        if ($product->quantity < $newQuantity) {
+          return response()->json(['message' => 'Insufficient product quantity'], 400);
+        }
+
+        // Tăng số lượng sản phẩm trong giỏ hàng nếu đã tồn tại
+        $cartItem->quantity = $newQuantity;
+        $cartItem->amount = $cartItem->quantity * $product->price;
+        $cartItem->save();
       }
-      // Tăng số lượng sản phẩm trong giỏ hàng nếu đã tồn tại
-      $cartItem->quantity = $newQuantity;
-      $cartItem->amount = $cartItem->quantity * $product->price;
-      $cartItem->save();
     } else {
       // Thêm sản phẩm vào giỏ hàng nếu chưa tồn tại
       $cartItem = CartItem::create([
@@ -84,7 +86,10 @@ class CartItemController extends Controller
     }
 
     // Cập nhật tổng giá trị giỏ hàng
-    $cart->total_prices += $request->quantity * $product->price;
+    $this->updateCartTotal($cart);
+
+    // Cập nhật tổng giá trị giỏ hàng
+    $cart->total_prices = $cart->cartItem->sum('amount');
     $cart->save();
 
     return response()->json([
@@ -92,6 +97,12 @@ class CartItemController extends Controller
       'status' => 200,
       'cart_item' => $cartItem,
     ], 200);
+  }
+
+  protected function updateCartTotal(Cart $cart)
+  {
+    $cart->total_prices = $cart->cartItem->sum('amount');
+    $cart->save();
   }
 
   public function removeProductFromCart($cart_item_id)
@@ -119,7 +130,7 @@ class CartItemController extends Controller
     $cartItem->delete();
 
     // Cập nhật tổng giá trị giỏ hàng
-    $cart->total_prices -= $cartItem->price;
+    $cart->total_prices -= $cartItem->amount;
     $cart->save();
 
     return response()->json([
