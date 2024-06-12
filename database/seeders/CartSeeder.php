@@ -31,9 +31,19 @@ class CartSeeder extends Seeder
       $numberOfCarts = rand(1, 30);
 
       for ($n = 0; $n < $numberOfCarts; $n++) {
+        // Kiểm tra xem khách hàng đã có giỏ hàng đang hoạt động chưa
+        $activeCart = Cart::where('customer_id', $customer->id)
+          ->where('is_active', true)
+          ->exists();
+
+        // Nếu khách hàng đã có giỏ hàng đang hoạt động, bỏ qua vòng lặp hiện tại
+        if ($activeCart) {
+          break;
+        }
+
         // Random 50% khách hàng có giỏ hàng
         if (rand(0, 1) == 1) {
-          $isActive = rand(0, 100) < 20; // 20% true (gio hang dang hoat dong), 70% false (da thanh toan)
+          $isActive = rand(0, 100) < 10; // 10% true (gio hang dang hoat dong), 90% false (da thanh toan)
 
           // Tạo giỏ hàng cho khách hàng
           $cart = Cart::create([
