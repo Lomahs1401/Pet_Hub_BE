@@ -41,6 +41,37 @@ class Shop extends Model
     return $this->belongsTo(Account::class);
   }
 
+  public function calculateShopRating()
+	{
+		// Lấy tất cả các đánh giá của sản phẩm
+		$ratings = $this->ratingShop;
+
+		// Đếm số lượng đánh giá
+		$count = $ratings->count();
+
+		// Nếu không có đánh giá nào, trả về 0
+		if ($count === 0) {
+			return [
+				'average' => 0,
+				'count' => 0
+			];
+		}
+
+		// Tính tổng điểm rating
+		$totalRating = $ratings->sum('rating');
+
+		// Tính điểm trung bình
+		$averageRating = $totalRating / $count;
+
+		// Làm tròn điểm trung bình đến một chữ số thập phân
+		$averageRating = round($averageRating, 2);
+
+		return [
+			'average' => number_format($averageRating, 2, '.', ''),
+			'count' => $count
+		];;
+	}
+
   public function ratingShop()
   {
     return $this->hasMany(RatingShop::class);

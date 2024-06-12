@@ -31,7 +31,8 @@ class CartController extends Controller
 
     foreach ($cartItems as $cart_item) {
       $shop = $cart_item->product->shop;
-      $ratingData = $cart_item->product->calculateProductRating();
+      $ratingShop = $shop->calculateShopRating();
+      $ratingProduct = $cart_item->product->calculateProductRating();
 
       $formatted_cart_item = [
         'id' => $cart_item->id,
@@ -42,8 +43,8 @@ class CartController extends Controller
         'amount' => $cart_item->amount,
         'product_id' => $cart_item->product_id,
         'product_image' => $cart_item->product->image,
-        'rating' => $ratingData['average'],
-        'rating_count' => $ratingData['count'],
+        'rating' => $ratingProduct['average'],
+        'rating_count' => $ratingProduct['count'],
       ];
 
       // Kiểm tra xem shop đã tồn tại trong danh sách chưa
@@ -51,9 +52,19 @@ class CartController extends Controller
         $shops[$shop->id] = [
           'shop_id' => $shop->id,
           'shop_name' => $shop->name,
+          'shop_username' => $shop->account->username,
           'shop_image' => $shop->image,
           'shop_avatar' => $shop->account->avatar,
+          'shop_description' => $shop->description,
+          'shop_phone' => $shop->phone,
           'shop_address' => $shop->address,
+          'shop_website' => $shop->website,
+          'shop_fanpage' => $shop->fanpage,
+          'shop_work_time' => $shop->work_time,
+          'shop_establish_year' => $shop->establish_year,
+          'shop_certificate' => $shop->certificate,
+          'rating' => $ratingShop['average'],
+          'rating_count' => $ratingShop['count'],
           'cart_items' => [],
         ];
       }

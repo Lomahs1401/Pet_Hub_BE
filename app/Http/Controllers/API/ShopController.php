@@ -90,8 +90,6 @@ class ShopController extends Controller
       'email' => 'required|email',
     ]);
 
-    var_dump($validatedData);
-
     // Cập nhật shop
     $shop->update([
       'name' => $validatedData['name'],
