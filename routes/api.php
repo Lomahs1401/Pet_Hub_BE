@@ -79,6 +79,7 @@ Route::group([
   // --------------     PRODUCT PAGINATION     --------------
   Route::get('/products/paginate', [ProductController::class, 'paging']); // lấy ds product có phân trang (query param: page_number, num_of_page, target)
   Route::get('/products/best-selling', [ProductController::class, 'getBestSellingProduct']); // lấy ds product bán chạy (ko ràng buộc bởi shop và category)
+  Route::get('/products/best-selling/category-type', [ProductController::class, 'getBestSellingProductByCategoryType']);
   Route::get('/products/best-selling/shop/{shop_id?}', [ProductController::class, 'getBestSellingProductByShop']); // lấy ds product bán chạy bởi shop
   Route::get('/products/best-selling/category/{product_category_id}', [ProductController::class, 'getBestSellingProductByCategory']); // lấy ds product bán chạy thuộc category
   Route::get('/products/best-selling/shop/{shop_id}/category-type', [ProductController::class, 'getBestSellingProductWithShopAndCategoryType']); // lấy ds product bán chạy bởi shop và thuộc category type
@@ -214,7 +215,12 @@ Route::group([
   Route::get('/banner/replies', [ShopDashboardController::class, 'getRepliesComparison']);
   Route::get('/banner/products', [ShopDashboardController::class, 'getProductsComparison']);
   Route::get('/banner/orders', [ShopDashboardController::class, 'getOrdersComparison']);
-  Route::get('/banner/sales', [ShopDashboardController::class, 'getSalesComparison']);
+  Route::get('/banner/sales', [ShopDashboardController::class, 'getSales']);
+  Route::get('/bar/revenue', [ShopDashboardController::class, 'getRevenue']);
+  Route::get('/bar/selled', [ShopDashboardController::class, 'getSelled']);
+  Route::get('/pie/product-category', [ShopDashboardController::class, 'getCategory']);
+  Route::get('/recent-orders', [ShopDashboardController::class, 'getRecentOrder']);
+  Route::get('/popular-products', [ShopDashboardController::class, 'getPopularProduct']);
 
   // --------------     SHOP     --------------
   Route::get('/profile', [ShopController::class, 'getProfileOfShop']);
@@ -266,6 +272,7 @@ Route::group([
 
   // --------------     ORDER     --------------
   Route::get('/orders', [OrderController::class, 'getOrders']);
+  Route::get('/orders/paging', [OrderController::class, 'pagingOrders']);
   Route::get('/orders/{order_id}', [OrderController::class, 'getOrderDetail']);
   Route::post('/orders', [OrderController::class, 'createOrder']);
 });

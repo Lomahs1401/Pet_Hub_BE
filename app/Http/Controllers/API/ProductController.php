@@ -303,7 +303,14 @@ class ProductController extends Controller
     $page_number = intval($request->query('page_number', 1));
     $num_of_page = intval($request->query('num_of_page', 8));
     $category_type = strtolower($request->query('category')) ?? 'all';
-    $target = strtolower($request->query('target')) ?? 'all';
+    $target = $request->query('target');
+
+    // Nếu target không được truyền hoặc là một chuỗi rỗng, gán giá trị 'all'
+    if (empty($target)) {
+      $target = 'all';
+    } else {
+      $target = strtolower($target);
+    }
 
     if ($target === 'all') {
       // Nếu không có field 'target' được gửi đến, lấy tất cả các danh mục
@@ -451,7 +458,14 @@ class ProductController extends Controller
     $page_number = intval($request->query('page_number', 1));
     $num_of_page = intval($request->query('num_of_page', 8));
     $category_type = strtolower($request->query('category')) ?? 'all';
-    $target = strtolower($request->query('target')) ?? 'all';
+    $target = $request->query('target');
+
+    // Nếu target không được truyền hoặc là một chuỗi rỗng, gán giá trị 'all'
+    if (empty($target)) {
+      $target = 'all';
+    } else {
+      $target = strtolower($target);
+    }
 
     if ($target === 'all') {
       // Nếu không có field 'target' được gửi đến, lấy tất cả các danh mục
@@ -592,7 +606,14 @@ class ProductController extends Controller
 
     $page_number = intval($request->query('page_number', 1));
     $num_of_page = intval($request->query('num_of_page', 10));
-    $target = strtolower($request->query('target')) ?? 'all';
+    $target = $request->query('target');
+
+    // Nếu target không được truyền hoặc là một chuỗi rỗng, gán giá trị 'all'
+    if (empty($target)) {
+      $target = 'all';
+    } else {
+      $target = strtolower($target);
+    }
 
     if ($target === 'all') {
       // Nếu không có field 'target' được gửi đến, lấy tất cả các danh mục
@@ -727,7 +748,14 @@ class ProductController extends Controller
 
     $page_number = intval($request->query('page_number', 1));
     $num_of_page = intval($request->query('num_of_page', 10));
-    $target = strtolower($request->query('target')) ?? 'all';
+    $target = $request->query('target');
+
+    // Nếu target không được truyền hoặc là một chuỗi rỗng, gán giá trị 'all'
+    if (empty($target)) {
+      $target = 'all';
+    } else {
+      $target = strtolower($target);
+    }
 
     if ($target === 'all') {
       // Nếu không có field 'target' được gửi đến, lấy tất cả các danh mục
@@ -865,7 +893,14 @@ class ProductController extends Controller
     $num_of_page = intval($request->query('num_of_page', 10));
     $is_deleted = $request->query('deleted', false);
 
-    $target = strtolower($request->query('target')) ?? 'all';
+    $target = $request->query('target');
+
+    // Nếu target không được truyền hoặc là một chuỗi rỗng, gán giá trị 'all'
+    if (empty($target)) {
+      $target = 'all';
+    } else {
+      $target = strtolower($target);
+    }
 
     if ($target === 'all') {
       // Nếu không có field 'target' được gửi đến, lấy tất cả các danh mục
@@ -1113,6 +1148,115 @@ class ProductController extends Controller
     ]);
   }
 
+  public function getBestSellingProductByCategoryType(Request $request)
+  {
+
+    $page_number = intval($request->query('page_number', 1));
+    $num_of_page = intval($request->query('num_of_page', 10));
+    $category_type = $request->query('category_type', '');
+
+    // Lấy danh sách các ID của các category có cùng type
+    $category_ids = ProductCategory::where('type', $category_type)->pluck('id')->toArray();
+
+    if (empty($category_ids)) {
+      return response()->json([
+        'message' => 'No categories found for the given type!',
+        'status' => 404
+      ], 404);
+    }
+
+    $total_products_query = Product::query()
+      ->whereNull('deleted_at')
+      ->whereIn('product_category_id', $category_ids);
+
+    // Tính tổng số trang
+    $total_products = $total_products_query->count();
+    $total_pages = ceil($total_products / $num_of_page);
+
+    // Tính toán offset
+    $offset = ($page_number - 1) * $num_of_page;
+
+    // Lấy dữ liệu sản phẩm dựa trên trang hiện tại và số lượng sản phẩm trên mỗi trang
+    $products = $total_products_query->with(['shop' => function ($query) {
+      $query->withCount('ratingShop')->withAvg('ratingShop', 'rating');
+    }, 'category']) // Sử dụng eager loading để lấy thông tin cửa hàng
+      ->orderBy('sold_quantity', 'desc')
+      ->offset($offset)
+      ->limit($num_of_page)
+      ->get();
+
+    // Kiểm tra nếu không có sản phẩm nào được tìm thấy
+    if ($products->isEmpty()) {
+      return response()->json([
+        'message' => 'Product Not Found',
+        'status' => 404,
+      ], 404);
+    }
+
+    $formatted_products = [];
+    foreach ($products as $product) {
+      $ratingData = $product->calculateProductRating();
+
+      $shopRating = $product->shop->rating_shop_avg_rating ?? 0;
+      $shopRatingCount = $product->shop->rating_shop_count ?? 0;
+
+      $formatted_products[] = [
+        'id' => $product->id,
+        'name' => $product->name,
+        'description' => $product->description,
+        'price' => $product->price,
+        'image' => $product->image,
+        'quantity' => $product->quantity,
+        'sold_quantity' => $product->sold_quantity,
+        'status' => $product->status,
+        'product_category_id' => $product->product_category_id,
+        "rating" => $ratingData['average'],
+        "rating_count" => $ratingData['count'],
+        'created_at' => $product->created_at,
+        'updated_at' => $product->updated_at,
+        "deleted_at" => $product->deleted_at,
+        'shop' => [
+          'id' => $product->shop->id,
+          'name' => $product->shop->name,
+          'email' => $product->shop->account->email,
+          'avatar' => $product->shop->account->avatar,
+          'description' => $product->shop->description,
+          'image' => $product->shop->image,
+          'phone' => $product->shop->phone,
+          'address' => $product->shop->address,
+          'website' => $product->shop->website,
+          'fanpage' => $product->shop->fanpage,
+          'work_time' => $product->shop->work_time,
+          'establish_year' => $product->shop->establish_year,
+          'rating' => $shopRating,
+          'rating_count' => $shopRatingCount,
+          'account_id' => $product->shop->account->id,
+          'created_at' => $product->shop->created_at,
+          'updated_at' => $product->shop->updated_at,
+        ],
+        'category' => [
+          'id' => $product->category->id,
+          'name' => $product->category->name,
+          'target' => $product->category->target,
+          'type' => $product->category->type,
+          'created_at' => $product->category->created_at,
+          'updated_at' => $product->category->updated_at,
+        ],
+      ];
+    }
+
+    // Trả về JSON response
+    return response()->json([
+      'message' => 'Query successfully!',
+      'status' => 200,
+      'page_number' => $page_number,
+      'num_of_page' => $num_of_page,
+      'total_page' => $total_pages,
+      'total_products' => $total_products,
+      'data' => $formatted_products,
+    ]);
+  }
+
   public function getBestSellingProductWithShopAndCategoryType(Request $request, $shop_id)
   {
     if (!Shop::find($shop_id)) {
@@ -1348,7 +1492,14 @@ class ProductController extends Controller
 
     $page_number = intval($request->query('page_number', 1));
     $num_of_page = intval($request->query('num_of_page', 10));
-    $target = strtolower($request->query('target')) ?? 'all';
+    $target = $request->query('target');
+
+    // Nếu target không được truyền hoặc là một chuỗi rỗng, gán giá trị 'all'
+    if (empty($target)) {
+      $target = 'all';
+    } else {
+      $target = strtolower($target);
+    }
 
     if ($target === 'all') {
       $categories = DB::table('product_categories')
@@ -1476,7 +1627,14 @@ class ProductController extends Controller
     $page_number = intval($request->query('page_number', 1));
     $num_of_page = intval($request->query('num_of_page', 10));
     $is_deleted = $request->query('deleted', false);
-    $target = strtolower($request->query('target')) ?? 'all';
+    $target = $request->query('target');
+
+    // Nếu target không được truyền hoặc là một chuỗi rỗng, gán giá trị 'all'
+    if (empty($target)) {
+      $target = 'all';
+    } else {
+      $target = strtolower($target);
+    }
 
     if ($target === 'all') {
       $categories = DB::table('product_categories')
@@ -1847,7 +2005,14 @@ class ProductController extends Controller
 
     $page_number = intval($request->query('page_number', 1));
     $num_of_page = intval($request->query('num_of_page', 10));
-    $target = strtolower($request->query('target')) ?? 'all';
+    $target = $request->query('target');
+
+    // Nếu target không được truyền hoặc là một chuỗi rỗng, gán giá trị 'all'
+    if (empty($target)) {
+      $target = 'all';
+    } else {
+      $target = strtolower($target);
+    }
 
     if ($target === 'all') {
       $categories = DB::table('product_categories')
@@ -1983,7 +2148,14 @@ class ProductController extends Controller
     $page_number = intval($request->query('page_number', 1));
     $num_of_page = intval($request->query('num_of_page', 10));
     $is_deleted = $request->query('deleted', false);
-    $target = strtolower($request->query('target')) ?? 'all';
+    $target = $request->query('target');
+
+    // Nếu target không được truyền hoặc là một chuỗi rỗng, gán giá trị 'all'
+    if (empty($target)) {
+      $target = 'all';
+    } else {
+      $target = strtolower($target);
+    }
 
     if ($target === 'all') {
       $categories = DB::table('product_categories')
@@ -2354,7 +2526,14 @@ class ProductController extends Controller
 
     $page_number = intval($request->query('page_number', 1));
     $num_of_page = intval($request->query('num_of_page', 10));
-    $target = strtolower($request->query('target')) ?? 'all';
+    $target = $request->query('target');
+
+    // Nếu target không được truyền hoặc là một chuỗi rỗng, gán giá trị 'all'
+    if (empty($target)) {
+      $target = 'all';
+    } else {
+      $target = strtolower($target);
+    }
     $is_deleted = $request->query('deleted', false);
 
     if ($target === 'all') {

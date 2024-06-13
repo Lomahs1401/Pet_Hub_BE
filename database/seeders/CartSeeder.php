@@ -51,15 +51,15 @@ class CartSeeder extends Seeder
         ]);
 
         // Tạo từ 1 đến 5 sản phẩm trong giỏ hàng
-        $numberOfItems = rand(1, 5);
+        $numberOfItems = rand(1, 8);
         $totalPrices = 0;
         $shopIds = [];
 
         for ($i = 0; $i < $numberOfItems; $i++) {
           $product = $products->random();
           $quantity = rand(1, 10);
-          $amount = $product->price;
-          $price = $amount * $quantity;
+          $price = $product->price;
+          $amount = $price * $quantity;
 
           // Thêm sản phẩm vào giỏ hàng
           CartItem::create([
@@ -68,15 +68,18 @@ class CartSeeder extends Seeder
             'name' => $product->name,
             'description' => $product->description,
             'quantity' => $quantity,
-            'amount' => $amount,
             'price' => $price,
+            'amount' => $amount,
           ]);
 
           // Tính tổng giá trị giỏ hàng
-          $totalPrices += $price;
+          $totalPrices += $amount;
 
           // Lưu lại shop_id của sản phẩm
-          $shopIds[$product->shop_id][] = $price;
+          $shopIds[$product->shop_id][] = $amount;
+
+          $product->increment('sold_quantity', $quantity);
+          $product->decrement('quantity', $quantity);
         }
 
         // Cập nhật tổng giá trị giỏ hàng
@@ -84,7 +87,7 @@ class CartSeeder extends Seeder
         $cart->save();
 
         // Random order_date từ 2 thang trước đến thời điểm hiện tại
-        $order_date = $faker->dateTimeBetween('-2 months', 'now');
+        $order_date = $faker->dateTimeBetween('-2 years', 'now');
 
         if (!$isActive) {
           $paymentMethod = (rand(0, 1) == 1) ? 'COD' : 'Paypal';
@@ -101,8 +104,8 @@ class CartSeeder extends Seeder
           ]);
 
           // Tạo SubOrder cho mỗi shop
-          foreach ($shopIds as $shopId => $prices) {
-            $subTotalPrices = array_sum($prices);
+          foreach ($shopIds as $shopId => $amount) {
+            $subTotalPrices = array_sum($amount);
 
             // Xác định trạng thái dựa trên phương thức thanh toán
             if ($paymentMethod == 'Paypal') {
