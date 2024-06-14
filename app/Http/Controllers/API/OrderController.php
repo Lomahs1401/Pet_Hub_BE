@@ -79,6 +79,9 @@ class OrderController extends Controller
 
       // Kiểm tra xem shop đã tồn tại trong danh sách chưa
       if (!isset($shops[$shop->id])) {
+        // Lấy sub_order của shop này
+        $subOrder = $order->subOrder->where('shop_id', $shop->id)->first();
+
         $shops[$shop->id] = [
           'shop_id' => $shop->id,
           'shop_name' => $shop->name,
@@ -95,6 +98,8 @@ class OrderController extends Controller
           'shop_certificate' => $shop->certificate,
           'rating' => $ratingShop['average'],
           'rating_count' => $ratingShop['count'],
+          'sub_total_amount' => $subOrder ? $subOrder->sub_total_prices : null,
+          'status' => $subOrder ? $subOrder->status : null,
           'cart_items' => [],
         ];
       }
@@ -113,7 +118,6 @@ class OrderController extends Controller
       'address' => $order->address,
       'payment_method' => $order->payment_method,
       'transaction_order_id' => $order->transaction_order_id,
-      'status' => $order->transaction_order_id,
       'customer_id' => $order->customer_id,
       'full_name' => $order->customer->full_name,
       'username' => $order->customer->account->username,
