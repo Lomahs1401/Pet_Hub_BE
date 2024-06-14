@@ -25,6 +25,15 @@ class OrderController extends Controller
     $formatted_orders = [];
 
     foreach ($orders as $order) {
+      // Format sub orders
+      $formatted_sub_orders = [];
+      foreach ($order->subOrder as $subOrder) {
+        $formatted_sub_orders[] = [
+          'sub_total_amount' => $subOrder->sub_total_prices,
+          'status' => $subOrder->status,
+        ];
+      }
+
       $formatted_orders[] = [
         'id' => $order->id,
         'total_prices' => $order->total_prices,
@@ -33,6 +42,7 @@ class OrderController extends Controller
         'transaction_order_id' => $order->transaction_order_id,
         'customer_id' => $order->customer_id,
         'cart_id' => $order->cart_id,
+        'sub_orders' => $formatted_sub_orders,
         'created_at' => $order->created_at,
         'updated_at' => $order->updated_at,
       ];
