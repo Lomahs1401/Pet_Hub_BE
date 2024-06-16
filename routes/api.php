@@ -273,6 +273,11 @@ Route::group([
   // --------------     ORDER     --------------
   Route::get('/orders', [OrderController::class, 'getOrders']);
   Route::get('/orders/paging', [OrderController::class, 'pagingOrders']);
+  Route::get('/orders/revenue/{product_id}', [OrderController::class, 'getRevenueByOrder']);
+  Route::get('/orders/selling/{product_id}', [OrderController::class, 'getSellingByOrder']);
   Route::get('/orders/{order_id}', [OrderController::class, 'getOrderDetail']);
   Route::post('/orders', [OrderController::class, 'createOrder']);
+
+  // --------------     SUB ORDER     --------------
+  Route::get('/sub-orders/{sub_order_id}', [OrderController::class, 'getSubOrders']);
 });

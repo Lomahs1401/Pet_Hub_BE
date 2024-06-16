@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Cart;
+use App\Models\CartItem;
 use App\Models\Order;
 use App\Models\Role;
 use App\Models\SubOrder;
@@ -275,12 +276,29 @@ class OrderController extends Controller
       ], 400);
     }
 
+    // Lấy các tham số search_term và status từ request
+    $searchTerm = $request->query('search_term', '');
+    $status = $request->query('status', 'All');
+
     // Lấy danh sách sub_orders theo shop_id trong khoảng thời gian
     $subOrdersQuery = SubOrder::join('orders', 'sub_orders.order_id', '=', 'orders.id')
       ->join('customers', 'orders.customer_id', '=', 'customers.id')
       ->join('accounts', 'customers.account_id', '=', 'accounts.id')
       ->where('sub_orders.shop_id', $shop_id)
       ->whereBetween('orders.created_at', [$startDate, $endDate]);
+
+    // Thêm điều kiện tìm kiếm theo search_term nếu có
+    if (!empty($searchTerm)) {
+      $subOrdersQuery = $subOrdersQuery->where(function ($query) use ($searchTerm) {
+        $query->where('customers.full_name', 'like', '%' . $searchTerm . '%')
+          ->orWhere('accounts.email', 'like', '%' . $searchTerm . '%');
+      });
+    }
+
+    // Thêm điều kiện lọc theo status nếu có
+    if ($status !== 'All') {
+      $subOrdersQuery = $subOrdersQuery->where('sub_orders.status', $status);
+    }
 
     // Lấy số lượng sub_orders và tính tổng số trang
     $totalSubOrders = $subOrdersQuery->count();
@@ -300,7 +318,7 @@ class OrderController extends Controller
         'customers.full_name',
         'accounts.username',
         'accounts.email',
-        'accounts.avatar',
+        'accounts.avatar'
       )
       ->offset($offset)
       ->limit($numOfPage)
@@ -335,6 +353,201 @@ class OrderController extends Controller
       'total_pages' => $totalPages,
       'total_sub_orders' => $totalSubOrders,
       'data' => $formattedSubOrders,
+    ]);
+  }
+
+  public function getRevenueByOrder(Request $request, $product_id)
+  {
+    $shop_id = auth()->user()->shop->id;
+    $year = $request->get('year', Carbon::now()->year); // Lấy năm từ request hoặc sử dụng năm hiện tại
+
+    // Khởi tạo mảng để chứa dữ liệu theo tháng
+    $salesData = array_fill(0, 12, ['name' => '', 'revenue' => 0]);
+
+    // Tên các tháng
+    $monthNames = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    ];
+
+    foreach ($monthNames as $index => $month) {
+      $monthStart = Carbon::create($year, $index + 1, 1)->startOfMonth();
+      $monthEnd = $monthStart->copy()->endOfMonth();
+
+      // Lấy tổng doanh thu và số lượng bán được của sản phẩm từ cart_items
+      $revenueData = SubOrder::join('orders', 'sub_orders.order_id', '=', 'orders.id')
+        ->join('carts', 'orders.cart_id', '=', 'carts.id')
+        ->join('cart_items', 'carts.id', '=', 'cart_items.cart_id')
+        ->where('sub_orders.shop_id', $shop_id)
+        ->where('cart_items.product_id', $product_id)
+        ->whereBetween('sub_orders.created_at', [$monthStart, $monthEnd])
+        ->selectRaw('SUM(cart_items.amount) as total_revenue')
+        ->first();
+
+      $salesData[$index] = [
+        'name' => $month,
+        'revenue' => (float)$revenueData->total_revenue,
+      ];
+    }
+
+    return response()->json([
+      'message' => 'Revenue product retrieved successfully!',
+      'status' => 200,
+      'data' => $salesData
+    ]);
+  }
+
+  public function getSellingByOrder(Request $request, $product_id)
+  {
+    $shop_id = auth()->user()->shop->id;
+    $year = $request->get('year', Carbon::now()->year); // Lấy năm từ request hoặc sử dụng năm hiện tại
+
+    // Khởi tạo mảng để chứa dữ liệu theo tháng
+    $salesData = array_fill(0, 12, ['name' => '', 'quantity' => 0]);
+
+    // Tên các tháng
+    $monthNames = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    ];
+
+    foreach ($monthNames as $index => $month) {
+      $monthStart = Carbon::create($year, $index + 1, 1)->startOfMonth();
+      $monthEnd = $monthStart->copy()->endOfMonth();
+
+      // Lấy tổng doanh thu và số lượng bán được của sản phẩm từ cart_items
+      $sellingData = SubOrder::join('orders', 'sub_orders.order_id', '=', 'orders.id')
+        ->join('carts', 'orders.cart_id', '=', 'carts.id')
+        ->join('cart_items', 'carts.id', '=', 'cart_items.cart_id')
+        ->where('sub_orders.shop_id', $shop_id)
+        ->where('cart_items.product_id', $product_id)
+        ->whereBetween('sub_orders.created_at', [$monthStart, $monthEnd])
+        ->selectRaw('SUM(cart_items.quantity) as total_quantity')
+        ->first();
+
+      $salesData[$index] = [
+        'name' => $month,
+        'selled' => (int)$sellingData->total_quantity,
+      ];
+    }
+
+    return response()->json([
+      'message' => 'Selling product retrieved successfully!',
+      'status' => 200,
+      'data' => $salesData
+    ]);
+  }
+
+  public function getSubOrders($sub_order_id)
+  {
+    $shop_id = auth()->user()->shop->id;
+
+    // Lấy thông tin sub_order
+    $subOrder = SubOrder::join('orders', 'sub_orders.order_id', '=', 'orders.id')
+      ->join('customers', 'orders.customer_id', '=', 'customers.id')
+      ->join('accounts', 'customers.account_id', '=', 'accounts.id')
+      ->where('sub_orders.id', $sub_order_id)
+      ->where('sub_orders.shop_id', $shop_id)
+      ->select(
+        'sub_orders.id',
+        'sub_orders.sub_total_prices',
+        'sub_orders.status',
+        'sub_orders.order_id',
+        'sub_orders.shop_id',
+        'sub_orders.created_at as sub_order_created_at',
+        'sub_orders.updated_at as sub_order_updated_at',
+        'orders.payment_method',
+        'customers.full_name',
+        'customers.ranking_point',
+        'accounts.username',
+        'accounts.email',
+        'accounts.avatar',
+        'accounts.created_at as account_creation_date'
+      )
+      ->first();
+
+    // Nếu không tìm thấy sub_order, trả về lỗi
+    if (!$subOrder) {
+      return response()->json([
+        'message' => 'Sub Order not found',
+        'status' => 404,
+      ], 404);
+    }
+
+    // Chuyển đổi ngày giờ sang định dạng ISO 8601
+    $subOrder->account_creation_date = Carbon::parse($subOrder->account_creation_date)->toIso8601String();
+    $subOrder->sub_order_created_at = Carbon::parse($subOrder->sub_order_created_at)->toIso8601String();
+    $subOrder->sub_order_updated_at = Carbon::parse($subOrder->sub_order_updated_at)->toIso8601String();
+
+    // Lấy danh sách các cart_items
+    $cartItems = CartItem::join('products', 'cart_items.product_id', '=', 'products.id')
+      ->join('carts', 'cart_items.cart_id', '=', 'carts.id')
+      ->join('orders', 'carts.id', '=', 'orders.cart_id')
+      ->join('customers', 'orders.customer_id', '=', 'customers.id')
+      ->join('accounts', 'customers.account_id', '=', 'accounts.id')
+      ->leftJoin('rating_products', function ($join) {
+        $join->on('rating_products.product_id', '=', 'products.id')
+          ->where('rating_products.customer_id', '=', DB::raw('customers.id'));
+      })
+      ->where('orders.id', $subOrder->order_id)
+      ->where('products.shop_id', $shop_id)
+      ->select(
+        'cart_items.*',
+        'products.image',
+      )
+      ->groupBy(
+        'cart_items.id',
+        'cart_items.cart_id',
+        'cart_items.name',
+        'cart_items.description',
+        'cart_items.quantity',
+        'cart_items.price',
+        'cart_items.amount',
+        'cart_items.product_id',
+        'cart_items.created_at',
+        'cart_items.updated_at',
+        'cart_items.deleted_at',
+        'products.image'
+      )
+      ->get();
+
+    // Định dạng dữ liệu cart_items để trả về
+    $formattedCartItems = $cartItems->map(function ($cartItem) {
+      return [
+        'id' => $cartItem->id,
+        'name' => $cartItem->name,
+        'description' => $cartItem->description,
+        'quantity' => $cartItem->quantity,
+        'price' => $cartItem->price,
+        'amount' => $cartItem->amount,
+        'product_id' => $cartItem->product_id,
+        'product_image' => $cartItem->image,
+      ];
+    })->toArray();
+
+    // Trả về JSON response
+    return response()->json([
+      'message' => 'Sub Order retrieved successfully!',
+      'status' => 200,
+      'data' => [
+        'sub_order' => [
+          'id' => $subOrder->id,
+          'sub_total_prices' => $subOrder->sub_total_prices,
+          'payment_method' => $subOrder->payment_method,
+          'status' => $subOrder->status,
+          'order_id' => $subOrder->order_id,
+          'shop_id' => $subOrder->shop_id,
+          'ranking_point' => $subOrder->ranking_point,
+          'full_name' => $subOrder->full_name,
+          'username' => $subOrder->username,
+          'email' => $subOrder->email,
+          'avatar' => $subOrder->avatar,
+          'account_creation_date' => $subOrder->account_creation_date,
+          'created_at' => $subOrder->sub_order_created_at,
+          'updated_at' => $subOrder->sub_order_updated_at,
+        ],
+        'cart_items' => $formattedCartItems,
+      ],
     ]);
   }
 }
