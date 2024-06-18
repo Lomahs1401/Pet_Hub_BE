@@ -51,11 +51,9 @@ class InteractSeeder extends Seeder
     // Khởi tạo mảng tài khoản tương tác cho mỗi bài blog
     $this->interacted_accounts_of_blog[$blog->id] = [];
 
-    // Random số lượng likes, dislikes, saves và shares
+    // Random số lượng likes, dislikes
     $number_of_likes = rand(0, 10);
     $number_of_dislikes = rand(0, 5);
-    $number_of_saves = rand(0, 2);
-    $number_of_shares = rand(0, 2);
 
     for ($i = 0; $i < $number_of_likes; $i++) {
       // Lấy ngẫu nhiên một tài khoản từ danh sách
@@ -78,34 +76,6 @@ class InteractSeeder extends Seeder
       if (!in_array($customer_account->id, $this->interacted_accounts_of_blog[$blog->id])) {
         // Tạo một tương tác mới
         $this->createInteraction($blog, $customer_account, 'dislike');
-        // Đánh dấu tài khoản đã tương tác với blog
-        $this->interacted_accounts_of_blog[$blog->id][] = $customer_account->id;
-      }
-    }
-
-    $this->interacted_accounts_of_blog[$blog->id] = [];
-
-    for ($i = 0; $i < $number_of_saves; $i++) {
-      // Lấy ngẫu nhiên một tài khoản từ danh sách
-      $customer_account = $this->customer_accounts->random();
-      // Kiểm tra xem tài khoản đã tương tác với blog chưa
-      if (!in_array($customer_account->id, $this->interacted_accounts_of_blog[$blog->id])) {
-        // Tạo một tương tác mới
-        $this->createInteraction($blog, $customer_account, 'save');
-        // Đánh dấu tài khoản đã tương tác với blog
-        $this->interacted_accounts_of_blog[$blog->id][] = $customer_account->id;
-      }
-    }
-
-    $this->interacted_accounts_of_blog[$blog->id] = [];
-
-    for ($i = 0; $i < $number_of_shares; $i++) {
-      // Lấy ngẫu nhiên một tài khoản từ danh sách
-      $customer_account = $this->customer_accounts->random();
-      // Kiểm tra xem tài khoản đã tương tác với blog chưa
-      if (!in_array($customer_account->id, $this->interacted_accounts_of_blog[$blog->id])) {
-        // Tạo một tương tác mới
-        $this->createInteraction($blog, $customer_account, 'share');
         // Đánh dấu tài khoản đã tương tác với blog
         $this->interacted_accounts_of_blog[$blog->id][] = $customer_account->id;
       }

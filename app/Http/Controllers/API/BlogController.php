@@ -37,7 +37,7 @@ class BlogController extends Controller
       ->get();
 
     // Tạo danh sách kết quả
-    $result = $blogs->map(function ($blog) {
+    $result = $blogs->map(function ($blog) use($accountId) {
       $commentsCount = Comment::where('blog_id', $blog->id)->count();
       $likesCount = Interact::where('target_label', 'blogs')
         ->where('target_id', $blog->id)
@@ -47,6 +47,11 @@ class BlogController extends Controller
         ->where('target_id', $blog->id)
         ->where('target_type', 'dislike')
         ->count();
+      // Kiểm tra người dùng hiện tại đã tương tác với bài viết này chưa và loại tương tác
+      $userInteraction = Interact::where('target_label', 'blogs')
+        ->where('target_id', $blog->id)
+        ->where('account_id', $accountId)
+        ->first();
 
       return [
         'id' => $blog->id,
@@ -60,6 +65,7 @@ class BlogController extends Controller
         'comments_count' => $commentsCount,
         'likes_count' => $likesCount,
         'dislikes_count' => $dislikesCount,
+        'interaction_type' => $userInteraction ? $userInteraction->target_type : null,
         'created_at' => $blog->created_at,
         'updated_at' => $blog->updated_at,
       ];
@@ -101,7 +107,7 @@ class BlogController extends Controller
       ->get();
 
     // Tạo danh sách kết quả
-    $result = $blogs->map(function ($blog) {
+    $result = $blogs->map(function ($blog) use ($accountId) {
       $commentsCount = Comment::where('blog_id', $blog->id)->count();
       $likesCount = Interact::where('target_label', 'blogs')
         ->where('target_id', $blog->id)
@@ -111,6 +117,11 @@ class BlogController extends Controller
         ->where('target_id', $blog->id)
         ->where('target_type', 'dislike')
         ->count();
+      // Kiểm tra người dùng hiện tại đã tương tác với bài viết này chưa và loại tương tác
+      $userInteraction = Interact::where('target_label', 'blogs')
+      ->where('target_id', $blog->id)
+      ->where('account_id', $accountId)
+      ->first();
 
       return [
         'id' => $blog->id,
@@ -124,6 +135,7 @@ class BlogController extends Controller
         'comments_count' => $commentsCount,
         'likes_count' => $likesCount,
         'dislikes_count' => $dislikesCount,
+        'interaction_type' => $userInteraction ? $userInteraction->target_type : null,
         'created_at' => $blog->created_at,
         'updated_at' => $blog->updated_at,
       ];
@@ -220,7 +232,6 @@ class BlogController extends Controller
           'avatar' => $comment->account ? $comment->account->avatar : null,
           'likes_count' => $commentLikesCount,
           'dislikes_count' => $commentDislikesCount,
-          'user_interacted' => $userInteraction ? true : false,
           'interaction_type' => $userInteraction ? $userInteraction->target_type : null,
           'created_at' => $comment->created_at,
           'updated_at' => $comment->updated_at,
@@ -251,7 +262,6 @@ class BlogController extends Controller
               'avatar' => $subComment->account ? $subComment->account->avatar : null,
               'likes_count' => $subCommentLikesCount,
               'dislikes_count' => $subCommentDislikesCount,
-              'user_interacted' => $userSubInteraction ? true : false,
               'interaction_type' => $userSubInteraction ? $userSubInteraction->target_type : null,
               'created_at' => $subComment->created_at,
               'updated_at' => $subComment->updated_at,
