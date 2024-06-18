@@ -27,16 +27,10 @@ class Blog extends Model
     'text',
     'image',
     'account_id',
-    'blog_category_id',
   ];
 
   public function account()
   {
     return $this->belongsTo(Account::class);
-  }
-
-  public function blogCategory()
-  {
-    return $this->belongsTo(BlogCategory::class);
   }
 }

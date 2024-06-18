@@ -11,79 +11,6 @@ use Illuminate\Http\Request;
 
 class BlogController extends Controller
 {
-  public function index()
-  {
-    $categories = BlogCategory::all();
-
-    return response()->json([
-      'message' => 'Query successfully!',
-      'status' => 200,
-      'data' => $categories,
-    ], 200);
-  }
-
-  // Lấy số lượng từng loại bài blog thuộc từng category
-  public function countBlogsByCategory()
-  {
-    $categories = BlogCategory::withCount('blogs')->get();
-
-    return response()->json([
-      'message' => 'Query successfully!',
-      'status' => 200,
-      'data' => $categories,
-    ], 200);
-  }
-
-  // Thêm mới blog category
-  public function store(Request $request)
-  {
-    $request->validate([
-      'name' => 'required|string|unique:blog_categories',
-    ]);
-
-    $category = BlogCategory::create([
-      'name' => $request->input('name'),
-    ]);
-
-    return response()->json([
-      'message' => 'Blog category created successfully!',
-      'status' => 201,
-      'data' => $category,
-    ], 201);
-  }
-
-  // Update blog category
-  public function update(Request $request, $id)
-  {
-    $category = BlogCategory::findOrFail($id);
-
-    $request->validate([
-      'name' => 'required|string|unique:blog_categories,name,' . $category->id,
-    ]);
-
-    $category->update([
-      'name' => $request->input('name'),
-    ]);
-
-    return response()->json([
-      'message' => 'Blog category updated successfully!',
-      'status' => 200,
-      'data' => $category,
-    ], 200);
-  }
-
-  // Xoá blog category
-  public function destroy($id)
-  {
-    $category = BlogCategory::findOrFail($id);
-    $category->delete();
-
-    return response()->json([
-      'message' => 'Blog category deleted successfully!',
-      'status' => 200,
-    ], 200);
-  }
-
   public function getBlogs(Request $request)
   {
     $accountId = auth()->user()->id;
@@ -93,7 +20,7 @@ class BlogController extends Controller
 
     // Lấy số lượng blogs
     $blog_query = Blog::query()
-      ->with(['blogCategory', 'account'])
+      ->with('account')
       ->where('account_id', '!=', $accountId)
       ->whereNull('deleted_at');
 
@@ -130,8 +57,6 @@ class BlogController extends Controller
         'email' => $blog->account->email,
         'username' => $blog->account->username,
         'avatar' => $blog->account->avatar,
-        'blog_category_id' => $blog->blog_category_id,
-        'blog_category_name' => $blog->blogCategory->name,
         'comments_count' => $commentsCount,
         'likes_count' => $likesCount,
         'dislikes_count' => $dislikesCount,
@@ -160,7 +85,7 @@ class BlogController extends Controller
 
     // Lấy số lượng blogs
     $blog_query = Blog::query()
-      ->with(['blogCategory', 'account'])
+      ->with('account')
       ->where('account_id', '=', $accountId)
       ->whereNull('deleted_at');
 
@@ -196,8 +121,6 @@ class BlogController extends Controller
         'email' => $blog->account->email,
         'username' => $blog->account->username,
         'avatar' => $blog->account->avatar,
-        'blog_category_id' => $blog->blog_category_id,
-        'blog_category_name' => $blog->blogCategory->name,
         'comments_count' => $commentsCount,
         'likes_count' => $likesCount,
         'dislikes_count' => $dislikesCount,
@@ -220,7 +143,7 @@ class BlogController extends Controller
   public function getBlogDetail($blog_id)
   {
     // Tìm bài blog theo id
-    $blog = Blog::with(['blogCategory', 'account'])->find($blog_id);
+    $blog = Blog::with('account')->find($blog_id);
 
     // Kiểm tra nếu blog không tồn tại
     if (!$blog) {
@@ -247,8 +170,6 @@ class BlogController extends Controller
         'text' => $blog->text,
         'image' => $blog->image,
         'account_id' => $blog->account_id,
-        'blog_category_id' => $blog->blog_category_id,
-        'blog_category_name' => $blog->blogCategory ? $blog->blogCategory->name : null,
         'email' => $blog->account ? $blog->account->email : null,
         'username' => $blog->account ? $blog->account->username : null,
         'avatar' => $blog->account ? $blog->account->avatar : null,
@@ -297,7 +218,6 @@ class BlogController extends Controller
       'title' => 'required|string|max:255',
       'text' => 'required|string',
       'image' => 'nullable|string',
-      'blog_category_id' => 'required|exists:blog_categories,id',
     ]);
 
     $validatedData['account_id'] = $account_id;
@@ -335,7 +255,6 @@ class BlogController extends Controller
       'title' => 'sometimes|string|max:255',
       'text' => 'sometimes|string',
       'image' => 'nullable|string',
-      'blog_category_id' => 'sometimes|exists:blog_categories,id',
     ]);
 
     $blog->update($validatedData);

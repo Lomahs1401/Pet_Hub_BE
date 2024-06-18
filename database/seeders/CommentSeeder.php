@@ -34,12 +34,14 @@ class CommentSeeder extends Seeder
       for ($i = 0; $i < $number_of_comments; $i++) {
         $author = $faker->randomElement($customer_accounts);
 
+        $comment_created_at = $faker->dateTimeBetween($blog->created_at, 'now');
+
         $comment = Comment::factory()->create([
           'text' => $faker->paragraph(),
           'account_id' => $author->id,
           'blog_id' => $blog->id,
-          'created_at' => now(),
-          'updated_at' => now(),
+          'created_at' => $comment_created_at,
+          'updated_at' => $comment_created_at,
         ]);
 
         $comments[] = $comment->id;
@@ -51,6 +53,8 @@ class CommentSeeder extends Seeder
           $parent_comment = Comment::find($comment_id);
           $author = $faker->randomElement($customer_accounts);
 
+          $sub_comment_created_at = $faker->dateTimeBetween($parent_comment->created_at, 'now');
+
           // Đảm bảo account_id của sub-comment khác account_id của comment cha
           while ($author->id == $parent_comment->account_id) {
             $author = $faker->randomElement($customer_accounts);
@@ -61,8 +65,8 @@ class CommentSeeder extends Seeder
             'account_id' => $author->id,
             'blog_id' => $blog->id,
             'parent_comments_id' => $comment_id,
-            'created_at' => now(),
-            'updated_at' => now(),
+            'created_at' => $sub_comment_created_at,
+            'updated_at' => $sub_comment_created_at,
           ]);
         }
       }

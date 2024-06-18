@@ -7,6 +7,7 @@ use App\Http\Controllers\API\BlogController;
 use App\Http\Controllers\API\BreedController;
 use App\Http\Controllers\API\CartController;
 use App\Http\Controllers\API\CartItemController;
+use App\Http\Controllers\API\CommentController;
 use App\Http\Controllers\API\CustomerController;
 use App\Http\Controllers\API\DoctorController;
 use App\Http\Controllers\API\MedicalCenterController;
@@ -107,8 +108,15 @@ Route::group([
   Route::put('/blogs/{blog_id}', [BlogController::class, 'updateBlog']);
   Route::delete('/blogs/{blog_id}', [BlogController::class, 'deleteBlog']);
 
-  Route::get('/blog-categories', [BlogController::class, 'index']);
-  Route::get('/blog-categories/count-blogs', [BlogController::class, 'countBlogsByCategory']);
+  // --------------     COMMENT     --------------
+  Route::post('/comments', [CommentController::class, 'createComment']);
+  Route::put('/comments/{comment_id}', [CommentController::class, 'updateComment']);
+  Route::delete('/comments/{comment_id}', [CommentController::class, 'deleteComment']);
+
+  // --------------     INTERACT     --------------
+  Route::post('/interacts', [CommentController::class, 'createComment']);
+  Route::post('/interacts/{comment_id}', [CommentController::class, 'updateComment']);
+  Route::delete('/comments/{comment_id}', [CommentController::class, 'deleteComment']);
 
   // --------------     SERVICE     --------------
   Route::get('/services', [ServiceController::class, 'index']); // lấy tất cả service

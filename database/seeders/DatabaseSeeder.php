@@ -24,7 +24,6 @@ class DatabaseSeeder extends Seeder
     $this->call(RankingSeeder::class);
     $this->call(AccountSeeder::class);
     $this->call(BreedSeeder::class);
-    $this->call(BlogCategorySeeder::class);
     $this->call(BlogSeeder::class);
     $this->call(CommentSeeder::class);
     $this->call(InteractSeeder::class);
