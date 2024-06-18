@@ -162,6 +162,20 @@ class BlogController extends Controller
     // Đếm tổng số comments
     $totalComments = Comment::where('blog_id', $blog_id)->count();
 
+    // Đếm số lượng like và dislike cho blog
+    $likesCount = Interact::where('target_label', 'blogs')
+      ->where('target_id', $blog_id)
+      ->where('target_type', 'like')
+      ->count();
+
+    $dislikesCount = Interact::where('target_label', 'blogs')
+      ->where('target_id', $blog_id)
+      ->where('target_type', 'dislike')
+      ->count();
+
+    // Lấy id người dùng hiện tại
+    $account_id = auth()->user()->id;
+
     // Chuẩn bị dữ liệu trả về
     $result = [
       'blog' => [
@@ -173,11 +187,30 @@ class BlogController extends Controller
         'email' => $blog->account ? $blog->account->email : null,
         'username' => $blog->account ? $blog->account->username : null,
         'avatar' => $blog->account ? $blog->account->avatar : null,
+        'likes_count' => $likesCount,
+        'dislikes_count' => $dislikesCount,
         'created_at' => $blog->created_at,
         'updated_at' => $blog->updated_at,
       ],
       'total_comments' => $totalComments,
-      'comments' => $comments->map(function ($comment) {
+      'comments' => $comments->map(function ($comment) use ($account_id) {
+        // Đếm số lượng like và dislike cho comment
+        $commentLikesCount = Interact::where('target_label', 'comments')
+          ->where('target_id', $comment->id)
+          ->where('target_type', 'like')
+          ->count();
+
+        $commentDislikesCount = Interact::where('target_label', 'comments')
+          ->where('target_id', $comment->id)
+          ->where('target_type', 'dislike')
+          ->count();
+
+        // Kiểm tra người dùng hiện tại đã tương tác với comment này chưa
+        $userInteracted = Interact::where('target_label', 'comments')
+          ->where('target_id', $comment->id)
+          ->where('account_id', $account_id)
+          ->exists();
+
         return [
           'id' => $comment->id,
           'text' => $comment->text,
@@ -185,9 +218,29 @@ class BlogController extends Controller
           'email' => $comment->account ? $comment->account->email : null,
           'username' => $comment->account ? $comment->account->username : null,
           'avatar' => $comment->account ? $comment->account->avatar : null,
+          'likes_count' => $commentLikesCount,
+          'dislikes_count' => $commentDislikesCount,
+          'user_interacted' => $userInteracted,
           'created_at' => $comment->created_at,
           'updated_at' => $comment->updated_at,
-          'sub_comments' => $comment->subComments->map(function ($subComment) {
+          'sub_comments' => $comment->subComments->map(function ($subComment) use ($account_id) {
+            // Đếm số lượng like và dislike cho sub-comment
+            $subCommentLikesCount = Interact::where('target_label', 'comments')
+              ->where('target_id', $subComment->id)
+              ->where('target_type', 'like')
+              ->count();
+
+            $subCommentDislikesCount = Interact::where('target_label', 'comments')
+              ->where('target_id', $subComment->id)
+              ->where('target_type', 'dislike')
+              ->count();
+
+            // Kiểm tra người dùng hiện tại đã tương tác với sub-comment này chưa
+            $userSubInteracted = Interact::where('target_label', 'comments')
+              ->where('target_id', $subComment->id)
+              ->where('account_id', $account_id)
+              ->exists();
+
             return [
               'id' => $subComment->id,
               'text' => $subComment->text,
@@ -195,6 +248,9 @@ class BlogController extends Controller
               'email' => $subComment->account ? $subComment->account->email : null,
               'username' => $subComment->account ? $subComment->account->username : null,
               'avatar' => $subComment->account ? $subComment->account->avatar : null,
+              'likes_count' => $subCommentLikesCount,
+              'dislikes_count' => $subCommentDislikesCount,
+              'user_interacted' => $userSubInteracted,
               'created_at' => $subComment->created_at,
               'updated_at' => $subComment->updated_at,
             ];

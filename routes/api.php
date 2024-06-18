@@ -10,6 +10,7 @@ use App\Http\Controllers\API\CartItemController;
 use App\Http\Controllers\API\CommentController;
 use App\Http\Controllers\API\CustomerController;
 use App\Http\Controllers\API\DoctorController;
+use App\Http\Controllers\API\InteractController;
 use App\Http\Controllers\API\MedicalCenterController;
 use App\Http\Controllers\API\OrderController;
 use App\Http\Controllers\API\PetController;
@@ -114,10 +115,9 @@ Route::group([
   Route::delete('/comments/{comment_id}', [CommentController::class, 'deleteComment']);
 
   // --------------     INTERACT     --------------
-  Route::post('/interacts', [CommentController::class, 'createComment']);
-  Route::post('/interacts/{comment_id}', [CommentController::class, 'updateComment']);
-  Route::delete('/comments/{comment_id}', [CommentController::class, 'deleteComment']);
-
+  Route::post('/interacts/blog/{blog_id}', [InteractController::class, 'interactBlog']);
+  Route::post('/interacts/comment/{comment_id}', [InteractController::class, 'interactComment']);
+  
   // --------------     SERVICE     --------------
   Route::get('/services', [ServiceController::class, 'index']); // lấy tất cả service
   Route::get('/services/medical-center/{medical_center_id}', [ServiceController::class, 'getListServiceByMedicalCenterId']); // lấy dsach các service được cung cấp bởi trung tâm y tế
