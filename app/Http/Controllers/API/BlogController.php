@@ -206,10 +206,10 @@ class BlogController extends Controller
           ->count();
 
         // Kiểm tra người dùng hiện tại đã tương tác với comment này chưa
-        $userInteracted = Interact::where('target_label', 'comments')
+        $userInteraction = Interact::where('target_label', 'comments')
           ->where('target_id', $comment->id)
           ->where('account_id', $account_id)
-          ->exists();
+          ->first();
 
         return [
           'id' => $comment->id,
@@ -220,7 +220,8 @@ class BlogController extends Controller
           'avatar' => $comment->account ? $comment->account->avatar : null,
           'likes_count' => $commentLikesCount,
           'dislikes_count' => $commentDislikesCount,
-          'user_interacted' => $userInteracted,
+          'user_interacted' => $userInteraction ? true : false,
+          'interaction_type' => $userInteraction ? $userInteraction->target_type : null,
           'created_at' => $comment->created_at,
           'updated_at' => $comment->updated_at,
           'sub_comments' => $comment->subComments->map(function ($subComment) use ($account_id) {
@@ -236,10 +237,10 @@ class BlogController extends Controller
               ->count();
 
             // Kiểm tra người dùng hiện tại đã tương tác với sub-comment này chưa
-            $userSubInteracted = Interact::where('target_label', 'comments')
+            $userSubInteraction = Interact::where('target_label', 'comments')
               ->where('target_id', $subComment->id)
               ->where('account_id', $account_id)
-              ->exists();
+              ->first();
 
             return [
               'id' => $subComment->id,
@@ -250,7 +251,8 @@ class BlogController extends Controller
               'avatar' => $subComment->account ? $subComment->account->avatar : null,
               'likes_count' => $subCommentLikesCount,
               'dislikes_count' => $subCommentDislikesCount,
-              'user_interacted' => $userSubInteracted,
+              'user_interacted' => $userSubInteraction ? true : false,
+              'interaction_type' => $userSubInteraction ? $userSubInteraction->target_type : null,
               'created_at' => $subComment->created_at,
               'updated_at' => $subComment->updated_at,
             ];
