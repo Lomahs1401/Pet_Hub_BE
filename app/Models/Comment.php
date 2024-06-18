@@ -8,24 +8,34 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Comment extends Model
 {
-    use HasFactory, SoftDeletes;
+  use HasFactory, SoftDeletes;
 
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'comments';
+  /**
+   * The table associated with the model.
+   *
+   * @var string
+   */
+  protected $table = 'comments';
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
-    protected $fillable = [
-        'text',
-        'account_id',
-        'parent_comments_id',
-        'blog_id',
-    ];
+  /**
+   * The attributes that are mass assignable.
+   *
+   * @var array<int, string>
+   */
+  protected $fillable = [
+    'text',
+    'account_id',
+    'parent_comments_id',
+    'blog_id',
+  ];
+
+  public function account()
+  {
+    return $this->belongsTo(Account::class);
+  }
+
+  public function subComments()
+  {
+    return $this->hasMany(Comment::class, 'parent_comments_id');
+  }
 }

@@ -12,31 +12,43 @@ use Faker\Factory as Faker;
 
 class BlogSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
-    public function run()
-    {
-        $faker = Faker::create();
+  /**
+   * Run the database seeds.
+   *
+   * @return void
+   */
+  public function run()
+  {
+    $faker = Faker::create();
 
-        $role_customer = Role::where('role_name', 'ROLE_CUSTOMER')->first()->id;
-        $role_shop = Role::where('role_name', 'ROLE_SHOP')->first()->id;
-        $role_medical_center = Role::where('role_name', 'ROLE_MEDICAL_CENTER')->first()->id;
-        $role_aid_center = Role::where('role_name', 'ROLE_AID_CENTER')->first()->id;
+    // Lấy ID của các role
+    $role_customer_id = Role::where('role_name', 'ROLE_CUSTOMER')->pluck('id')->first();
+    $role_aid_center_id = Role::where('role_name', 'ROLE_AID_CENTER')->pluck('id')->first();
 
-        $blog_category_model = new BlogCategory();
-        $blog_category_ids = $blog_category_model->pluck('id')->toArray();
+    // Lấy danh sách các account_id từ bảng accounts với role_id là 1 và 5
+    $account_ids = Account::whereIn('role_id', [$role_customer_id, $role_aid_center_id])->pluck('id')->toArray();
 
-        for ($i = 0; $i < 9; $i++) {
-            Blog::factory()->create([
-                'title' => $faker->sentence(10),
-                'text' => $faker->paragraph(16),
-                'image' => 'gs://new_petshop_bucket/blogs/blog_' . ($i+1) . '.jpg',
-                'account_id' => $faker->randomElement([$role_customer, $role_shop, $role_medical_center, $role_aid_center]),
-                'category_id' => $faker->randomElement($blog_category_ids),
-            ]);
-        }
+    $blog_category_model = new BlogCategory();
+    $blog_category_ids = $blog_category_model->pluck('id')->toArray();
+
+    for ($i = 0; $i < 20; $i++) {
+      $random_image = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+      $fake_random_image = $faker->randomElement($random_image);
+
+      // Lấy một role ID ngẫu nhiên từ hai mảng role
+      $random_role_id = $faker->randomElement($account_ids);
+
+      $created_at = $faker->dateTimeBetween('-4 months', 'now');
+
+      Blog::factory()->create([
+        'title' => $faker->sentence(10),
+        'text' => $faker->paragraph(16),
+        'image' => 'gs://new_petshop_bucket/blogs/blog_' . $fake_random_image . '.jpg',
+        'account_id' => $random_role_id,
+        'blog_category_id' => $faker->randomElement($blog_category_ids),
+        'created_at' => $created_at,
+        'updated_at' => $created_at,
+      ]);
     }
+  }
 }

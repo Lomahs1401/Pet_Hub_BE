@@ -3,93 +3,375 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Blog;
 use App\Models\BlogCategory;
+use App\Models\Comment;
+use App\Models\Interact;
 use Illuminate\Http\Request;
 
 class BlogController extends Controller
 {
-    public function index()
-    {
-        $categories = BlogCategory::all();
+  public function index()
+  {
+    $categories = BlogCategory::all();
 
-        return response()->json([
-            'message' => 'Query successfully!',
-            'status' => 200,
-            'data' => $categories,
-        ], 200);
+    return response()->json([
+      'message' => 'Query successfully!',
+      'status' => 200,
+      'data' => $categories,
+    ], 200);
+  }
+
+  // Lấy số lượng từng loại bài blog thuộc từng category
+  public function countBlogsByCategory()
+  {
+    $categories = BlogCategory::withCount('blogs')->get();
+
+    return response()->json([
+      'message' => 'Query successfully!',
+      'status' => 200,
+      'data' => $categories,
+    ], 200);
+  }
+
+  // Thêm mới blog category
+  public function store(Request $request)
+  {
+    $request->validate([
+      'name' => 'required|string|unique:blog_categories',
+    ]);
+
+    $category = BlogCategory::create([
+      'name' => $request->input('name'),
+    ]);
+
+    return response()->json([
+      'message' => 'Blog category created successfully!',
+      'status' => 201,
+      'data' => $category,
+    ], 201);
+  }
+
+  // Update blog category
+  public function update(Request $request, $id)
+  {
+    $category = BlogCategory::findOrFail($id);
+
+    $request->validate([
+      'name' => 'required|string|unique:blog_categories,name,' . $category->id,
+    ]);
+
+    $category->update([
+      'name' => $request->input('name'),
+    ]);
+
+    return response()->json([
+      'message' => 'Blog category updated successfully!',
+      'status' => 200,
+      'data' => $category,
+    ], 200);
+  }
+
+  // Xoá blog category
+  public function destroy($id)
+  {
+    $category = BlogCategory::findOrFail($id);
+    $category->delete();
+
+    return response()->json([
+      'message' => 'Blog category deleted successfully!',
+      'status' => 200,
+    ], 200);
+  }
+
+  public function getBlogs(Request $request)
+  {
+    $accountId = auth()->user()->id;
+
+    $page_number = intval($request->query('page_number', 1));
+    $num_of_page = intval($request->query('num_of_page', 10));
+
+    // Lấy số lượng blogs
+    $blog_query = Blog::query()
+      ->with(['blogCategory', 'account'])
+      ->where('account_id', '!=', $accountId)
+      ->whereNull('deleted_at');
+
+    $total_blogs = $blog_query->count();
+    $total_pages = ceil($total_blogs / $num_of_page);
+
+    // Tính toán offset
+    $offset = ($page_number - 1) * $num_of_page;
+
+    // Lấy danh sách các bài viết không thuộc về account đang đăng nhập, sắp xếp theo thời gian mới nhất đến cũ nhất
+    $blogs = $blog_query->offset($offset)
+      ->limit($num_of_page)
+      ->orderBy('created_at', 'desc')
+      ->get();
+
+    // Tạo danh sách kết quả
+    $result = $blogs->map(function ($blog) {
+      $commentsCount = Comment::where('blog_id', $blog->id)->count();
+      $likesCount = Interact::where('target_label', 'blogs')
+        ->where('target_id', $blog->id)
+        ->where('target_type', 'like')
+        ->count();
+      $dislikesCount = Interact::where('target_label', 'blogs')
+        ->where('target_id', $blog->id)
+        ->where('target_type', 'dislike')
+        ->count();
+
+      return [
+        'id' => $blog->id,
+        'title' => $blog->title,
+        'text' => $blog->text,
+        'image' => $blog->image,
+        'account_id' => $blog->account_id,
+        'email' => $blog->account->email,
+        'username' => $blog->account->username,
+        'avatar' => $blog->account->avatar,
+        'blog_category_id' => $blog->blog_category_id,
+        'blog_category_name' => $blog->blogCategory->name,
+        'comments_count' => $commentsCount,
+        'likes_count' => $likesCount,
+        'dislikes_count' => $dislikesCount,
+        'created_at' => $blog->created_at,
+        'updated_at' => $blog->updated_at,
+      ];
+    });
+
+    return response()->json([
+      'message' => 'Query successfully!',
+      'status' => 200,
+      'page_number' => $page_number,
+      'num_of_page' => $num_of_page,
+      'total_pages' => $total_pages,
+      'total_blogs' => $total_blogs,
+      'data' => $result,
+    ]);
+  }
+
+  public function getMyBlogs(Request $request)
+  {
+    $accountId = auth()->user()->id;
+
+    $page_number = intval($request->query('page_number', 1));
+    $num_of_page = intval($request->query('num_of_page', 10));
+
+    // Lấy số lượng blogs
+    $blog_query = Blog::query()
+      ->with(['blogCategory', 'account'])
+      ->where('account_id', '=', $accountId)
+      ->whereNull('deleted_at');
+
+    $total_blogs = $blog_query->count();
+    $total_pages = ceil($total_blogs / $num_of_page);
+
+    // Tính toán offset
+    $offset = ($page_number - 1) * $num_of_page;
+
+    $blogs = $blog_query->offset($offset)
+      ->limit($num_of_page)
+      ->orderBy('created_at', 'desc')
+      ->get();
+
+    // Tạo danh sách kết quả
+    $result = $blogs->map(function ($blog) {
+      $commentsCount = Comment::where('blog_id', $blog->id)->count();
+      $likesCount = Interact::where('target_label', 'blogs')
+        ->where('target_id', $blog->id)
+        ->where('target_type', 'like')
+        ->count();
+      $dislikesCount = Interact::where('target_label', 'blogs')
+        ->where('target_id', $blog->id)
+        ->where('target_type', 'dislike')
+        ->count();
+
+      return [
+        'id' => $blog->id,
+        'title' => $blog->title,
+        'text' => $blog->text,
+        'image' => $blog->image,
+        'account_id' => $blog->account_id,
+        'email' => $blog->account->email,
+        'username' => $blog->account->username,
+        'avatar' => $blog->account->avatar,
+        'blog_category_id' => $blog->blog_category_id,
+        'blog_category_name' => $blog->blogCategory->name,
+        'comments_count' => $commentsCount,
+        'likes_count' => $likesCount,
+        'dislikes_count' => $dislikesCount,
+        'created_at' => $blog->created_at,
+        'updated_at' => $blog->updated_at,
+      ];
+    });
+
+    return response()->json([
+      'message' => 'Query successfully!',
+      'status' => 200,
+      'page_number' => $page_number,
+      'num_of_page' => $num_of_page,
+      'total_pages' => $total_pages,
+      'total_blogs' => $total_blogs,
+      'data' => $result,
+    ]);
+  }
+
+  public function getBlogDetail($blog_id)
+  {
+    // Tìm bài blog theo id
+    $blog = Blog::with(['blogCategory', 'account'])->find($blog_id);
+
+    // Kiểm tra nếu blog không tồn tại
+    if (!$blog) {
+      return response()->json([
+        'message' => 'Blog not found!',
+        'status' => 404,
+      ], 404);
     }
 
-    // Lấy số lượng các blog category hiện có
-    public function countCategories()
-    {
-        $count = BlogCategory::count();
+    // Lấy danh sách comments của blog
+    $comments = Comment::where('blog_id', $blog_id)
+      ->whereNull('parent_comments_id')
+      ->with('account', 'subComments.account')
+      ->get();
 
-        return response()->json([
-            'message' => 'Query successfully!',
-            'status' => 200,
-            'data' => $count,
-        ], 200);
+    // Đếm tổng số comments
+    $totalComments = Comment::where('blog_id', $blog_id)->count();
+
+    // Chuẩn bị dữ liệu trả về
+    $result = [
+      'blog' => [
+        'id' => $blog->id,
+        'title' => $blog->title,
+        'text' => $blog->text,
+        'image' => $blog->image,
+        'account_id' => $blog->account_id,
+        'blog_category_id' => $blog->blog_category_id,
+        'blog_category_name' => $blog->blogCategory ? $blog->blogCategory->name : null,
+        'email' => $blog->account ? $blog->account->email : null,
+        'username' => $blog->account ? $blog->account->username : null,
+        'avatar' => $blog->account ? $blog->account->avatar : null,
+        'created_at' => $blog->created_at,
+        'updated_at' => $blog->updated_at,
+      ],
+      'total_comments' => $totalComments,
+      'comments' => $comments->map(function ($comment) {
+        return [
+          'id' => $comment->id,
+          'text' => $comment->text,
+          'account_id' => $comment->account_id,
+          'email' => $comment->account ? $comment->account->email : null,
+          'username' => $comment->account ? $comment->account->username : null,
+          'avatar' => $comment->account ? $comment->account->avatar : null,
+          'created_at' => $comment->created_at,
+          'updated_at' => $comment->updated_at,
+          'sub_comments' => $comment->subComments->map(function ($subComment) {
+            return [
+              'id' => $subComment->id,
+              'text' => $subComment->text,
+              'account_id' => $subComment->account_id,
+              'email' => $subComment->account ? $subComment->account->email : null,
+              'username' => $subComment->account ? $subComment->account->username : null,
+              'avatar' => $subComment->account ? $subComment->account->avatar : null,
+              'created_at' => $subComment->created_at,
+              'updated_at' => $subComment->updated_at,
+            ];
+          }),
+        ];
+      }),
+    ];
+
+    return response()->json([
+      'message' => 'Query successfully!',
+      'status' => 200,
+      'data' => $result,
+    ]);
+  }
+
+  public function createBlog(Request $request)
+  {
+    $account_id = auth()->user()->id;
+
+    $validatedData = $request->validate([
+      'title' => 'required|string|max:255',
+      'text' => 'required|string',
+      'image' => 'nullable|string',
+      'blog_category_id' => 'required|exists:blog_categories,id',
+    ]);
+
+    $validatedData['account_id'] = $account_id;
+
+    $blog = Blog::create($validatedData);
+
+    return response()->json([
+      'message' => 'Blog created successfully!',
+      'status' => 201,
+      'data' => $blog,
+    ], 201);
+  }
+
+  public function updateBlog(Request $request, $blog_id)
+  {
+    $blog = Blog::find($blog_id);
+
+    if (!$blog) {
+      return response()->json([
+        'message' => 'Blog not found!',
+        'status' => 404,
+      ], 404);
     }
 
-    // Lấy số lượng từng loại bài blog thuộc từng category
-    public function countBlogsByCategory()
-    {
-        $categories = BlogCategory::withCount('blogs')->get();
-
-        return response()->json([
-            'message' => 'Query successfully!',
-            'status' => 200,
-            'data' => $categories,
-        ], 200);
+    // Kiểm tra quyền sở hữu blog
+    $accountId = auth()->user()->id;
+    if ($blog->account_id !== $accountId) {
+      return response()->json([
+        'message' => 'Unauthorized action!',
+        'status' => 403,
+      ], 403);
     }
 
-    // Thêm mới blog category
-    public function store(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|unique:blog_categories',
-        ]);
+    $validatedData = $request->validate([
+      'title' => 'sometimes|string|max:255',
+      'text' => 'sometimes|string',
+      'image' => 'nullable|string',
+      'blog_category_id' => 'sometimes|exists:blog_categories,id',
+    ]);
 
-        $category = BlogCategory::create([
-            'name' => $request->input('name'),
-        ]);
+    $blog->update($validatedData);
 
-        return response()->json([
-            'message' => 'Blog category created successfully!',
-            'status' => 201,
-            'data' => $category,
-        ], 201);
+    return response()->json([
+      'message' => 'Blog updated successfully!',
+      'status' => 200,
+      'data' => $blog,
+    ]);
+  }
+
+  public function deleteBlog($blog_id)
+  {
+    $blog = Blog::find($blog_id);
+
+    if (!$blog) {
+      return response()->json([
+        'message' => 'Blog not found!',
+        'status' => 404,
+      ], 404);
     }
 
-    // Update blog category
-    public function update(Request $request, $id)
-    {
-        $category = BlogCategory::findOrFail($id);
-
-        $request->validate([
-            'name' => 'required|string|unique:blog_categories,name,' . $category->id,
-        ]);
-
-        $category->update([
-            'name' => $request->input('name'),
-        ]);
-
-        return response()->json([
-            'message' => 'Blog category updated successfully!',
-            'status' => 200,
-            'data' => $category,
-        ], 200);
+    // Kiểm tra quyền sở hữu blog
+    $accountId = auth()->user()->id;
+    if ($blog->account_id !== $accountId) {
+      return response()->json([
+        'message' => 'Unauthorized action!',
+        'status' => 403,
+      ], 403);
     }
 
-    // Xoá blog category
-    public function destroy($id)
-    {
-        $category = BlogCategory::findOrFail($id);
-        $category->delete();
+    $blog->delete();
 
-        return response()->json([
-            'message' => 'Blog category deleted successfully!',
-            'status' => 200,
-        ], 200);
-    }
+    return response()->json([
+      'message' => 'Blog deleted successfully!',
+      'status' => 200,
+    ]);
+  }
 }

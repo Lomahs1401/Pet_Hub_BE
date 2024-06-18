@@ -7,21 +7,26 @@ use Illuminate\Database\Eloquent\Model;
 
 class BlogCategory extends Model
 {
-    use HasFactory;
+  use HasFactory;
 
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'blog_categories';
+  /**
+   * The table associated with the model.
+   *
+   * @var string
+   */
+  protected $table = 'blog_categories';
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
-    protected $fillable = [
-        'name',
-    ];
+  /**
+   * The attributes that are mass assignable.
+   *
+   * @var array<int, string>
+   */
+  protected $fillable = [
+    'name',
+  ];
+
+  public function blogs()
+  {
+    return $this->hasMany(Blog::class);
+  }
 }

@@ -99,16 +99,16 @@ Route::group([
   Route::get('/product-categories/shop/{shop_id}', [ProductCategoryController::class, 'getProductCountsByCategory']); // lấy sl product của category và thuộc shop_id
   Route::get('/product-categories/type/shop/{shop_id}', [ProductCategoryController::class, 'getProductCountsByCategoryType']); // lấy sl product của category type và thuộc shop_id
 
-
   // --------------     BLOG     --------------
+  Route::get('/blogs', [BlogController::class, 'getBlogs']);
+  Route::get('/blogs/me/', [BlogController::class, 'getMyBlogs']);
+  Route::get('/blogs/{blog_id}', [BlogController::class, 'getBlogDetail']);
+  Route::post('/blogs', [BlogController::class, 'createBlog']);
+  Route::put('/blogs/{blog_id}', [BlogController::class, 'updateBlog']);
+  Route::delete('/blogs/{blog_id}', [BlogController::class, 'deleteBlog']);
+
   Route::get('/blog-categories', [BlogController::class, 'index']);
-  Route::get('/blog-categories/count', [BlogController::class, 'countCategories']);
   Route::get('/blog-categories/count-blogs', [BlogController::class, 'countBlogsByCategory']);
-  Route::post('/blog-categories', [BlogController::class, 'store']);
-  Route::put('/blog-categories/{id}', [BlogController::class, 'update']);
-  Route::delete('/blog-categories/{id}', [BlogController::class, 'destroy']);
-
-
 
   // --------------     SERVICE     --------------
   Route::get('/services', [ServiceController::class, 'index']); // lấy tất cả service
