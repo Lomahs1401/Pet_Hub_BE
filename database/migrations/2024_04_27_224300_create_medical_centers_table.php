@@ -17,11 +17,11 @@ class CreateMedicalCentersTable extends Migration
       $table->id();
       $table->string('name');
       $table->text('description')->nullable();
-      $table->string('image');
-      $table->string('phone');
+      $table->string('image')->nullable();
+      $table->string('phone')->unique();
       $table->string('address');
-      $table->string('website');
-      $table->string('fanpage');
+      $table->string('website')->nullable();
+      $table->string('fanpage')->nullable();
       $table->string('work_time');
       $table->string('establish_year');
       $table->string('certificate')->nullable();

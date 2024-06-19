@@ -118,4 +118,24 @@ class ShopController extends Controller
       'data' => $shop
     ], 200);
   }
+
+  public function getAddress() {
+    $shop_id = auth()->user()->shop->id;
+
+    try {
+      // Lấy shop hiện tại
+      $shop = Shop::findOrFail($shop_id);
+    } catch (ModelNotFoundException $e) {
+      return response()->json([
+        'message' => 'Shop not found!',
+        'status' => 404
+      ], 404);
+    }
+
+    return response()->json([
+      'message' => 'Get shop address successfully',
+      'status' => 200,
+      'data' => $shop->address
+    ], 200);
+  }
 }

@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\API\AccountController;
+use App\Http\Controllers\API\AdminController;
+use App\Http\Controllers\API\AdminDashboardController;
 use App\Http\Controllers\API\AppointmentController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\BlogController;
@@ -17,6 +19,7 @@ use App\Http\Controllers\API\PetController;
 use App\Http\Controllers\API\ProductCategoryController;
 use App\Http\Controllers\API\ProductController;
 use App\Http\Controllers\API\RatingProductController;
+use App\Http\Controllers\API\RatingShopController;
 use App\Http\Controllers\API\ServiceController;
 use App\Http\Controllers\API\ShopController;
 use App\Http\Controllers\API\ShopDashboardController;
@@ -41,7 +44,11 @@ Route::group([
   'prefix' => 'auth'
 ], function ($router) {
   Route::post('/login', [AuthController::class, 'login']);
-  Route::post('/register', [AuthController::class, 'register']);
+  Route::post('/register-customer', [AuthController::class, 'registerCustomer']);
+  Route::post('/register-shop', [AuthController::class, 'registerShop']);
+  Route::post('/register-medical-center', [AuthController::class, 'registerMedicalCenter']);
+  Route::post('/register-aid-center', [AuthController::class, 'registerAidCenter']);
+  Route::post('/register-doctor', [AuthController::class, 'registerDoctor']);
   Route::post('/refresh', [AuthController::class, 'refresh']);
   Route::patch('/reset-password/request', [AccountController::class, 'requestSendResetCode']);
   Route::patch('/reset-verify-code/request', [AccountController::class, 'resetVerifyCode']);
@@ -117,7 +124,7 @@ Route::group([
   // --------------     INTERACT     --------------
   Route::post('/interacts/blog/{blog_id}', [InteractController::class, 'interactBlog']);
   Route::post('/interacts/comment/{comment_id}', [InteractController::class, 'interactComment']);
-  
+
   // --------------     SERVICE     --------------
   Route::get('/services', [ServiceController::class, 'index']); // lấy tất cả service
   Route::get('/services/medical-center/{medical_center_id}', [ServiceController::class, 'getListServiceByMedicalCenterId']); // lấy dsach các service được cung cấp bởi trung tâm y tế
@@ -232,6 +239,7 @@ Route::group([
 
   // --------------     SHOP     --------------
   Route::get('/profile', [ShopController::class, 'getProfileOfShop']);
+  Route::get('/profile/address', [ShopController::class, 'getAddress']);
   Route::put('/profile', [ShopController::class, 'updateShop']);
 
   // --------------     PRODUCT     --------------
@@ -288,4 +296,55 @@ Route::group([
 
   // --------------     SUB ORDER     --------------
   Route::get('/sub-orders/{sub_order_id}', [OrderController::class, 'getSubOrders']);
+});
+
+// Shop API
+Route::group([
+  'middleware' => ['force.json.response', 'api', 'auth.user', 'auth.admin'],
+  'prefix' => 'admin',
+], function ($router) {
+  // --------------     DASHBOARD     --------------
+  Route::get('/banner/reviews', [ShopDashboardController::class, 'getReviewsComparison']);
+  Route::get('/banner/replies', [ShopDashboardController::class, 'getRepliesComparison']);
+  Route::get('/banner/products', [ShopDashboardController::class, 'getProductsComparison']);
+  Route::get('/banner/orders', [ShopDashboardController::class, 'getOrdersComparison']);
+  Route::get('/banner/sales', [ShopDashboardController::class, 'getSales']);
+
+  Route::get('/bar/shop', [AdminDashboardController::class, 'getShop']);
+  Route::get('/bar/medical-center', [AdminDashboardController::class, 'getMedicalCenter']);
+  Route::get('/bar/aid-center', [AdminDashboardController::class, 'getAidCenter']);
+  Route::get('/bar/customer', [AdminDashboardController::class, 'getCustomer']);
+  Route::get('/pie/account-type', [AdminDashboardController::class, 'getAccountType']);
+  Route::get('/pie/account-status', [AdminDashboardController::class, 'getAccountStatus']);
+  Route::get('/radar/account-approved', [AdminDashboardController::class, 'getAccountByApproved']);
+  Route::get('/recent-waiting-approved-account', [AdminDashboardController::class, 'getRecentWaitingApprovedAccount']);
+
+  Route::get('/recent-orders', [ShopDashboardController::class, 'getRecentOrder']);
+  Route::get('/popular-products', [ShopDashboardController::class, 'getPopularProduct']);
+
+  // --------------     SHOP     --------------
+  Route::get('/shops', [AdminController::class, 'getShops']);
+  Route::get('/shops/not-approved', [AdminController::class, 'getShopsNotApproved']);
+  Route::get('/shops/blocked', [AdminController::class, 'getShopsBlocked']);
+  Route::get('/shops/{shop_id}', [AdminController::class, 'getShopDetail']);
+  Route::get('/shops/revenue/{shop_id}', [AdminController::class, 'getRevenueByShop']);
+  Route::get('/shops/rating/{shop_id}', [AdminController::class, 'getRatingByShop']);
+  Route::get('/shops/rating/{shop_id}/detail', [AdminController::class, 'getRatingByShop']);
+
+  Route::patch('/shops/approved/{account_id}', [AdminController::class, 'approvedShop']);
+  Route::patch('/shops/block/{account_id}', [AdminController::class, 'blockShop']);
+  Route::patch('/shops/restore/{account_id}', [AdminController::class, 'restoreShop']);
+
+  // --------------     RATING DETAIL     --------------
+  Route::get('/ratings/shop/{shop_id}/detail', [RatingShopController::class, 'getDetailRating']);
+
+  // --------------     MEDICAL CENTER     --------------
+  Route::patch('/medical-centers/approved/{account_id}', [AdminController::class, 'approvedMedicalCenter']);
+  Route::patch('/medical-centers/block/{account_id}', [AdminController::class, 'blockMedicalCenter']);
+  Route::patch('/medical-centers/restore/{account_id}', [AdminController::class, 'restoreMedicalCenter']);
+
+  // --------------     AID CENTER     --------------
+  Route::patch('/aid-centers/approved/{account_id}', [AdminController::class, 'approvedAidCenter']);
+  Route::patch('/aid-centers/block/{account_id}', [AdminController::class, 'blockAidCenter']);
+  Route::patch('/aid-centers/restore/{account_id}', [AdminController::class, 'restoreAidCenter']);
 });
