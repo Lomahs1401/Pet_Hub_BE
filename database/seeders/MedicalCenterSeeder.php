@@ -85,6 +85,8 @@ class MedicalCenterSeeder extends Seeder
         'work_time' => $work_time,
         'establish_year' => $faker->year(),
         'account_id' => $medical_center_account->id,
+        'created_at' => $created_at,
+        'updated_at' => $created_at,
       ]);
 
       $doctor_created_at = $faker->dateTimeBetween($created_at, 'now');
@@ -120,8 +122,8 @@ class MedicalCenterSeeder extends Seeder
         'address' => $faker->city(),
         'phone' => $faker->regexify('0(3|5|7|8|9){1}([0-9]{8})'),
         'image' => $list_doctors_avatars[$i],
-        'created_at' => $created_at,
-        'updated_at' => $created_at,
+        'created_at' => $doctor_created_at,
+        'updated_at' => $doctor_created_at,
       ]);
     }
   }

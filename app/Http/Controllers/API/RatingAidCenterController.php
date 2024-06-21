@@ -5,7 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class RatingServiceController extends Controller
+class RatingAidCenterController extends Controller
 {
     //
 }

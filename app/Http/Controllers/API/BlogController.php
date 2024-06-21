@@ -37,7 +37,7 @@ class BlogController extends Controller
       ->get();
 
     // Tạo danh sách kết quả
-    $result = $blogs->map(function ($blog) use($accountId) {
+    $result = $blogs->map(function ($blog) use ($accountId) {
       $commentsCount = Comment::where('blog_id', $blog->id)->count();
       $likesCount = Interact::where('target_label', 'blogs')
         ->where('target_id', $blog->id)
@@ -119,9 +119,9 @@ class BlogController extends Controller
         ->count();
       // Kiểm tra người dùng hiện tại đã tương tác với bài viết này chưa và loại tương tác
       $userInteraction = Interact::where('target_label', 'blogs')
-      ->where('target_id', $blog->id)
-      ->where('account_id', $accountId)
-      ->first();
+        ->where('target_id', $blog->id)
+        ->where('account_id', $accountId)
+        ->first();
 
       return [
         'id' => $blog->id,
@@ -165,10 +165,13 @@ class BlogController extends Controller
       ], 404);
     }
 
-    // Lấy danh sách comments của blog
+    // Lấy danh sách comments của blog và sắp xếp theo chiều từ mới nhất đến cũ nhất
     $comments = Comment::where('blog_id', $blog_id)
       ->whereNull('parent_comments_id')
-      ->with('account', 'subComments.account')
+      ->with(['account', 'subComments.account' => function ($query) {
+        $query->orderBy('created_at', 'desc');
+      }])
+      ->orderBy('created_at', 'desc')
       ->get();
 
     // Đếm tổng số comments
@@ -235,7 +238,7 @@ class BlogController extends Controller
           'interaction_type' => $userInteraction ? $userInteraction->target_type : null,
           'created_at' => $comment->created_at,
           'updated_at' => $comment->updated_at,
-          'sub_comments' => $comment->subComments->map(function ($subComment) use ($account_id) {
+          'sub_comments' => $comment->subComments->sortByDesc('created_at')->map(function ($subComment) use ($account_id) {
             // Đếm số lượng like và dislike cho sub-comment
             $subCommentLikesCount = Interact::where('target_label', 'comments')
               ->where('target_id', $subComment->id)

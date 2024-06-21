@@ -200,11 +200,11 @@ class AdminDashboardController extends Controller
     // Định dạng dữ liệu trả về
     $data = [
       [
-        "status" => "Enabled",
+        "status" => "Actived",
         "count" => $enabledCount
       ],
       [
-        "status" => "Not Approved",
+        "status" => "Waiting Approve",
         "count" => $notApprovedCount
       ],
       [

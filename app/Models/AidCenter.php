@@ -35,4 +35,9 @@ class AidCenter extends Model
     'certificate',
     'account_id',
   ];
+
+  public function account()
+  {
+    return $this->belongsTo(Account::class);
+  }
 }

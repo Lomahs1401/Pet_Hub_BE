@@ -4,16 +4,15 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Account;
-use App\Models\RatingShop;
-use App\Models\Shop;
-use App\Models\SubOrder;
+use App\Models\MedicalCenter;
+use App\Models\RatingMedicalCenter;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class AdminController extends Controller
+class AdminMedicalCenterController extends Controller
 {
-  public function getShops(Request $request)
+  public function getMedicalCenters(Request $request)
   {
     // Lấy tham số start_date và end_date từ request, nếu không có thì sử dụng ngày hiện tại
     $startDate = $request->query('start_date', Carbon::today()->toDateString());
@@ -41,14 +40,14 @@ class AdminController extends Controller
 
     $accountIds = $approvedAccounts->pluck('id');
 
-    // Lấy danh sách các shop có tài khoản đã được approved
-    $shopsQuery = Shop::whereHas('account', function ($query) use ($accountIds) {
+    // Lấy danh sách các medical center có tài khoản đã được approved
+    $medicalCentersQuery = MedicalCenter::whereHas('account', function ($query) use ($accountIds) {
       $query->whereIn('accounts.id', $accountIds);
     });
 
     // Thêm điều kiện tìm kiếm theo search_term nếu có
     if (!empty($searchTerm)) {
-      $shopsQuery = $shopsQuery->where(function ($query) use ($searchTerm) {
+      $medicalCentersQuery = $medicalCentersQuery->where(function ($query) use ($searchTerm) {
         $query->where('name', 'like', '%' . $searchTerm . '%')
           ->orWhere('phone', 'like', '%' . $searchTerm . '%')
           ->orWhereHas('account', function ($query) use ($searchTerm) {
@@ -59,50 +58,51 @@ class AdminController extends Controller
     // Thực hiện phân trang
     $pageNumber = intval($request->query('page_number', 1));
     $numOfPage = intval($request->query('num_of_page', 10));
-    $totalShops = $shopsQuery->count();
-    $totalPages = ceil($totalShops / $numOfPage);
+    $totalMedicalCenters = $medicalCentersQuery->count();
+    $totalPages = ceil($totalMedicalCenters / $numOfPage);
     $offset = ($pageNumber - 1) * $numOfPage;
 
-    // Lấy dữ liệu các shop theo phân trang
-    $shops = $shopsQuery->offset($offset)
+    // Lấy dữ liệu các medical center theo phân trang
+    $medicalCenters = $medicalCentersQuery->offset($offset)
       ->limit($numOfPage)
       ->get();
 
-    // Định dạng dữ liệu shop để trả về
-    $formattedShops = $shops->map(function ($shop) {
-      $ratingData = $shop->calculateShopRating();
+    // Định dạng dữ liệu medical center để trả về
+    $formattedMedicalCenters = $medicalCenters->map(function ($medical_center) {
+      $ratingData = $medical_center->calculateMedicalCenterRating();
 
       return [
-        'id' => $shop->id,
-        'account_id' => $shop->account->id,
-        'name' => $shop->name,
-        'email' => $shop->account->email,
-        'username' => $shop->account->username,
-        'avatar' => $shop->account->avatar,
-        'address' => $shop->address,
-        'phone' => $shop->phone,
-        'work_time' => $shop->work_time,
-        'establish_year' => $shop->establish_year,
+        'id' => $medical_center->id,
+        'account_id' => $medical_center->account->id,
+        'name' => $medical_center->name,
+        'email' => $medical_center->account->email,
+        'username' => $medical_center->account->username,
+        'avatar' => $medical_center->account->avatar,
+        'address' => $medical_center->address,
+        'phone' => $medical_center->phone,
+        'work_time' => $medical_center->work_time,
+        'establish_year' => $medical_center->establish_year,
         'rating' => $ratingData['average'],
         'rating_count' => $ratingData['count'],
-        'created_at' => $shop->created_at,
-        'updated_at' => $shop->updated_at,
+        'created_at' => $medical_center->created_at,
+        'updated_at' => $medical_center->updated_at,
       ];
     });
 
     // Trả về JSON response
     return response()->json([
-      'message' => 'Shops retrieved successfully!',
+      'message' => 'Medical center retrieved successfully!',
       'status' => 200,
       'page_number' => $pageNumber,
       'num_of_page' => $numOfPage,
       'total_pages' => $totalPages,
-      'total_shops' => $totalShops,
-      'data' => $formattedShops,
+      'total_medical_centers' => $totalMedicalCenters,
+      'data' => $formattedMedicalCenters,
     ]);
   }
 
-  public function getShopsNotApproved(Request $request)
+  // Những account bị xoá trước khi được approve sẽ không hiển thị
+  public function getMedicalCentersWaitingApproved(Request $request)
   {
     // Lấy tham số start_date và end_date từ request, nếu không có thì sử dụng ngày hiện tại
     $startDate = $request->query('start_date', Carbon::today()->toDateString());
@@ -123,21 +123,21 @@ class AdminController extends Controller
     // Lấy tham số search_term từ request
     $searchTerm = $request->query('search_term', '');
 
-    // Lấy danh sách các tài khoản đã được approved
+    // Lấy danh sách các tài khoản đang chờ approved
     $approvedAccounts = Account::where('is_approved', false)
       ->whereBetween('created_at', [$startDate, $endDate])
       ->get();
 
     $accountIds = $approvedAccounts->pluck('id');
 
-    // Lấy danh sách các shop có tài khoản đã được approved
-    $shopsQuery = Shop::whereHas('account', function ($query) use ($accountIds) {
+    // Lấy danh sách các medical_center có tài khoản đang chờ approved
+    $medicalCentersQuery = MedicalCenter::whereHas('account', function ($query) use ($accountIds) {
       $query->whereIn('accounts.id', $accountIds);
     });
 
     // Thêm điều kiện tìm kiếm theo search_term nếu có
     if (!empty($searchTerm)) {
-      $shopsQuery = $shopsQuery->where(function ($query) use ($searchTerm) {
+      $medicalCentersQuery = $medicalCentersQuery->where(function ($query) use ($searchTerm) {
         $query->where('name', 'like', '%' . $searchTerm . '%')
           ->orWhere('phone', 'like', '%' . $searchTerm . '%')
           ->orWhereHas('account', function ($query) use ($searchTerm) {
@@ -145,50 +145,51 @@ class AdminController extends Controller
           });
       });
     }
+
     // Thực hiện phân trang
     $pageNumber = intval($request->query('page_number', 1));
     $numOfPage = intval($request->query('num_of_page', 10));
-    $totalShops = $shopsQuery->count();
-    $totalPages = ceil($totalShops / $numOfPage);
+    $totalMedicalCenters = $medicalCentersQuery->count();
+    $totalPages = ceil($totalMedicalCenters / $numOfPage);
     $offset = ($pageNumber - 1) * $numOfPage;
 
-    // Lấy dữ liệu các shop theo phân trang
-    $shops = $shopsQuery->offset($offset)
+    // Lấy dữ liệu các medical_center theo phân trang
+    $medical_centers = $medicalCentersQuery->offset($offset)
       ->limit($numOfPage)
       ->get();
 
-    // Định dạng dữ liệu shop để trả về
-    $formattedShops = $shops->map(function ($shop) {
+    // Định dạng dữ liệu medical_center để trả về
+    $formattedMedicalCenters = $medical_centers->map(function ($medical_center) {
 
       return [
-        'id' => $shop->id,
-        'account_id' => $shop->account->id,
-        'name' => $shop->name,
-        'email' => $shop->account->email,
-        'username' => $shop->account->username,
-        'avatar' => $shop->account->avatar,
-        'address' => $shop->address,
-        'phone' => $shop->phone,
-        'work_time' => $shop->work_time,
-        'establish_year' => $shop->establish_year,
-        'created_at' => $shop->created_at,
-        'updated_at' => $shop->updated_at,
+        'id' => $medical_center->id,
+        'account_id' => $medical_center->account->id,
+        'name' => $medical_center->name,
+        'email' => $medical_center->account->email,
+        'username' => $medical_center->account->username,
+        'avatar' => $medical_center->account->avatar,
+        'address' => $medical_center->address,
+        'phone' => $medical_center->phone,
+        'work_time' => $medical_center->work_time,
+        'establish_year' => $medical_center->establish_year,
+        'created_at' => $medical_center->created_at,
+        'updated_at' => $medical_center->updated_at,
       ];
     });
 
     // Trả về JSON response
     return response()->json([
-      'message' => 'Shops not approved retrieved successfully!',
+      'message' => 'Medical centers waiting approve retrieved successfully!',
       'status' => 200,
       'page_number' => $pageNumber,
       'num_of_page' => $numOfPage,
       'total_pages' => $totalPages,
-      'total_shops' => $totalShops,
-      'data' => $formattedShops,
+      'total_medical_centers' => $totalMedicalCenters,
+      'data' => $formattedMedicalCenters,
     ]);
   }
 
-  public function getShopsBlocked(Request $request)
+  public function getMedicalCentersBlocked(Request $request)
   {
     // Lấy tham số start_date và end_date từ request, nếu không có thì sử dụng ngày hiện tại
     $startDate = $request->query('start_date', '2000-01-01'); // Sử dụng một ngày rất xa trong quá khứ
@@ -216,14 +217,14 @@ class AdminController extends Controller
 
     $accountIds = $blockedAccounts->pluck('id');
 
-    // Lấy danh sách các shop có tài khoản đã bị chặn
-    $shopsQuery = Shop::withTrashed()->whereHas('account', function ($query) use ($accountIds) {
+    // Lấy danh sách các medical_center có tài khoản đã bị chặn
+    $medicalCentersQuery = MedicalCenter::withTrashed()->whereHas('account', function ($query) use ($accountIds) {
       $query->whereIn('accounts.id', $accountIds);
-    });
+    })->whereNotNull('deleted_at');
 
     // Thêm điều kiện tìm kiếm theo search_term nếu có
     if (!empty($searchTerm)) {
-      $shopsQuery = $shopsQuery->where(function ($query) use ($searchTerm) {
+      $medicalCentersQuery = $medicalCentersQuery->where(function ($query) use ($searchTerm) {
         $query->where('name', 'like', '%' . $searchTerm . '%')
           ->orWhere('phone', 'like', '%' . $searchTerm . '%')
           ->orWhereHas('account', function ($query) use ($searchTerm) {
@@ -235,158 +236,78 @@ class AdminController extends Controller
     // Thực hiện phân trang
     $pageNumber = intval($request->query('page_number', 1));
     $numOfPage = intval($request->query('num_of_page', 10));
-    $totalShops = $shopsQuery->count();
-    $totalPages = ceil($totalShops / $numOfPage);
+    $totalMedicalCenters = $medicalCentersQuery->count();
+    $totalPages = ceil($totalMedicalCenters / $numOfPage);
     $offset = ($pageNumber - 1) * $numOfPage;
 
-    // Lấy dữ liệu các shop theo phân trang
-    $shops = $shopsQuery->offset($offset)
+    // Lấy dữ liệu các medical_center theo phân trang
+    $medical_centers = $medicalCentersQuery->offset($offset)
       ->limit($numOfPage)
       ->get();
 
-    // Định dạng dữ liệu shop để trả về
-    $formattedShops = $shops->map(function ($shop) {
+    // Định dạng dữ liệu medical_center để trả về
+    $formattedMedicalCenters = $medical_centers->map(function ($medical_center) {
       return [
-        'id' => $shop->id,
-        'account_id' => $shop->account->id,
-        'name' => $shop->name,
-        'email' => $shop->account->email,
-        'username' => $shop->account->username,
-        'avatar' => $shop->account->avatar,
-        'address' => $shop->address,
-        'phone' => $shop->phone,
-        'work_time' => $shop->work_time,
-        'establish_year' => $shop->establish_year,
-        'created_at' => $shop->created_at,
-        'updated_at' => $shop->updated_at,
-        'deleted_at' => $shop->deleted_at,
+        'id' => $medical_center->id,
+        'account_id' => $medical_center->account->id,
+        'name' => $medical_center->name,
+        'email' => $medical_center->account->email,
+        'username' => $medical_center->account->username,
+        'avatar' => $medical_center->account->avatar,
+        'address' => $medical_center->address,
+        'phone' => $medical_center->phone,
+        'work_time' => $medical_center->work_time,
+        'establish_year' => $medical_center->establish_year,
+        'created_at' => $medical_center->created_at,
+        'updated_at' => $medical_center->updated_at,
+        'deleted_at' => $medical_center->deleted_at,
       ];
     });
 
     // Trả về JSON response
     return response()->json([
-      'message' => 'Shops blocked retrieved successfully!',
+      'message' => 'Medical centers blocked retrieved successfully!',
       'status' => 200,
       'page_number' => $pageNumber,
       'num_of_page' => $numOfPage,
       'total_pages' => $totalPages,
-      'total_shops' => $totalShops,
-      'data' => $formattedShops,
+      'total_medical_centers' => $totalMedicalCenters,
+      'data' => $formattedMedicalCenters,
     ]);
   }
 
-  public function getShopDetail($shop_id)
-  {
-    // Tìm kiếm shop bằng id
-    $shop = Shop::withTrashed()->find($shop_id);
-
-    // Nếu không tìm thấy shop, trả về lỗi
-    if (!$shop) {
-      return response()->json([
-        'message' => 'Shop not found',
-        'status' => 404,
-      ], 404);
-    }
-
-    $ratingData = $shop->calculateShopRating();
-
-    // Định dạng dữ liệu shop để trả về
-    $shopDetail = [
-      'id' => $shop->id,
-      'username' => $shop->account->username,
-      'email' => $shop->account->email,
-      'avatar' => $shop->account->avatar,
-      'name' => $shop->name,
-      'description' => $shop->description,
-      'image' => $shop->image,
-      'phone' => $shop->phone,
-      'address' => $shop->address,
-      'website' => $shop->website,
-      'fanpage' => $shop->fanpage,
-      'work_time' => $shop->work_time,
-      'establish_year' => $shop->establish_year,
-      'certificate' => $shop->certificate,
-      'rating' => $ratingData['average'],
-      'rating_count' => $ratingData['count'],
-      'created_at' => $shop->created_at,
-      'updated_at' => $shop->updated_at,
-    ];
-
-    // Trả về JSON response
-    return response()->json([
-      'message' => 'Shop detail retrieved successfully!',
-      'status' => 200,
-      'data' => $shopDetail,
-    ]);
-  }
-
-  public function getRevenueByShop(Request $request, $shop_id)
-  {
-    $year = $request->get('year', Carbon::now()->year); // Lấy năm từ request hoặc sử dụng năm hiện tại
-
-    // Khởi tạo mảng để chứa dữ liệu theo tháng
-    $salesData = array_fill(0, 12, ['name' => '', 'revenue' => 0]);
-
-    // Tên các tháng
-    $monthNames = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-    ];
-
-    foreach ($monthNames as $index => $month) {
-      $monthStart = Carbon::create($year, $index + 1, 1)->startOfMonth();
-      $monthEnd = $monthStart->copy()->endOfMonth();
-
-      // Lấy tổng doanh thu từ sub_orders
-      $revenueData = SubOrder::where('shop_id', $shop_id)
-        ->whereBetween('created_at', [$monthStart, $monthEnd])
-        ->sum('sub_total_prices');
-
-      $salesData[$index] = [
-        'name' => $month,
-        'revenue' => (float)$revenueData, // Ép kiểu về số thực
-      ];
-    }
-
-    return response()->json([
-      'message' => 'Revenue retrieved successfully!',
-      'status' => 200,
-      'data' => $salesData
-    ]);
-  }
-
-  public function getRatingByShop(Request $request, $shop_id)
+  public function getRatingByMedicalCenter(Request $request, $medical_center_id)
   {
     $user = auth()->user();
     $role_user = DB::table('roles')->where('id', '=', $user->role_id)->value('role_name');
 
-    // Lấy thông tin shop của user nếu role là shop
-    if ($role_user === 'ROLE_SHOP') {
-      $auth_shop_id = DB::table('shops')->where('account_id', '=', $user->id)->value('id');
+    // Lấy thông tin medical_center của user nếu role là medical_center
+    if ($role_user === 'ROLE_MEDICAL_CENTER') {
+      $auth_medical_center_id = DB::table('medical_centers')->where('account_id', '=', $user->id)->value('id');
     }
 
-    // Nếu role là shop và shop_id không phải shop của user, trả về lỗi
-    if ($role_user === 'ROLE_SHOP' && $auth_shop_id !== $shop_id) {
+    // Nếu role là medical_center và medical_center_id không phải medical_center của user, trả về lỗi
+    if ($role_user === 'ROLE_MEDICAL_CENTER' && $auth_medical_center_id !== $medical_center_id) {
       return response()->json([
-        'message' => 'You do not have access to this shop.',
+        'message' => 'You do not have access to this medical_center.',
       ], 403); // 403 Forbidden
     }
 
-    // Lấy thông tin của shop
-    $shop = Shop::withTrashed()->with('account')->find($shop_id);
-    if (!$shop) {
+    // Lấy thông tin của medical_center
+    $medical_center = MedicalCenter::withTrashed()->with('account')->find($medical_center_id);
+    if (!$medical_center) {
       return response()->json([
-        'message' => 'Shop not found!',
+        'message' => 'Medical center not found!',
         'status' => 404
       ], 404);
     }
 
-    // Lấy rating của shop cụ thể
-    $ratings = RatingShop::with(['customer.account', 'customer.ratings', 'interacts.account'])
-      ->where('shop_id', $shop_id)
+    // Lấy rating của medical_center cụ thể
+    $ratings = RatingMedicalCenter::with(['customer.account', 'customer.ratings', 'interacts.account'])
+      ->where('medical_center_id', $medical_center_id)
       ->orderBy('created_at', 'desc')
       ->get()
-      ->map(function ($rating) use ($user, $shop) {
+      ->map(function ($rating) use ($user, $medical_center) {
         $customer = $rating->customer;
         $account = $customer->account;
 
@@ -399,8 +320,8 @@ class AdminController extends Controller
           ];
         });
 
-        // Kiểm tra xem shop có nằm trong danh sách likes hay không
-        $shop_liked = $rating->interacts->contains('account_id', $user->id);
+        // Kiểm tra xem medical_center có nằm trong danh sách likes hay không
+        $medical_center_liked = $rating->interacts->contains('account_id', $user->id);
 
         return [
           'rating_id' => $rating->id,
@@ -414,10 +335,10 @@ class AdminController extends Controller
           'account_creation_date' => $account->created_at,
           'customer_rating_count' => $customer->ratings->count(),
           'customer_ranking_point' => $customer->ranking_point ?? 0,
-          'shop_avatar' => $shop->account->avatar, // Thêm trường shop_avatar vào từng đánh giá
+          'medical_center_avatar' => $medical_center->account->avatar,
           'likes' => [
             'total_likes' => $rating->interacts->count(),
-            'shop_liked' => $shop_liked,
+            'medical_center_liked' => $medical_center_liked,
             'details' => $likes,
           ]
         ];
@@ -443,8 +364,53 @@ class AdminController extends Controller
     ]);
   }
 
-  // Phê duyệt shop
-  public function approvedShop($account_id)
+  public function getMedicalCenterDetail($medical_center_id)
+  {
+    // Tìm kiếm medical center bằng id
+    $medical_center = MedicalCenter::withTrashed()->find($medical_center_id);
+
+    // Nếu không tìm thấy medical center, trả về lỗi
+    if (!$medical_center) {
+      return response()->json([
+        'message' => 'Medical center not found',
+        'status' => 404,
+      ], 404);
+    }
+
+    $ratingData = $medical_center->calculateMedicalCenterRating();
+
+    // Định dạng dữ liệu medical center để trả về
+    $shopDetail = [
+      'id' => $medical_center->id,
+      'username' => $medical_center->account->username,
+      'email' => $medical_center->account->email,
+      'avatar' => $medical_center->account->avatar,
+      'name' => $medical_center->name,
+      'description' => $medical_center->description,
+      'image' => $medical_center->image,
+      'phone' => $medical_center->phone,
+      'address' => $medical_center->address,
+      'website' => $medical_center->website,
+      'fanpage' => $medical_center->fanpage,
+      'work_time' => $medical_center->work_time,
+      'establish_year' => $medical_center->establish_year,
+      'certificate' => $medical_center->certificate,
+      'rating' => $ratingData['average'],
+      'rating_count' => $ratingData['count'],
+      'created_at' => $medical_center->created_at,
+      'updated_at' => $medical_center->updated_at,
+    ];
+
+    // Trả về JSON response
+    return response()->json([
+      'message' => 'Medical center detail retrieved successfully!',
+      'status' => 200,
+      'data' => $shopDetail,
+    ]);
+  }
+
+  // Phê duyệt medical center
+  public function approveMedicalCenter($account_id)
   {
     // Tìm tài khoản với account_id
     $account = Account::find($account_id);
@@ -456,12 +422,12 @@ class AdminController extends Controller
       ], 404);
     }
 
-    // Kiểm tra xem tài khoản có role_id là ROLE_SHOP hay không
+    // Kiểm tra xem tài khoản có role_id là ROLE_MEDICAL_CENTER hay không
     $roleName = DB::table('roles')->where('id', $account->role_id)->value('role_name');
 
-    if ($roleName !== 'ROLE_SHOP') {
+    if ($roleName !== 'ROLE_MEDICAL_CENTER') {
       return response()->json([
-        'message' => 'Account is not a shop!',
+        'message' => 'Account is not a medical center!',
         'status' => 400
       ], 400);
     }
@@ -477,8 +443,8 @@ class AdminController extends Controller
     ]);
   }
 
-  // Chặn shop
-  public function blockShop(Request $request, $account_id)
+  // Chặn medical center
+  public function blockMedicalCenter($account_id)
   {
     // Tìm tài khoản với account_id
     $account = Account::find($account_id);
@@ -490,12 +456,12 @@ class AdminController extends Controller
       ], 404);
     }
 
-    // Kiểm tra xem tài khoản có role_id là ROLE_SHOP hay không
+    // Kiểm tra xem tài khoản có role_id là ROLE_MEDICAL_CENTER hay không
     $roleName = DB::table('roles')->where('id', $account->role_id)->value('role_name');
 
-    if ($roleName !== 'ROLE_SHOP') {
+    if ($roleName !== 'ROLE_MEDICAL_CENTER') {
       return response()->json([
-        'message' => 'Account is not a shop!',
+        'message' => 'Account is not a medical center!',
         'status' => 400
       ], 400);
     }
@@ -504,12 +470,12 @@ class AdminController extends Controller
     $account->enabled = false;
     $account->save();
 
-    // Cập nhật shop tương ứng
-    $shop = Shop::where('account_id', $account_id)->first();
+    // Cập nhật medical center tương ứng
+    $medical_center = MedicalCenter::where('account_id', $account_id)->first();
 
-    if ($shop) {
-      $shop->deleted_at = now();
-      $shop->save();
+    if ($medical_center) {
+      $medical_center->deleted_at = now();
+      $medical_center->save();
     }
 
     return response()->json([
@@ -518,8 +484,7 @@ class AdminController extends Controller
     ]);
   }
 
-  // Chặn shop
-  public function restoreShop(Request $request, $account_id)
+  public function restoreMedicalCenter($account_id)
   {
     // Tìm tài khoản với account_id
     $account = Account::find($account_id);
@@ -531,25 +496,28 @@ class AdminController extends Controller
       ], 404);
     }
 
-    // Kiểm tra xem tài khoản có role_id là ROLE_SHOP hay không
+    // Kiểm tra xem tài khoản có role_id là ROLE_MEDICAL_CENTER hay không
     $roleName = DB::table('roles')->where('id', $account->role_id)->value('role_name');
 
-    if ($roleName !== 'ROLE_SHOP') {
+    if ($roleName !== 'ROLE_MEDICAL_CENTER') {
       return response()->json([
-        'message' => 'Account is not a shop!',
+        'message' => 'Account is not a medical center!',
         'status' => 400
       ], 400);
     }
 
-    // Chặn tài khoản
-    $account->enabled = true;
-    $account->save();
+    // Nếu is_approved = false => tk này đc xoá trước khi được approve
+    if ($account->is_approved) {
+      // Chặn tài khoản
+      $account->enabled = true;
+      $account->save();
+    }
 
-    // Cập nhật shop tương ứng
-    $shop = Shop::withTrashed()->where('account_id', $account_id)->first();
+    // Cập nhật medical center tương ứng
+    $medical_center = MedicalCenter::withTrashed()->where('account_id', $account_id)->first();
 
-    if ($shop) {
-      $shop->restore();
+    if ($medical_center) {
+      $medical_center->restore();
     }
 
     return response()->json([

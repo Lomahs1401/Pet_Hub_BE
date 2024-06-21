@@ -1,8 +1,11 @@
 <?php
 
 use App\Http\Controllers\API\AccountController;
+use App\Http\Controllers\API\AdminAidCenterController;
 use App\Http\Controllers\API\AdminController;
 use App\Http\Controllers\API\AdminDashboardController;
+use App\Http\Controllers\API\AdminMedicalCenterController;
+use App\Http\Controllers\API\AdminShopController;
 use App\Http\Controllers\API\AppointmentController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\BlogController;
@@ -18,6 +21,7 @@ use App\Http\Controllers\API\OrderController;
 use App\Http\Controllers\API\PetController;
 use App\Http\Controllers\API\ProductCategoryController;
 use App\Http\Controllers\API\ProductController;
+use App\Http\Controllers\API\RatingMedicalCenterController;
 use App\Http\Controllers\API\RatingProductController;
 use App\Http\Controllers\API\RatingShopController;
 use App\Http\Controllers\API\ServiceController;
@@ -323,28 +327,38 @@ Route::group([
   Route::get('/popular-products', [ShopDashboardController::class, 'getPopularProduct']);
 
   // --------------     SHOP     --------------
-  Route::get('/shops', [AdminController::class, 'getShops']);
-  Route::get('/shops/not-approved', [AdminController::class, 'getShopsNotApproved']);
-  Route::get('/shops/blocked', [AdminController::class, 'getShopsBlocked']);
-  Route::get('/shops/{shop_id}', [AdminController::class, 'getShopDetail']);
-  Route::get('/shops/revenue/{shop_id}', [AdminController::class, 'getRevenueByShop']);
-  Route::get('/shops/rating/{shop_id}', [AdminController::class, 'getRatingByShop']);
-  Route::get('/shops/rating/{shop_id}/detail', [AdminController::class, 'getRatingByShop']);
+  Route::get('/shops', [AdminShopController::class, 'getShops']);
+  Route::get('/shops/waiting-approve', [AdminShopController::class, 'getShopsWaitingApprove']);
+  Route::get('/shops/blocked', [AdminShopController::class, 'getShopsBlocked']);
+  Route::get('/shops/revenue/{shop_id}', [AdminShopController::class, 'getRevenueByShop']);
+  Route::get('/shops/rating/{shop_id}', [AdminShopController::class, 'getRatingByShop']);
+  Route::patch('/shops/approve/{account_id}', [AdminShopController::class, 'approveShop']);
+  Route::patch('/shops/block/{account_id}', [AdminShopController::class, 'blockShop']);
+  Route::patch('/shops/restore/{account_id}', [AdminShopController::class, 'restoreShop']);
+  Route::get('/shops/{shop_id}', [AdminShopController::class, 'getShopDetail']);
 
-  Route::patch('/shops/approved/{account_id}', [AdminController::class, 'approvedShop']);
-  Route::patch('/shops/block/{account_id}', [AdminController::class, 'blockShop']);
-  Route::patch('/shops/restore/{account_id}', [AdminController::class, 'restoreShop']);
+  // --------------     MEDICAL CENTER     --------------
+  Route::get('/medical-centers', [AdminMedicalCenterController::class, 'getMedicalCenters']);
+  Route::get('/medical-centers/waiting-approve', [AdminMedicalCenterController::class, 'getMedicalCentersWaitingApproved']);
+  Route::get('/medical-centers/blocked', [AdminMedicalCenterController::class, 'getMedicalCentersBlocked']);
+  Route::get('/medical-centers/{medical_center_id}', [AdminMedicalCenterController::class, 'getMedicalCenterDetail']);
+  Route::get('/medical-centers/rating/{medical_center_id}', [AdminMedicalCenterController::class, 'getRatingByMedicalCenter']);
+  Route::patch('/medical-centers/approve/{account_id}', [AdminMedicalCenterController::class, 'approveMedicalCenter']);
+  Route::patch('/medical-centers/block/{account_id}', [AdminMedicalCenterController::class, 'blockMedicalCenter']);
+  Route::patch('/medical-centers/restore/{account_id}', [AdminMedicalCenterController::class, 'restoreMedicalCenter']);
+  Route::get('/medical-centers/{medical_center_id}', [AdminMedicalCenterController::class, 'getMedicalCenterDetail']);
+
+  // --------------     AID CENTER     --------------
+  Route::get('/aid-centers', [AdminAidCenterController::class, 'getAidCenters']);
+  Route::get('/aid-centers/waiting-approve', [AdminAidCenterController::class, 'getAidCentersWaitingApproved']);
+  Route::get('/aid-centers/blocked', [AdminAidCenterController::class, 'getAidCentersBlocked']);
+  Route::get('/aid-centers/{aid_center_id}', [AdminAidCenterController::class, 'getAidCenterDetail']);
+  Route::patch('/aid-centers/approve/{account_id}', [AdminAidCenterController::class, 'approvedAidCenter']);
+  Route::patch('/aid-centers/block/{account_id}', [AdminAidCenterController::class, 'blockAidCenter']);
+  Route::patch('/aid-centers/restore/{account_id}', [AdminAidCenterController::class, 'restoreAidCenter']);
 
   // --------------     RATING DETAIL     --------------
   Route::get('/ratings/shop/{shop_id}/detail', [RatingShopController::class, 'getDetailRating']);
-
-  // --------------     MEDICAL CENTER     --------------
-  Route::patch('/medical-centers/approved/{account_id}', [AdminController::class, 'approvedMedicalCenter']);
-  Route::patch('/medical-centers/block/{account_id}', [AdminController::class, 'blockMedicalCenter']);
-  Route::patch('/medical-centers/restore/{account_id}', [AdminController::class, 'restoreMedicalCenter']);
-
-  // --------------     AID CENTER     --------------
-  Route::patch('/aid-centers/approved/{account_id}', [AdminController::class, 'approvedAidCenter']);
-  Route::patch('/aid-centers/block/{account_id}', [AdminController::class, 'blockAidCenter']);
-  Route::patch('/aid-centers/restore/{account_id}', [AdminController::class, 'restoreAidCenter']);
+  Route::get('/ratings/medical-centers/{medical_center_id}/detail', [RatingMedicalCenterController::class, 'getDetailRating']);
+  Route::get('/ratings/aid-centers/{aid_center_id}/detail', [RatingShopController::class, 'getDetailRating']);
 });
