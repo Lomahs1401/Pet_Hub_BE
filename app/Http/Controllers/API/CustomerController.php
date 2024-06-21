@@ -11,6 +11,53 @@ use Illuminate\Validation\Rule;
 
 class CustomerController extends Controller
 {
+  public function getProfile()
+  {
+    // Xác thực người dùng là khách hàng
+    $customer = auth()->user();
+
+    // Lấy thông tin khách hàng từ cơ sở dữ liệu
+    $customerProfile = Customer::with('account')->find($customer->id);
+
+    if (!$customerProfile) {
+      return response()->json([
+        'message' => 'Customer not found',
+        'status' => 404
+      ], 404);
+    }
+
+    // Định dạng dữ liệu trả về
+    $profileData = [
+      'id' => $customerProfile->id,
+      'full_name' => $customerProfile->full_name,
+      'gender' => $customerProfile->gender,
+      'birthdate' => $customerProfile->birthdate,
+      'address' => $customerProfile->address,
+      'phone' => $customerProfile->phone,
+      'ranking_point' => $customerProfile->ranking_point,
+      'account' => [
+        'id' => $customerProfile->account->id,
+        'username' => $customerProfile->account->username,
+        'email' => $customerProfile->account->email,
+        'avatar' => $customerProfile->account->avatar,
+        'enabled' => $customerProfile->account->enabled,
+        'is_approved' => $customerProfile->account->is_approved,
+        'role_id' => $customerProfile->account->role_id,
+        'created_at' => $customerProfile->account->created_at,
+        'updated_at' => $customerProfile->account->updated_at,
+      ],
+      'created_at' => $customerProfile->created_at,
+      'updated_at' => $customerProfile->updated_at,
+    ];
+
+    // Trả về JSON response
+    return response()->json([
+      'message' => 'Profile retrieved successfully!',
+      'status' => 200,
+      'data' => $profileData,
+    ]);
+  }
+
   public function updateCustomer(Request $request)
   {
     $customer_id = auth()->user()->customer->id;
@@ -25,16 +72,6 @@ class CustomerController extends Controller
       ], 404);
     }
 
-    // Kiểm tra riêng xem email có bị trùng lặp hay không
-    $email = $request->input('email');
-    $existingAccount = Account::where('email', $email)->where('id', '!=', $customer->account_id)->first();
-    if ($existingAccount) {
-      return response()->json([
-        'message' => 'The email has already been taken.',
-        'status' => 422
-      ], 422);
-    }
-
     // Xác thực dữ liệu
     $validatedData = $request->validate([
       'full_name' => 'required|string',
@@ -44,7 +81,6 @@ class CustomerController extends Controller
       'phone' => ['required', 'string', Rule::unique('customers')->ignore($customer->id)],
       'avatar' => 'nullable|string',
       'username' => 'required|string',
-      'email' => 'required|email',
     ]);
 
     // Cập nhật shop
@@ -60,7 +96,6 @@ class CustomerController extends Controller
     $account = Account::findOrFail($customer->account_id);
     $account->update([
       'username' => $validatedData['username'],
-      'email' => $validatedData['email'],
       'avatar' => $validatedData['avatar'],
     ]);
 

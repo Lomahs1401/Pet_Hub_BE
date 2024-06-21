@@ -22,7 +22,17 @@ class HistoryAdopt extends Model
    * @var array<int, string>
    */
   protected $fillable = [
-      'customer_id',
-      'pet_id',
+    'customer_id',
+    'pet_id',
   ];
+
+  public function customer()
+  {
+    return $this->belongsTo(Customer::class);
+  }
+
+  public function pet()
+  {
+    return $this->belongsTo(Pet::class);
+  }
 }

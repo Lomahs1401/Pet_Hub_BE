@@ -40,4 +40,9 @@ class AidCenter extends Model
   {
     return $this->belongsTo(Account::class);
   }
+
+  public function pets()
+  {
+    return $this->hasMany(Pet::class, 'aid_center_id');
+  }
 }

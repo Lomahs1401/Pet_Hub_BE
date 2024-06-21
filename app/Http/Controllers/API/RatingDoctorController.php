@@ -3,29 +3,28 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Models\MedicalCenter;
-use App\Models\RatingMedicalCenter;
+use App\Models\RatingDoctor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class RatingMedicalCenterController extends Controller
+class RatingDoctorController extends Controller
 {
-  public function getCustomerRatingsOfMedicalCenterId(Request $request, $medical_center_id)
+  public function getCustomerRatingsOfDoctorId(Request $request, $doctor_id)
   {
-    // Kiểm tra xem medical center có tồn tại hay không
-    $medicalCenterExists = DB::table('medical_centers')->where('id', $medical_center_id)->exists();
+    // Kiểm tra xem doctor có tồn tại hay không
+    $doctorExists = DB::table('doctors')->where('id', $doctor_id)->exists();
 
-    if (!$medicalCenterExists) {
+    if (!$doctorExists) {
       return response()->json([
-        'message' => 'Medical center not found!',
+        'message' => 'Doctor not found!',
         'status' => 404
       ], 404);
     }
 
     $user = auth()->user();
 
-    $ratings = RatingMedicalCenter::with(['customer.account', 'customer.ratings', 'interacts.account'])
-      ->where('medical_center_id', $medical_center_id)
+    $ratings = RatingDoctor::with(['customer.account', 'customer.ratings', 'interacts.account'])
+      ->where('doctor_id', $doctor_id)
       ->orderBy('created_at', 'desc')
       ->get()
       ->map(function ($rating) use ($user) {
@@ -84,70 +83,15 @@ class RatingMedicalCenterController extends Controller
     ]);
   }
 
-  public function getDetailRating($shop_id)
-  {
-    $shop = MedicalCenter::withTrashed()->find($shop_id);
-    if (!$shop) {
-      return response()->json([
-        'message' => 'Medical center not found!',
-        'status' => 404
-      ], 404);
-    }
-
-    // Lấy số lượng rating cho từng mức điểm từ 1 đến 5
-    $ratings = RatingMedicalCenter::select('rating', DB::raw('count(*) as count'))
-      ->where('medical_center_id', $shop_id)
-      ->groupBy('rating')
-      ->orderBy('rating', 'desc')
-      ->get();
-
-    // Tạo một mảng để lưu số lượng các rating từ 1 đến 5 sao
-    $ratingCounts = [
-      'five_star' => 0,
-      'four_star' => 0,
-      'three_star' => 0,
-      'two_star' => 0,
-      'one_star' => 0,
-    ];
-
-    // Cập nhật số lượng rating vào mảng
-    foreach ($ratings as $rating) {
-      switch ($rating->rating) {
-        case 5:
-          $ratingCounts['five_star'] = $rating->count;
-          break;
-        case 4:
-          $ratingCounts['four_star'] = $rating->count;
-          break;
-        case 3:
-          $ratingCounts['three_star'] = $rating->count;
-          break;
-        case 2:
-          $ratingCounts['two_star'] = $rating->count;
-          break;
-        case 1:
-          $ratingCounts['one_star'] = $rating->count;
-          break;
-      }
-    }
-
-    // Trả về kết quả dưới dạng JSON
-    return response()->json([
-      'message' => 'Query successfully!',
-      'status' => 200,
-      'data' => $ratingCounts
-    ]);
-  }
-
   // ====================================     For Customer     ====================================
-  public function createRatingMedicalCenter(Request $request, $medical_center_id)
+  public function createRatingDoctor(Request $request, $doctor_id)
   {
-    // Kiểm tra xem medical center có tồn tại hay không
-    $medicalCenterExists = DB::table('medical_centers')->where('id', $medical_center_id)->exists();
+    // Kiểm tra xem doctor có tồn tại hay không
+    $doctorExists = DB::table('doctors')->where('id', $doctor_id)->exists();
 
-    if (!$medicalCenterExists) {
+    if (!$doctorExists) {
       return response()->json([
-        'message' => 'Medical center not found!',
+        'message' => 'Doctor not found!',
         'status' => 404
       ], 404);
     }
@@ -164,23 +108,23 @@ class RatingMedicalCenterController extends Controller
       'description.string' => 'The description must be a valid string.',
     ]);
 
-    $rating = new RatingMedicalCenter();
+    $rating = new RatingDoctor();
     $rating->rating = $validatedData['rating'];
     $rating->description = $validatedData['description'];
     $rating->customer_id = auth()->user()->id;
-    $rating->medical_center_id = $medical_center_id;
+    $rating->doctor_id = $doctor_id;
     $rating->save();
 
     return response()->json([
-      'message' => 'Medical center rated successfully!',
+      'message' => 'Doctor rated successfully!',
       'data' => $rating,
     ], 201);
   }
 
-  public function updateRatingMedicalCenter(Request $request, $rating_id)
+  public function updateRatingDoctor(Request $request, $rating_id)
   {
     // Kiểm tra xem rating có tồn tại hay không
-    $rating = RatingMedicalCenter::find($rating_id);
+    $rating = RatingDoctor::find($rating_id);
 
     if (!$rating) {
       return response()->json([
@@ -218,10 +162,10 @@ class RatingMedicalCenterController extends Controller
     ], 200);
   }
 
-  public function deleteRatingMedicalCenter($rating_id)
+  public function deleteRatingDoctor($rating_id)
   {
     // Kiểm tra xem rating có tồn tại hay không
-    $rating = RatingMedicalCenter::find($rating_id);
+    $rating = RatingDoctor::find($rating_id);
 
     if (!$rating) {
       return response()->json([

@@ -38,7 +38,17 @@ class Pet extends Model
 
   public function breed()
   {
-    return $this->belongsTo(Breed::class);
+    return $this->belongsTo(Breed::class, 'breed_id');
+  }
+
+  public function aidCenter()
+  {
+    return $this->belongsTo(AidCenter::class, 'aid_center_id');
+  }
+
+  public function customer()
+  {
+    return $this->belongsTo(Customer::class, 'customer_id');
   }
 
   public function historyAdoptions()
@@ -51,16 +61,9 @@ class Pet extends Model
     return $this->hasMany(HistoryVaccine::class);
   }
 
-
   public function historyDiagnosis()
   {
     return $this->hasMany(HistoryDiagnosis::class);
-  }
-
-
-  public function customer()
-  {
-    return $this->belongsTo(Customer::class);
   }
 
   public function getIsPurebredAttribute($value)

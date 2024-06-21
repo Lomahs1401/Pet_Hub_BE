@@ -6,6 +6,7 @@ use App\Http\Controllers\API\AdminController;
 use App\Http\Controllers\API\AdminDashboardController;
 use App\Http\Controllers\API\AdminMedicalCenterController;
 use App\Http\Controllers\API\AdminShopController;
+use App\Http\Controllers\API\AidCenterController;
 use App\Http\Controllers\API\AppointmentController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\BlogController;
@@ -21,6 +22,7 @@ use App\Http\Controllers\API\OrderController;
 use App\Http\Controllers\API\PetController;
 use App\Http\Controllers\API\ProductCategoryController;
 use App\Http\Controllers\API\ProductController;
+use App\Http\Controllers\API\RatingDoctorController;
 use App\Http\Controllers\API\RatingMedicalCenterController;
 use App\Http\Controllers\API\RatingProductController;
 use App\Http\Controllers\API\RatingShopController;
@@ -76,6 +78,7 @@ Route::group([
   'prefix' => 'customer',
 ], function ($router) {
   // --------------     CUSTOMER     --------------
+  Route::get('/profile', [CustomerController::class, 'getProfile']);
   Route::put('/profile', [CustomerController::class, 'updateCustomer']);
 
   // --------------     PRODUCT     --------------
@@ -129,39 +132,34 @@ Route::group([
   Route::post('/interacts/blog/{blog_id}', [InteractController::class, 'interactBlog']);
   Route::post('/interacts/comment/{comment_id}', [InteractController::class, 'interactComment']);
 
-  // --------------     SERVICE     --------------
-  Route::get('/services', [ServiceController::class, 'index']); // lấy tất cả service
-  Route::get('/services/medical-center/{medical_center_id}', [ServiceController::class, 'getListServiceByMedicalCenterId']); // lấy dsach các service được cung cấp bởi trung tâm y tế
-  Route::get('/services/medical-center/{medical_center_id}/total', [ServiceController::class, 'getNumberOfServiceByMedicalCenterId']); // lấy số lượng service mà trung tâm y tế cung cấp
-  Route::get('/services/category/{category_id}', [ServiceController::class, 'getListServiceByCategoryId']); // lấy dsach các service thuộc category
-  Route::get('/services/category/{category_id}/total', [ServiceController::class, 'getNumberOfServiceByCategoryId']); // lấy số lượng service thuộc category
-  Route::get('/services/medical-center/distinct/category/{category_id}', [ServiceController::class, 'getNumberOfMedicalCetnterProvideServiceByCategory']); // lấy số lượng các medical center cung cấp service thuộc category
-  Route::get('/services/medical-center/{medical_center_id}/category/{category_id}', [ServiceController::class, 'getListServiceWithMedicalCenterAndCategory']); // lấy ds các service được cung cấp bởi medical center và thuộc category_id
-  Route::get('/services/medical-center/{medical_center_id}/category/{category_id}/total', [ServiceController::class, 'getNumberOfServiceWithMedicalCenterAndCategory']); // lấy số lượng service được cung cấp bởi medical center và thuộc category_id
-  Route::get('/services/sort', [ServiceController::class, 'sortServicesByPrice']);
-  Route::get('/services/search', [ServiceController::class, 'searchService']);
-  // --------------     SERVICE PAGINATION     --------------
-  Route::get('/services/paginate', [ServiceController::class, 'paging']); // lấy ds service có phân trang (query param: page_number, num_of_page, target)
-  Route::get('/services/best-selling', [ServiceController::class, 'getBestSellingService']); // lấy ds service bán chạy (ko ràng buộc bởi medical center và category)
-  Route::get('/services/best-selling/medical-center/{medical_center_id}', [ServiceController::class, 'getBestSellingServiceByMedicalCenter']); // lấy ds service bán chạy bởi medical center
-  Route::get('/services/best-selling/category/{category_id}', [ServiceController::class, 'getBestSellingServiceByCategory']); // lấy ds service bán chạy thuộc category
-  Route::get('/services/best-selling/medical-center/{medical_center_id}/category/{category_id}', [ServiceController::class, 'getBestSellingServicetWithMedicalCenterAndCategory']); // lấy ds service bán chạy bởi medical center và thuộc category
-  Route::get('/services/highest-rating', [ServiceController::class, 'getHighestRatingService']); // lấy ds service được đánh giá cao nhất (ko ràng buộc bởi medical center và category)
-  Route::get('/services/highest-rating/medical-center/{medical_center_id}', [ServiceController::class, 'getHighestRatingServiceByMedicalCenter']); // lấy ds service có điểm đánh giá cao nhất thuộc medical center
-  Route::get('/services/highest-rating/category/{category_id}', [ServiceController::class, 'getHighestRatingServiceByCategory']); // lấy ds service có điểm đánh giá cao nhất thuộc category
-  Route::get('/services/highest-rating/medical-center/{medical_center_id}/category/{category_id}', [ServiceController::class, 'getHighestRatingServiceWithMedicalCenterAndCategory']); // lấy ds service có điểm đánh giá cao nhất thuộc medical center và category
-  // --------------     SERVICE SOFT DELETE     --------------
-  Route::get('/services/deleted', [ServiceController::class, 'getDeletedServices']);
-  Route::put('/services/{id}/restore', [ServiceController::class, 'restore']);
-  // ------------------------------------------------
-  Route::get('/services/{id}', [ServiceController::class, 'show']);
-  Route::post('/services', [ServiceController::class, 'store']);
-  Route::put('/services/{id}', [ServiceController::class, 'update']);
-  Route::delete('/services/{id}', [ServiceController::class, 'destroy']);
-
-
   // --------------     RATING     --------------
   Route::get('/ratings/product/{product_id}', [RatingProductController::class, 'getCustomerRatingsOfProductId']); // lấy dsach rating của customer theo product id
+  Route::get('/ratings/shop/{shop_id}', [RatingShopController::class, 'getCustomerRatingsOfShopId']); // lấy dsach rating của customer theo shop id
+  Route::get('/ratings/doctor/{doctor_id}', [RatingDoctorController::class, 'getCustomerRatingsOfDoctorId']); // lấy dsach rating của customer theo doctor id
+  Route::get('/ratings/medical-center/{medical_center_id}', [RatingMedicalCenterController::class, 'getCustomerRatingsOfMedicalCenterId']); // lấy dsach rating của customer theo medical center id
+
+  Route::post('/ratings/product/{product_id}', [RatingProductController::class, 'createRatingProduct']);
+  Route::patch('/ratings/{rating_id}/product', [RatingProductController::class, 'updateRatingProduct']);
+  Route::delete('/ratings/{rating_id}/product', [RatingProductController::class, 'deleteRatingProduct']);
+
+  Route::post('/ratings/shop/{shop_id}', [RatingShopController::class, 'createRatingShop']);
+  Route::patch('/ratings/{rating_id}/shop', [RatingShopController::class, 'updateRatingShop']);
+  Route::delete('/ratings/{rating_id}/shop', [RatingShopController::class, 'deleteRatingShop']);
+
+  Route::post('/ratings/doctor/{doctor_id}', [RatingDoctorController::class, 'createRatingDoctor']);
+  Route::patch('/ratings/{rating_id}/doctor', [RatingDoctorController::class, 'updateRatingDoctor']);
+  Route::delete('/ratings/{rating_id}/doctor', [RatingDoctorController::class, 'deleteRatingDoctor']);
+  
+  Route::post('/ratings/medical-center/{medical_center_id}', [RatingMedicalCenterController::class, 'createRatingMedicalCenter']);
+  Route::patch('/ratings/{rating_id}/medical-center', [RatingMedicalCenterController::class, 'updateRatingMedicalCenter']);
+  Route::delete('/ratings/{rating_id}/medical-center', [RatingMedicalCenterController::class, 'deleteRatingMedicalCenter']);
+
+  // --------------     AID CENTER     --------------
+  Route::get('/unadopted-pets', [AidCenterController::class, 'getUnadoptedPets']);
+  Route::get('/unadopted-pets/{pet_id}', [AidCenterController::class, 'getDetailUnadpotedPet']);
+  Route::get('/my-adopted-pets', [AidCenterController::class, 'getMyAdoptedPets']);
+  Route::get('/my-adopted-pets/{pet_id}', [AidCenterController::class, 'getDetailMyAdoptedPets']);
+  Route::post('/adopt-pet/{pet_id}', [AidCenterController::class, 'adoptPet']);
 
   // --------------     MEDICAL CENTER　PAGINATION     --------------
   Route::get('/medical-centers/paginate', [MedicalCenterController::class, 'paging']);
