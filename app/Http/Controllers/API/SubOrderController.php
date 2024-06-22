@@ -25,7 +25,7 @@ class SubOrderController extends Controller
     $num_of_page = intval($request->query('num_of_page', 10));
 
     // Truy vấn danh sách các suborders có trạng thái là 'Done' và thuộc về customer đang đăng nhập
-    $query = SubOrder::with(['order.cart.cartItem.product.shop.account', 'shop.account'])
+    $query = SubOrder::with(['order.cart.cartItem.product.shop'])
       ->whereHas('order', function ($query) use ($customer) {
         $query->where('customer_id', $customer->id);
       })
@@ -43,28 +43,25 @@ class SubOrderController extends Controller
 
     // Chuẩn bị dữ liệu trả về
     $result = $doneSubOrders->map(function ($subOrder) {
-      // Lấy các cart_items và nhóm theo shop
-      $shops = $subOrder->order->cart->cartItem->groupBy('product.shop_id')->map(function ($items, $shopId) {
-        $firstItem = $items->first();
+      // Lấy shop_id của sub_order
+      $shopId = $subOrder->order->cart->cartItem->first()->product->shop_id;
+
+      // Lấy các cart_items thuộc cùng shop với sub_order
+      $cartItems = $subOrder->order->cart->cartItem->filter(function ($item) use ($shopId) {
+        return $item->product->shop_id === $shopId;
+      })->map(function ($item) {
         return [
-          'shop_id' => $shopId,
-          'shop_name' => $firstItem->product->shop->name,
-          'shop_avatar' => $firstItem->product->shop->account->avatar,
-          'cart_items' => $items->map(function ($item) {
-            return [
-              'id' => $item->id,
-              'name' => $item->name,
-              'description' => $item->description,
-              'quantity' => $item->quantity,
-              'price' => $item->price,
-              'amount' => $item->amount,
-              'product_id' => $item->product_id,
-              'created_at' => $item->created_at,
-              'updated_at' => $item->updated_at,
-            ];
-          })->values()->all(),
+          'id' => $item->id,
+          'name' => $item->name,
+          'description' => $item->description,
+          'quantity' => $item->quantity,
+          'price' => $item->price,
+          'amount' => $item->amount,
+          'product_id' => $item->product_id,
+          'created_at' => $item->created_at,
+          'updated_at' => $item->updated_at,
         ];
-      })->values()->all();
+      });
 
       return [
         'sub_order_id' => $subOrder->id,
@@ -76,7 +73,7 @@ class SubOrderController extends Controller
         'transaction_order_id' => $subOrder->order->transaction_order_id,
         'created_at' => $subOrder->created_at,
         'updated_at' => $subOrder->updated_at,
-        'shops' => $shops,
+        'cart_items' => $cartItems->values()->all(),
       ];
     });
 
