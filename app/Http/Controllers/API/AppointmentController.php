@@ -7,6 +7,8 @@ use App\Models\Appointment;
 use App\Models\Doctor;
 use App\Models\MedicalCenter;
 use App\Models\Pet;
+use App\Models\RatingDoctor;
+use App\Models\RatingMedicalCenter;
 use Illuminate\Http\Request;
 
 class AppointmentController extends Controller
@@ -42,6 +44,38 @@ class AppointmentController extends Controller
 
     $formatted_appointments = [];
     foreach ($appointments as $appointment) {
+      $doctor = $appointment->doctor;
+      $medicalCenter = $doctor->medicalCenter;
+
+      // Kiểm tra đánh giá của bác sĩ
+      $doctorReview = RatingDoctor::where('customer_id', $customer_id)
+        ->where('doctor_id', $doctor->id)
+        ->first();
+
+      $doctorIsReviewed = $doctorReview !== null;
+      $doctorShopResponsed = $doctorIsReviewed && $doctorReview->reply !== null;
+      $doctorRatingInfo = $doctorIsReviewed ? [
+        'rated' => true,
+        'rating' => $doctorReview->rating,
+        'description' => $doctorReview->description,
+        'reply' => $doctorReview->reply,
+        'reply_date' => $doctorReview->reply_date,
+      ] : null;
+
+      // Kiểm tra đánh giá của trung tâm y tế
+      $medicalCenterReview = RatingMedicalCenter::where('customer_id', $customer_id)
+        ->where('medical_center_id', $medicalCenter->id)
+        ->first();
+
+      $medicalCenterIsReviewed = $medicalCenterReview !== null;
+      $medicalCenterShopResponsed = $medicalCenterIsReviewed && $medicalCenterReview->reply !== null;
+      $medicalCenterRatingInfo = $medicalCenterIsReviewed ? [
+        'rated' => true,
+        'rating' => $medicalCenterReview->rating,
+        'description' => $medicalCenterReview->description,
+        'reply' => $medicalCenterReview->reply,
+        'reply_date' => $medicalCenterReview->reply_date,
+      ] : null;
 
       $formatted_appointments[] = [
         'appointment_id' => $appointment->id,
@@ -56,16 +90,22 @@ class AppointmentController extends Controller
           'name' => $appointment->pet->name,
         ],
         'doctor' => [
-          'full_name' => $appointment->doctor->full_name,
-          'email' => $appointment->doctor->account->email,
-          'phone' => $appointment->doctor->phone,
+          'full_name' => $doctor->full_name,
+          'email' => $doctor->account->email,
+          'phone' => $doctor->phone,
+          'is_reviewed' => $doctorIsReviewed,
+          'doctor_responsed' => $doctorShopResponsed,
+          'rating_info' => $doctorRatingInfo
         ],
         'medical_center' => [
-          'name' => $appointment->doctor->medicalCenter->name,
-          'email' => $appointment->doctor->medicalCenter->email,
-          'image' => $appointment->doctor->medicalCenter->image,
-          'phone' => $appointment->doctor->medicalCenter->phone,
-          'address' => $appointment->doctor->medicalCenter->address,
+          'name' => $medicalCenter->name,
+          'email' => $medicalCenter->email,
+          'image' => $medicalCenter->image,
+          'phone' => $medicalCenter->phone,
+          'address' => $medicalCenter->address,
+          'is_reviewed' => $medicalCenterIsReviewed,
+          'medical_center_responsed' => $medicalCenterShopResponsed,
+          'rating_info' => $medicalCenterRatingInfo
         ]
       ];
     }
@@ -203,6 +243,39 @@ class AppointmentController extends Controller
 
     $formatted_appointments = [];
     foreach ($appointments as $appointment) {
+      $doctor = $appointment->doctor;
+      $medicalCenter = $doctor->medicalCenter;
+
+      // Kiểm tra đánh giá của bác sĩ
+      $doctorReview = RatingDoctor::where('customer_id', $customer_id)
+        ->where('doctor_id', $doctor->id)
+        ->first();
+
+      $doctorIsReviewed = $doctorReview !== null;
+      $doctorShopResponsed = $doctorIsReviewed && $doctorReview->reply !== null;
+      $doctorRatingInfo = $doctorIsReviewed ? [
+        'rated' => true,
+        'rating' => $doctorReview->rating,
+        'description' => $doctorReview->description,
+        'reply' => $doctorReview->reply,
+        'reply_date' => $doctorReview->reply_date,
+      ] : null;
+
+      // Kiểm tra đánh giá của trung tâm y tế
+      $medicalCenterReview = RatingMedicalCenter::where('customer_id', $customer_id)
+        ->where('medical_center_id', $medicalCenter->id)
+        ->first();
+
+      $medicalCenterIsReviewed = $medicalCenterReview !== null;
+      $medicalCenterShopResponsed = $medicalCenterIsReviewed && $medicalCenterReview->reply !== null;
+      $medicalCenterRatingInfo = $medicalCenterIsReviewed ? [
+        'rated' => true,
+        'rating' => $medicalCenterReview->rating,
+        'description' => $medicalCenterReview->description,
+        'reply' => $medicalCenterReview->reply,
+        'reply_date' => $medicalCenterReview->reply_date,
+      ] : null;
+
       $formatted_appointments[] = [
         'appointment_id' => $appointment->id,
         'start_time' => $appointment->start_time,
@@ -216,16 +289,22 @@ class AppointmentController extends Controller
           'name' => $appointment->pet->name,
         ],
         'doctor' => [
-          'full_name' => $appointment->doctor->full_name,
-          'email' => $appointment->doctor->account->email,
-          'phone' => $appointment->doctor->phone,
+          'full_name' => $doctor->full_name,
+          'email' => $doctor->account->email,
+          'phone' => $doctor->phone,
+          'is_reviewed' => $doctorIsReviewed,
+          'doctor_esponsed' => $doctorShopResponsed,
+          'rating_info' => $doctorRatingInfo,
         ],
         'medical_center' => [
-          'name' => $appointment->doctor->medicalCenter->name,
-          'email' => $appointment->doctor->medicalCenter->email,
-          'image' => $appointment->doctor->medicalCenter->image,
-          'phone' => $appointment->doctor->medicalCenter->phone,
-          'address' => $appointment->doctor->medicalCenter->address,
+          'name' => $medicalCenter->name,
+          'email' => $medicalCenter->email,
+          'image' => $medicalCenter->image,
+          'phone' => $medicalCenter->phone,
+          'address' => $medicalCenter->address,
+          'is_reviewed' => $medicalCenterIsReviewed,
+          'medical_center_responsed' => $medicalCenterShopResponsed,
+          'rating_info' => $medicalCenterRatingInfo,
         ]
       ];
     }
@@ -266,6 +345,39 @@ class AppointmentController extends Controller
 
     $formatted_appointments = [];
     foreach ($appointments as $appointment) {
+      $doctor = $appointment->doctor;
+      $medicalCenter = $doctor->medicalCenter;
+
+      // Kiểm tra đánh giá của bác sĩ
+      $doctorReview = RatingDoctor::where('customer_id', $customer_id)
+        ->where('doctor_id', $doctor->id)
+        ->first();
+
+      $doctorIsReviewed = $doctorReview !== null;
+      $doctorShopResponsed = $doctorIsReviewed && $doctorReview->reply !== null;
+      $doctorRatingInfo = $doctorIsReviewed ? [
+        'rated' => true,
+        'rating' => $doctorReview->rating,
+        'description' => $doctorReview->description,
+        'reply' => $doctorReview->reply,
+        'reply_date' => $doctorReview->reply_date,
+      ] : null;
+
+      // Kiểm tra đánh giá của trung tâm y tế
+      $medicalCenterReview = RatingMedicalCenter::where('customer_id', $customer_id)
+        ->where('medical_center_id', $medicalCenter->id)
+        ->first();
+
+      $medicalCenterIsReviewed = $medicalCenterReview !== null;
+      $medicalCenterShopResponsed = $medicalCenterIsReviewed && $medicalCenterReview->reply !== null;
+      $medicalCenterRatingInfo = $medicalCenterIsReviewed ? [
+        'rated' => true,
+        'rating' => $medicalCenterReview->rating,
+        'description' => $medicalCenterReview->description,
+        'reply' => $medicalCenterReview->reply,
+        'reply_date' => $medicalCenterReview->reply_date,
+      ] : null;
+
       $formatted_appointments[] = [
         'appointment_id' => $appointment->id,
         'start_time' => $appointment->start_time,
@@ -279,16 +391,22 @@ class AppointmentController extends Controller
           'name' => $appointment->pet->name,
         ],
         'doctor' => [
-          'full_name' => $appointment->doctor->full_name,
-          'email' => $appointment->doctor->account->email,
-          'phone' => $appointment->doctor->phone,
+          'full_name' => $doctor->full_name,
+          'email' => $doctor->account->email,
+          'phone' => $doctor->phone,
+          'is_reviewed' => $doctorIsReviewed,
+          'doctor_responsed' => $doctorShopResponsed,
+          'rating_info' => $doctorRatingInfo,
         ],
         'medical_center' => [
-          'name' => $appointment->doctor->medicalCenter->name,
-          'email' => $appointment->doctor->medicalCenter->email,
-          'image' => $appointment->doctor->medicalCenter->image,
-          'phone' => $appointment->doctor->medicalCenter->phone,
-          'address' => $appointment->doctor->medicalCenter->address,
+          'name' => $medicalCenter->name,
+          'email' => $medicalCenter->email,
+          'image' => $medicalCenter->image,
+          'phone' => $medicalCenter->phone,
+          'address' => $medicalCenter->address,
+          'is_reviewed' => $medicalCenterIsReviewed,
+          'medical_center_responsed' => $medicalCenterShopResponsed,
+          'rating_info' => $medicalCenterRatingInfo,
         ]
       ];
     }
@@ -328,6 +446,38 @@ class AppointmentController extends Controller
 
     $formatted_appointments = [];
     foreach ($appointments as $appointment) {
+      $doctor = $appointment->doctor;
+      $medicalCenter = $doctor->medicalCenter;
+
+      // Kiểm tra đánh giá của bác sĩ
+      $doctorReview = RatingDoctor::where('customer_id', $customer_id)
+        ->where('doctor_id', $doctor->id)
+        ->first();
+
+      $doctorIsReviewed = $doctorReview !== null;
+      $doctorShopResponsed = $doctorIsReviewed && $doctorReview->reply !== null;
+      $doctorRatingInfo = $doctorIsReviewed ? [
+        'rated' => true,
+        'rating' => $doctorReview->rating,
+        'description' => $doctorReview->description,
+        'reply' => $doctorReview->reply,
+        'reply_date' => $doctorReview->reply_date,
+      ] : null;
+
+      // Kiểm tra đánh giá của trung tâm y tế
+      $medicalCenterReview = RatingMedicalCenter::where('customer_id', $customer_id)
+        ->where('medical_center_id', $medicalCenter->id)
+        ->first();
+
+      $medicalCenterIsReviewed = $medicalCenterReview !== null;
+      $medicalCenterShopResponsed = $medicalCenterIsReviewed && $medicalCenterReview->reply !== null;
+      $medicalCenterRatingInfo = $medicalCenterIsReviewed ? [
+        'rated' => true,
+        'rating' => $medicalCenterReview->rating,
+        'description' => $medicalCenterReview->description,
+        'reply' => $medicalCenterReview->reply,
+        'reply_date' => $medicalCenterReview->reply_date,
+      ] : null;
 
       $formatted_appointments[] = [
         'appointment_id' => $appointment->id,
@@ -342,16 +492,22 @@ class AppointmentController extends Controller
           'name' => $appointment->pet->name,
         ],
         'doctor' => [
-          'full_name' => $appointment->doctor->full_name,
-          'email' => $appointment->doctor->account->email,
-          'phone' => $appointment->doctor->phone,
+          'full_name' => $doctor->full_name,
+          'email' => $doctor->account->email,
+          'phone' => $doctor->phone,
+          'is_reviewed' => $doctorIsReviewed,
+          'doctor_responsed' => $doctorShopResponsed,
+          'rating_info' => $doctorRatingInfo,
         ],
         'medical_center' => [
-          'name' => $appointment->doctor->medicalCenter->name,
-          'email' => $appointment->doctor->medicalCenter->email,
-          'image' => $appointment->doctor->medicalCenter->image,
-          'phone' => $appointment->doctor->medicalCenter->phone,
-          'address' => $appointment->doctor->medicalCenter->address,
+          'name' => $medicalCenter->name,
+          'email' => $medicalCenter->email,
+          'image' => $medicalCenter->image,
+          'phone' => $medicalCenter->phone,
+          'address' => $medicalCenter->address,
+          'is_reviewed' => $medicalCenterIsReviewed,
+          'medical_center_responsed' => $medicalCenterShopResponsed,
+          'rating_info' => $medicalCenterRatingInfo,
         ]
       ];
     }
