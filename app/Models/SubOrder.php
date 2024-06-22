@@ -37,4 +37,9 @@ class SubOrder extends Model
   {
     return $this->belongsTo(Order::class);
   }
+
+  public function cartItems()
+  {
+    return $this->hasManyThrough(CartItem::class, Order::class, 'id', 'cart_id', 'order_id', 'cart_id');
+  }
 }

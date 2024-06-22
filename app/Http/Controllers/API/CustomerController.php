@@ -94,10 +94,16 @@ class CustomerController extends Controller
 
     // Cập nhật thông tin tài khoản
     $account = Account::findOrFail($customer->account_id);
-    $account->update([
-      'username' => $validatedData['username'],
-      'avatar' => $validatedData['avatar'],
-    ]);
+    $accountData = [
+      'username' => $validatedData['username']
+    ];
+
+    // Nếu avatar được truyền từ client, cập nhật nó
+    if (isset($validatedData['avatar'])) {
+      $accountData['avatar'] = $validatedData['avatar'];
+    }
+
+    $account->update($accountData);
 
     return response()->json([
       'message' => 'Customer updated successfully.',

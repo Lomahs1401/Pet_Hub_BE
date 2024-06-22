@@ -29,6 +29,7 @@ use App\Http\Controllers\API\RatingShopController;
 use App\Http\Controllers\API\ServiceController;
 use App\Http\Controllers\API\ShopController;
 use App\Http\Controllers\API\ShopDashboardController;
+use App\Http\Controllers\API\SubOrderController;
 use App\Models\MedicalCenter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -210,6 +211,9 @@ Route::group([
   Route::get('/orders', [OrderController::class, 'getOrders']);
   Route::get('/orders/{order_id}', [OrderController::class, 'getOrderDetail']);
   Route::post('/orders', [OrderController::class, 'createOrder']);
+
+  // --------------     SUB ORDER     --------------
+  Route::get('/sub-orders/done', [SubOrderController::class, 'getDoneSubOrder']);
 
   // --------------     CART     --------------
   Route::get('/carts', [CartController::class, 'getCurrentCart']);
