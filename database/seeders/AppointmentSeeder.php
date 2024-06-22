@@ -5,9 +5,14 @@ namespace Database\Seeders;
 use App\Models\Account;
 use App\Models\Appointment;
 use App\Models\Customer;
+use App\Models\Doctor;
 use App\Models\HistoryDiagnosis;
 use App\Models\HistoryVaccine;
 use App\Models\MedicalCenter;
+use App\Models\RatingDoctor;
+use App\Models\RatingDoctorInteract;
+use App\Models\RatingMedicalCenter;
+use App\Models\RatingMedicalCenterInteract;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Faker\Factory as Faker;
@@ -128,6 +133,134 @@ class AppointmentSeeder extends Seeder
             'doctor_id' => $doctor_id,
             'done' => $done,
           ]);
+
+          // Nếu appointment đã hoàn thành (done = true), có xác suất tạo RatingDoctor
+          if ($done && $faker->boolean(80)) {
+            // Kiểm tra xem khách hàng đã rating cho doctor này chưa
+            $existingRatingDoctor = RatingDoctor::where('customer_id', $customer_account_id)
+              ->where('doctor_id', $doctor_id)
+              ->exists();
+
+            if ($existingRatingDoctor) {
+              continue; // Bỏ qua nếu đã có rating cho doctor này
+            }
+
+            // 35% xác suất cho rating 5 sao
+            // 45% xác suất cho rating 4 sao
+            // 6% xác suất cho rating 3 sao
+            // 6% xác suất cho rating 2 sao
+            // 8% xác suất cho rating 1 sao
+            $ratings = array_merge(
+              array_fill(0, 35, 5),
+              array_fill(0, 45, 4),
+              array_fill(0, 6, 3),
+              array_fill(0, 6, 2),
+              array_fill(0, 8, 1)
+            );
+            $rating = $faker->randomElement($ratings);
+
+            // Random reply và reply_date (nếu có reply)
+            $reply = $faker->boolean(40) ? $faker->paragraph(6) : null;
+            $reply_date = $reply ? $faker->dateTimeBetween($valid_start_time, 'now') : null;
+
+            $ratingDoctor = RatingDoctor::create([
+              'rating' => $rating,
+              'description' => $faker->paragraph(8),
+              'customer_id' => $customer_account_id,
+              'doctor_id' => $doctor_id,
+              'reply' => $reply,
+              'reply_date' => $reply_date,
+              'created_at' => $valid_start_time,
+              'updated_at' => $valid_start_time
+            ]);
+
+            // Tạo RatingDoctorInteract
+            $num_likes = $faker->numberBetween(0, 5);
+            $liked_customer_ids = $faker->randomElements($customer_account_ids, $num_likes);
+
+            foreach ($liked_customer_ids as $liked_customer_id) {
+              RatingDoctorInteract::create([
+                'rating_doctor_id' => $ratingDoctor->id,
+                'account_id' => $liked_customer_id,
+              ]);
+            }
+
+            // Nếu có reply, quyết định liệu doctor có like hay không
+            if ($reply) {
+              if ($faker->boolean(50)) {
+                $doctor_account_id = Doctor::find($doctor_id)->account_id;
+
+                RatingDoctorInteract::create([
+                  'rating_doctor_id' => $ratingDoctor->id,
+                  'account_id' => $doctor_account_id,
+                ]);
+              }
+            }
+          }
+
+          // Nếu appointment đã hoàn thành (done = true), có xác suất tạo RatingMedicalCenter
+          if ($done && $faker->boolean(80)) {
+            // Kiểm tra xem khách hàng đã có rating cho medical center này chưa
+            $existingRatingMedicalCenter = RatingMedicalCenter::where('customer_id', $customer_account_id)
+              ->where('medical_center_id', $medical_center_id)
+              ->exists();
+
+            if ($existingRatingMedicalCenter) {
+              continue; // Bỏ qua nếu đã có rating cho medical center này
+            }
+
+            // 35% xác suất cho rating 5 sao
+            // 45% xác suất cho rating 4 sao
+            // 6% xác suất cho rating 3 sao
+            // 6% xác suất cho rating 2 sao
+            // 8% xác suất cho rating 1 sao
+            $ratings = array_merge(
+              array_fill(0, 35, 5),
+              array_fill(0, 45, 4),
+              array_fill(0, 6, 3),
+              array_fill(0, 6, 2),
+              array_fill(0, 8, 1)
+            );
+            $rating = $faker->randomElement($ratings);
+
+            // Random reply và reply_date (nếu có reply)
+            $reply = $faker->boolean(40) ? $faker->paragraph(6) : null;
+            $reply_date = $reply ? $faker->dateTimeBetween($valid_start_time, 'now') : null;
+
+            $ratingMedicalCenter = RatingMedicalCenter::create([
+              'rating' => $rating,
+              'description' => $faker->paragraph(8),
+              'customer_id' => $customer_account_id,
+              'medical_center_id' => $medical_center_id,
+              'reply' => $reply,
+              'reply_date' => $reply_date,
+              'created_at' => $valid_start_time,
+              'updated_at' => $valid_start_time
+            ]);
+
+            // Tạo RatingMedicalCenterInteract
+            $num_likes = $faker->numberBetween(0, 5);
+            $liked_customer_ids = $faker->randomElements($customer_account_ids, $num_likes);
+
+            foreach ($liked_customer_ids as $liked_customer_id) {
+              RatingMedicalCenterInteract::create([
+                'rating_medical_center_id' => $ratingMedicalCenter->id,
+                'account_id' => $liked_customer_id,
+              ]);
+            }
+
+            // Nếu có reply, quyết định liệu medical center có like hay không
+            if ($reply) {
+              if ($faker->boolean(50)) {
+                $medical_center_account_id = MedicalCenter::find($medical_center_id)->account_id;
+
+                RatingMedicalCenterInteract::create([
+                  'rating_medical_center_id' => $ratingMedicalCenter->id,
+                  'account_id' => $medical_center_account_id,
+                ]);
+              }
+            }
+          }
 
           if ($done) {
             $random_type = rand(0, 1);

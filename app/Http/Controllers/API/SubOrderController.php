@@ -25,32 +25,48 @@ class SubOrderController extends Controller
     $num_of_page = intval($request->query('num_of_page', 10));
 
     // Truy vấn danh sách các suborders có trạng thái là 'Done' và thuộc về customer đang đăng nhập
-    $query = SubOrder::with(['order.cart.cartItem.product.shop'])
+    $subOrders = SubOrder::with(['order.cart.cartItem.product.shop', 'order.cart.cartItem.product.ratings'])
       ->whereHas('order', function ($query) use ($customer) {
         $query->where('customer_id', $customer->id);
       })
-      ->where('status', 'Done');
-
-    // Tính tổng số suborders và tổng số trang
-    $total_suborders = $query->count();
-    $total_pages = ceil($total_suborders / $num_of_page);
-
-    // Phân trang
-    $doneSubOrders = $query->orderBy('created_at', 'desc')
+      ->where('status', 'Done')
+      ->orderBy('created_at', 'desc')
       ->offset(($page_number - 1) * $num_of_page)
       ->limit($num_of_page)
       ->get();
 
     // Chuẩn bị dữ liệu trả về
-    $result = $doneSubOrders->map(function ($subOrder) {
-      // Lấy shop_id của sub_order
-      $shopId = $subOrder->order->cart->cartItem->first()->product->shop_id;
+    $result = [];
 
-      // Lấy các cart_items thuộc cùng shop với sub_order
-      $cartItems = $subOrder->order->cart->cartItem->filter(function ($item) use ($shopId) {
-        return $item->product->shop_id === $shopId;
-      })->map(function ($item) {
-        return [
+    foreach ($subOrders as $subOrder) {
+      // Lấy danh sách các cart_items của subOrder hiện tại
+      $cartItems = $subOrder->order->cart->cartItem;
+
+      // Lọc ra các cart_items của cùng shop với subOrder
+      $filteredCartItems = $cartItems->filter(function ($item) use ($subOrder) {
+        return $item->product->shop_id === $subOrder->shop_id;
+      })->map(function ($item) use ($customer) {
+        $ratingInfo = null;
+
+        // Kiểm tra xem khách hàng đã đánh giá sản phẩm này chưa
+        $rating = $item->product->ratings->where('customer_id', $customer->id)->first();
+        $isReviewed = false;
+        $shopResponsed = false;
+
+        if ($rating) {
+          $isReviewed = true;
+          $shopResponsed = $rating->reply !== null;
+
+          $ratingInfo = [
+            'rated' => true,
+            'rating' => $rating->rating,
+            'description' => $rating->description,
+            'reply' => $rating->reply,
+            'reply_date' => $rating->reply_date,
+          ];
+        }
+
+        $itemData = [
           'id' => $item->id,
           'name' => $item->name,
           'description' => $item->description,
@@ -60,10 +76,19 @@ class SubOrderController extends Controller
           'product_id' => $item->product_id,
           'created_at' => $item->created_at,
           'updated_at' => $item->updated_at,
+          'is_reviewed' => $isReviewed,
+          'shop_responsed' => $shopResponsed,
         ];
+
+        if ($isReviewed) {
+          $itemData['rating_info'] = $ratingInfo;
+        }
+
+        return $itemData;
       });
 
-      return [
+      // Tạo dữ liệu cho mỗi subOrder
+      $result[] = [
         'sub_order_id' => $subOrder->id,
         'sub_total_prices' => $subOrder->sub_total_prices,
         'status' => $subOrder->status,
@@ -76,9 +101,15 @@ class SubOrderController extends Controller
         'shop_image' => $subOrder->shop->image,
         'created_at' => $subOrder->created_at,
         'updated_at' => $subOrder->updated_at,
-        'cart_items' => $cartItems->values()->all(),
+        'cart_items' => $filteredCartItems->values()->all(),
       ];
-    });
+    }
+
+    // Tính tổng số suborders và tổng số trang
+    $total_suborders = SubOrder::whereHas('order', function ($query) use ($customer) {
+      $query->where('customer_id', $customer->id);
+    })->where('status', 'Done')->count();
+    $total_pages = ceil($total_suborders / $num_of_page);
 
     return response()->json([
       'message' => 'Query successfully!',

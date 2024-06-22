@@ -7,6 +7,11 @@ use App\Models\CartItem;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\RatingProduct;
+use App\Models\RatingProductInteract;
+use App\Models\RatingShop;
+use App\Models\RatingShopInteract;
+use App\Models\Shop;
 use App\Models\SubOrder;
 use Illuminate\Database\Seeder;
 use Faker\Factory as Faker;
@@ -41,7 +46,7 @@ class CartSeeder extends Seeder
           break;
         }
 
-        $isActive = rand(0, 100) < 1; // 1% true (gio hang dang hoat dong), 99% false (da thanh toan)
+        $isActive = rand(0, 100) < 1; // 1% true (giỏ hàng đang hoạt động), 99% false (đã thanh toán)
 
         // Tạo giỏ hàng cho khách hàng
         $cart = Cart::create([
@@ -54,6 +59,7 @@ class CartSeeder extends Seeder
         $numberOfItems = rand(1, 8);
         $totalPrices = 0;
         $shopIds = [];
+        $subOrders = [];
 
         for ($i = 0; $i < $numberOfItems; $i++) {
           $product = $products->random();
@@ -86,7 +92,7 @@ class CartSeeder extends Seeder
         $cart->total_prices = $totalPrices;
         $cart->save();
 
-        // Random order_date từ 2 thang trước đến thời điểm hiện tại
+        // Random order_date từ 2 tháng trước đến thời điểm hiện tại
         $order_date = $faker->dateTimeBetween('-2 years', 'now');
 
         if (!$isActive) {
@@ -116,7 +122,7 @@ class CartSeeder extends Seeder
 
             $status = $statuses[array_rand($statuses)];
 
-            SubOrder::create([
+            $subOrder = SubOrder::create([
               'order_id' => $order->id,
               'shop_id' => $shopId,
               'sub_total_prices' => $subTotalPrices,
@@ -124,6 +130,105 @@ class CartSeeder extends Seeder
               'created_at' => $order_date,
               'updated_at' => $order_date,
             ]);
+
+            $subOrders[] = $subOrder;
+          }
+        }
+
+        // Tạo RatingProduct hoặc RatingShop nếu SubOrder có status là Done
+        foreach ($subOrders as $subOrder) {
+          if ($subOrder->status == 'Done') {
+            // Xác suất 20% để tạo đánh giá sản phẩm và cửa hàng
+            if ($faker->randomFloat(2, 0, 1) <= 0.2) {
+              // Tạo đánh giá cho sản phẩm trong subOrder
+              $ratedProducts = [];
+              $productsInSubOrder = CartItem::where('cart_id', $cart->id)
+                ->whereIn('product_id', Product::where('shop_id', $subOrder->shop_id)->pluck('id'))
+                ->get();
+
+              foreach ($productsInSubOrder as $productInSubOrder) {
+                // Kiểm tra xem đã đánh giá sản phẩm này chưa
+                if (!in_array($productInSubOrder->product_id, $ratedProducts)) {
+                  $existingRating = RatingProduct::where('customer_id', $customer->id)
+                    ->where('product_id', $productInSubOrder->product_id)
+                    ->exists();
+
+                  if (!$existingRating) {
+                    // Tạo rating ngẫu nhiên
+                    $ratings = array_merge(
+                      array_fill(0, 35, 5),
+                      array_fill(0, 45, 4),
+                      array_fill(0, 6, 3),
+                      array_fill(0, 6, 2),
+                      array_fill(0, 8, 1)
+                    );
+                    $rating = $faker->randomElement($ratings);
+
+                    // Tạo RatingProduct
+                    $ratingProduct = RatingProduct::create([
+                      'rating' => $rating,
+                      'description' => $faker->paragraph(8),
+                      'customer_id' => $customer->id,
+                      'product_id' => $productInSubOrder->product_id,
+                      'created_at' => $order_date,
+                      'updated_at' => $order_date
+                    ]);
+
+                    // Tạo RatingProductInteract
+                    $num_likes = $faker->numberBetween(0, 5);
+                    $liked_customer_ids = $faker->randomElements($customers->pluck('id')->toArray(), $num_likes);
+
+                    foreach ($liked_customer_ids as $liked_customer_id) {
+                      RatingProductInteract::create([
+                        'rating_product_id' => $ratingProduct->id,
+                        'account_id' => $liked_customer_id,
+                      ]);
+                    }
+
+                    // Thêm sản phẩm vào mảng đã đánh giá
+                    $ratedProducts[] = $productInSubOrder->product_id;
+                  }
+                }
+              }
+
+              // Kiểm tra xem đã đánh giá cửa hàng này chưa
+              $existingRatingShop = RatingShop::where('customer_id', $customer->id)
+                ->where('shop_id', $subOrder->shop_id)
+                ->exists();
+
+              if (!$existingRatingShop) {
+                // Tạo rating ngẫu nhiên cho cửa hàng
+                $ratings = array_merge(
+                  array_fill(0, 35, 5),
+                  array_fill(0, 45, 4),
+                  array_fill(0, 6, 3),
+                  array_fill(0, 6, 2),
+                  array_fill(0, 8, 1)
+                );
+                $rating = $faker->randomElement($ratings);
+
+                // Tạo RatingShop
+                $ratingShop = RatingShop::create([
+                  'rating' => $rating,
+                  'description' => $faker->paragraph(8),
+                  'customer_id' => $customer->id,
+                  'shop_id' => $subOrder->shop_id,
+                  'created_at' => $order_date,
+                  'updated_at' => $order_date
+                ]);
+
+                // Tạo RatingShopInteract
+                $num_likes = $faker->numberBetween(0, 5);
+                $liked_customer_ids = $faker->randomElements($customers->pluck('id')->toArray(), $num_likes);
+
+                foreach ($liked_customer_ids as $liked_customer_id) {
+                  RatingShopInteract::create([
+                    'rating_shop_id' => $ratingShop->id,
+                    'account_id' => $liked_customer_id,
+                  ]);
+                }
+              }
+            }
           }
         }
       }
