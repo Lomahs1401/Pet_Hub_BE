@@ -168,9 +168,7 @@ class BlogController extends Controller
     // Lấy danh sách comments của blog và sắp xếp theo chiều từ mới nhất đến cũ nhất
     $comments = Comment::where('blog_id', $blog_id)
       ->whereNull('parent_comments_id')
-      ->with(['account', 'subComments.account' => function ($query) {
-        $query->orderBy('created_at', 'desc');
-      }])
+      ->with(['account', 'subComments.account'])
       ->orderBy('created_at', 'desc')
       ->get();
 
@@ -269,9 +267,9 @@ class BlogController extends Controller
               'created_at' => $subComment->created_at,
               'updated_at' => $subComment->updated_at,
             ];
-          }),
+          })->values(), // Đảm bảo rằng sub_comments luôn được trả về dưới dạng mảng
         ];
-      }),
+      })->values(), // Đảm bảo rằng comments luôn được trả về dưới dạng mảng
     ];
 
     return response()->json([
