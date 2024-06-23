@@ -169,7 +169,7 @@ class RatingShopController extends Controller
     $result = [
       'rating_id' => $rating->id,
       'rating' => $rating->rating,
-      'description' => $rating->description,
+      'rating_description' => $rating->description,
       'reply' => $rating->reply,
       'reply_date' => $rating->reply_date,
       'created_at' => $rating->created_at,
@@ -179,7 +179,7 @@ class RatingShopController extends Controller
       'username' => $rating->shop->account->username,
       'email' => $rating->shop->account->email,
       'avatar' => $rating->shop->account->avatar,
-      'description' => $rating->shop->description,
+      'shop_description' => $rating->shop->description,
       'image' => $rating->shop->image,
       'phone' => $rating->shop->phone,
       'address' => $rating->shop->address,

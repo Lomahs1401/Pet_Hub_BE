@@ -169,7 +169,7 @@ class RatingMedicalCenterController extends Controller
     $result = [
       'rating_id' => $rating->id,
       'rating' => $rating->rating,
-      'description' => $rating->description,
+      'rating_description' => $rating->description,
       'reply' => $rating->reply,
       'reply_date' => $rating->reply_date,
       'created_at' => $rating->created_at,
@@ -179,7 +179,7 @@ class RatingMedicalCenterController extends Controller
       'username' => $rating->medicalCenter->account->username,
       'email' => $rating->medicalCenter->account->email,
       'avatar' => $rating->medicalCenter->account->avatar,
-      'description' => $rating->medicalCenter->description,
+      'medical_center_description' => $rating->medicalCenter->description,
       'image' => $rating->medicalCenter->image,
       'phone' => $rating->medicalCenter->phone,
       'address' => $rating->medicalCenter->address,

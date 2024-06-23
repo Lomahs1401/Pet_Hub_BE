@@ -113,7 +113,7 @@ class RatingDoctorController extends Controller
     $result = [
       'rating_id' => $rating->id,
       'rating' => $rating->rating,
-      'description' => $rating->description,
+      'rating_description' => $rating->description,
       'reply' => $rating->reply,
       'reply_date' => $rating->reply_date,
       'created_at' => $rating->created_at,
@@ -125,7 +125,7 @@ class RatingDoctorController extends Controller
       'avatar' => $rating->doctor->account->avatar,
       'gender' => $rating->doctor->gender,
       'birthdate' => $rating->doctor->birthdate,
-      'description' => $rating->doctor->description,
+      'doctor_description' => $rating->doctor->description,
       'CMND' => $rating->doctor->CMND,
       'phone' => $rating->doctor->phone,
       'address' => $rating->doctor->address,
