@@ -90,6 +90,7 @@ class AppointmentController extends Controller
           'name' => $appointment->pet->name,
         ],
         'doctor' => [
+          'id' => $doctor->id,
           'full_name' => $doctor->full_name,
           'email' => $doctor->account->email,
           'image' => $doctor->image,
@@ -100,6 +101,7 @@ class AppointmentController extends Controller
           'rating_info' => $doctorRatingInfo
         ],
         'medical_center' => [
+          'id' => $medicalCenter->id,
           'name' => $medicalCenter->name,
           'email' => $medicalCenter->email,
           'image' => $medicalCenter->image,
@@ -292,6 +294,7 @@ class AppointmentController extends Controller
           'name' => $appointment->pet->name,
         ],
         'doctor' => [
+          'id' => $doctor->id,
           'full_name' => $doctor->full_name,
           'email' => $doctor->account->email,
           'image' => $doctor->image,
@@ -302,6 +305,7 @@ class AppointmentController extends Controller
           'rating_info' => $doctorRatingInfo,
         ],
         'medical_center' => [
+          'id' => $medicalCenter->id,
           'name' => $medicalCenter->name,
           'email' => $medicalCenter->email,
           'image' => $medicalCenter->image,
@@ -397,6 +401,7 @@ class AppointmentController extends Controller
           'name' => $appointment->pet->name,
         ],
         'doctor' => [
+          'id' => $doctor->id,
           'full_name' => $doctor->full_name,
           'email' => $doctor->account->email,
           'image' => $doctor->image,
@@ -407,6 +412,7 @@ class AppointmentController extends Controller
           'rating_info' => $doctorRatingInfo,
         ],
         'medical_center' => [
+          'id' => $medicalCenter->id,
           'name' => $medicalCenter->name,
           'email' => $medicalCenter->email,
           'image' => $medicalCenter->image,
@@ -501,6 +507,7 @@ class AppointmentController extends Controller
           'name' => $appointment->pet->name,
         ],
         'doctor' => [
+          'id' => $doctor->id,
           'full_name' => $doctor->full_name,
           'email' => $doctor->account->email,
           'image' => $doctor->image,
@@ -511,6 +518,7 @@ class AppointmentController extends Controller
           'rating_info' => $doctorRatingInfo,
         ],
         'medical_center' => [
+          'id' => $medicalCenter->id,
           'name' => $medicalCenter->name,
           'email' => $medicalCenter->email,
           'image' => $medicalCenter->image,
