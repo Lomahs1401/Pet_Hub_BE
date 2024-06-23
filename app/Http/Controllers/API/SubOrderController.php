@@ -88,6 +88,26 @@ class SubOrderController extends Controller
         return $itemData;
       });
 
+      // Kiểm tra xem khách hàng đã đánh giá cửa hàng chưa
+      $shopRating = $subOrder->shop->ratingShop->where('customer_id', $customer->id)->first();
+
+      $isReviewed = false;
+      $isResponsed = false;
+      $ratingInfo = null;
+
+      if ($shopRating) {
+        $isReviewed = true;
+        $isResponsed = $shopRating->reply !== null;
+
+        $ratingInfo = [
+          'rated' => true,
+          'rating' => $shopRating->rating,
+          'description' => $shopRating->description,
+          'reply' => $shopRating->reply,
+          'reply_date' => $shopRating->reply_date,
+        ];
+      }
+
       // Tạo dữ liệu cho mỗi subOrder
       $result[] = [
         'sub_order_id' => $subOrder->id,
@@ -100,6 +120,9 @@ class SubOrderController extends Controller
         'shop_id' => $subOrder->shop->id,
         'shop_name' => $subOrder->shop->name,
         'shop_image' => $subOrder->shop->image,
+        'is_shop_reviewed' => $isReviewed,
+        'is_responsed' => $isResponsed,
+        'rating_info' => $ratingInfo,
         'created_at' => $subOrder->created_at,
         'updated_at' => $subOrder->updated_at,
         'cart_items' => $filteredCartItems->values()->all(),
