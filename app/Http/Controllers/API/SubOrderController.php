@@ -69,6 +69,7 @@ class SubOrderController extends Controller
         $itemData = [
           'id' => $item->id,
           'name' => $item->name,
+          'image' => $item->product->image,
           'description' => $item->description,
           'quantity' => $item->quantity,
           'price' => $item->price,
