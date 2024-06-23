@@ -10,6 +10,79 @@ use Illuminate\Support\Facades\DB;
 
 class AidCenterController extends Controller
 {
+  public function getUnadoptedPetsOfAidCenter(Request $request, $aid_center_id)
+  {
+    // Lấy tham số page_number và num_of_page từ request
+    $page_number = intval($request->query('page_number', 1));
+    $num_of_page = intval($request->query('num_of_page', 10));
+
+    $query = Pet::where('status', 0)
+      ->where('aid_center_id', $aid_center_id)
+      ->whereNull('customer_id');
+
+    // Tính tổng số pets và tổng số trang
+    $total_pets = $query->count();
+    $total_pages = ceil($total_pets / $num_of_page);
+
+    // Phân trang
+    $pets = $query->with(['aidCenter', 'aidCenter.account'])
+      ->offset(($page_number - 1) * $num_of_page)
+      ->limit($num_of_page)
+      ->get();
+
+    // Extract aid center information from the first pet
+    $aid_center_info = [];
+    if ($pets->isNotEmpty()) {
+      $firstPet = $pets->first();
+      $aid_center_info = [
+        'id' => $firstPet->aidCenter->id,
+        'name' => $firstPet->aidCenter->name,
+        'username' => $firstPet->aidCenter->account->username,
+        'email' => $firstPet->aidCenter->account->email,
+        'avatar' => $firstPet->aidCenter->account->avatar,
+        'image' => $firstPet->aidCenter->image,
+        'phone' => $firstPet->aidCenter->phone,
+        'address' => $firstPet->aidCenter->address,
+        'website' => $firstPet->aidCenter->website,
+        'fanpage' => $firstPet->aidCenter->fanpage,
+        'work_time' => $firstPet->aidCenter->work_time,
+        'establish_year' => $firstPet->aidCenter->establish_year,
+        'certificate' => $firstPet->aidCenter->certificate,
+      ];
+    }
+
+    // Format pets data
+    $formatted_pets = $pets->map(function ($pet) {
+      return [
+        'id' => $pet->id,
+        'name' => $pet->name,
+        'type' => $pet->type,
+        'breed' => $pet->breed->name,
+        'age' => $pet->age,
+        'gender' => $pet->gender,
+        'image' => $pet->image,
+        'status' => $pet->status,
+        'customer_id' => $pet->customer_id,
+        'created_at' => $pet->created_at,
+        'updated_at' => $pet->updated_at,
+      ];
+    });
+
+    // Construct response with aid center information at the top level
+    return response()->json([
+      'message' => 'Query successfully!',
+      'status' => 200,
+      'page_number' => $page_number,
+      'num_of_page' => $num_of_page,
+      'total_pages' => $total_pages,
+      'total_pets' => $total_pets,
+      'data' => [ // Use data block to include both aid_center and pets
+        'aid_center' => $aid_center_info, // Aid center info here
+        'pets' => $formatted_pets, // Only pets data here
+      ]
+    ]);
+  }
+
   public function getUnadoptedPets(Request $request)
   {
     // Lấy tham số page_number và num_of_page từ request

@@ -161,6 +161,7 @@ Route::group([
   Route::delete('/ratings/{rating_id}/medical-center', [RatingMedicalCenterController::class, 'deleteRatingMedicalCenter']);
 
   // --------------     AID CENTER     --------------
+  Route::get('/unadopted-pets-of-aid-center/{aid_center_id}', [AidCenterController::class, 'getUnadoptedPetsOfAidCenter']);
   Route::get('/unadopted-pets', [AidCenterController::class, 'getUnadoptedPets']);
   Route::get('/unadopted-pets/{pet_id}', [AidCenterController::class, 'getDetailUnadpotedPet']);
   Route::get('/my-adopted-pets', [AidCenterController::class, 'getMyAdoptedPets']);
