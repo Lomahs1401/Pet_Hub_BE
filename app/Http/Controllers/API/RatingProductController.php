@@ -169,6 +169,7 @@ class RatingProductController extends Controller
           'reply' => $rating->reply,
           'reply_date' => $rating->reply_date,
           'rating_date' => $rating->created_at,
+          'customer_id' => $customer->id,
           'customer_username' => $account->username,
           'customer_avatar' => $account->avatar,
           'account_creation_date' => $account->created_at,
@@ -254,6 +255,57 @@ class RatingProductController extends Controller
       'message' => 'Query successfully!',
       'status' => 200,
       'data' => $ratingCounts
+    ]);
+  }
+
+  public function getDetailRatingProductOfCustomer($product_id)
+  {
+    // Lấy thông tin khách hàng đang đăng nhập
+    $customer = auth()->user()->customer;
+
+    if (!$customer) {
+      return response()->json([
+        'message' => 'Customer not found!',
+        'status' => 404,
+      ], 404);
+    }
+
+    // Lấy thông tin đánh giá sản phẩm dựa trên rating_id và customer_id
+    $rating = RatingProduct::with(['product', 'product.shop'])
+      ->where('product_id', $product_id)
+      ->where('customer_id', $customer->id)
+      ->first();
+
+    if (!$rating) {
+      return response()->json([
+        'message' => 'Rating not found!',
+        'status' => 404,
+      ], 404);
+    }
+
+    // Chuẩn bị dữ liệu trả về
+    $result = [
+      'rating_id' => $rating->id,
+      'rating' => $rating->rating,
+      'description' => $rating->description,
+      'reply' => $rating->reply,
+      'reply_date' => $rating->reply_date,
+      'created_at' => $rating->created_at,
+      'updated_at' => $rating->updated_at,
+      'product_id' => $rating->product->id,
+      'name' => $rating->product->name,
+      'description' => $rating->product->description,
+      'image' => $rating->product->image,
+      'price' => $rating->product->price,
+      'shop_id' => $rating->product->shop->id,
+      'shop_name' => $rating->product->shop->name,
+      'shop_image' => $rating->product->shop->image,
+    ];
+
+    return response()->json([
+      'message' => 'Query successfully!',
+      'status' => 200,
+      'data' => $result,
     ]);
   }
 

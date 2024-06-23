@@ -50,6 +50,7 @@ class RatingDoctorController extends Controller
           'reply' => $rating->reply,
           'reply_date' => $rating->reply_date,
           'rating_date' => $rating->created_at,
+          'customer_id' => $customer->id,
           'customer_username' => $account->username,
           'customer_avatar' => $account->avatar,
           'account_creation_date' => $account->created_at,
@@ -80,6 +81,62 @@ class RatingDoctorController extends Controller
       'total_pages' => $total_pages,
       'total_ratings' => $totalRatings,
       'data' => $paginatedRatings,
+    ]);
+  }
+
+  public function getDetailRatingDoctorOfCustomer($doctor_id)
+  {
+    // Lấy thông tin khách hàng đang đăng nhập
+    $customer = auth()->user()->customer;
+
+    if (!$customer) {
+      return response()->json([
+        'message' => 'Customer not found!',
+        'status' => 404,
+      ], 404);
+    }
+
+    // Lấy thông tin đánh giá sản phẩm dựa trên rating_id và customer_id
+    $rating = RatingDoctor::with(['doctor', 'doctor.account'])
+      ->where('doctor_id', $doctor_id)
+      ->where('customer_id', $customer->id)
+      ->first();
+
+    if (!$rating) {
+      return response()->json([
+        'message' => 'Rating not found!',
+        'status' => 404,
+      ], 404);
+    }
+
+    // Chuẩn bị dữ liệu trả về
+    $result = [
+      'rating_id' => $rating->id,
+      'rating' => $rating->rating,
+      'description' => $rating->description,
+      'reply' => $rating->reply,
+      'reply_date' => $rating->reply_date,
+      'created_at' => $rating->created_at,
+      'updated_at' => $rating->updated_at,
+      'doctor_id' => $rating->doctor->id,
+      'full_name' => $rating->doctor->full_name,
+      'username' => $rating->doctor->account->username,
+      'email' => $rating->doctor->account->email,
+      'avatar' => $rating->doctor->account->avatar,
+      'gender' => $rating->doctor->gender,
+      'birthdate' => $rating->doctor->birthdate,
+      'description' => $rating->doctor->description,
+      'CMND' => $rating->doctor->CMND,
+      'phone' => $rating->doctor->phone,
+      'address' => $rating->doctor->address,
+      'image' => $rating->doctor->image,
+      'certificate' => $rating->doctor->certificate,
+    ];
+
+    return response()->json([
+      'message' => 'Query successfully!',
+      'status' => 200,
+      'data' => $result,
     ]);
   }
 

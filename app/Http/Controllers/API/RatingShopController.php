@@ -51,6 +51,7 @@ class RatingShopController extends Controller
           'reply' => $rating->reply,
           'reply_date' => $rating->reply_date,
           'rating_date' => $rating->created_at,
+          'customer_id' => $customer->id,
           'customer_username' => $account->username,
           'customer_avatar' => $account->avatar,
           'account_creation_date' => $account->created_at,
@@ -136,6 +137,62 @@ class RatingShopController extends Controller
       'message' => 'Query successfully!',
       'status' => 200,
       'data' => $ratingCounts
+    ]);
+  }
+
+  public function getDetailRatingShopOfCustomer($shop_id)
+  {
+    // Lấy thông tin khách hàng đang đăng nhập
+    $customer = auth()->user()->customer;
+
+    if (!$customer) {
+      return response()->json([
+        'message' => 'Customer not found!',
+        'status' => 404,
+      ], 404);
+    }
+
+    // Lấy thông tin đánh giá sản phẩm dựa trên rating_id và customer_id
+    $rating = RatingShop::with(['shop', 'shop.account'])
+      ->where('shop_id', $shop_id)
+      ->where('customer_id', $customer->id)
+      ->first();
+
+    if (!$rating) {
+      return response()->json([
+        'message' => 'Rating not found!',
+        'status' => 404,
+      ], 404);
+    }
+
+    // Chuẩn bị dữ liệu trả về
+    $result = [
+      'rating_id' => $rating->id,
+      'rating' => $rating->rating,
+      'description' => $rating->description,
+      'reply' => $rating->reply,
+      'reply_date' => $rating->reply_date,
+      'created_at' => $rating->created_at,
+      'updated_at' => $rating->updated_at,
+      'shop_id' => $rating->shop->id,
+      'name' => $rating->shop->name,
+      'username' => $rating->shop->account->username,
+      'email' => $rating->shop->account->email,
+      'avatar' => $rating->shop->account->avatar,
+      'description' => $rating->shop->description,
+      'image' => $rating->shop->image,
+      'phone' => $rating->shop->phone,
+      'address' => $rating->shop->address,
+      'website' => $rating->shop->website,
+      'fanpage' => $rating->shop->fanpage,
+      'work_time' => $rating->shop->work_time,
+      'establish_year' => $rating->shop->establish_year,
+    ];
+
+    return response()->json([
+      'message' => 'Query successfully!',
+      'status' => 200,
+      'data' => $result,
     ]);
   }
 

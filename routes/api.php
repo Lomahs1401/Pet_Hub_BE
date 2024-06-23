@@ -31,6 +31,7 @@ use App\Http\Controllers\API\ShopController;
 use App\Http\Controllers\API\ShopDashboardController;
 use App\Http\Controllers\API\SubOrderController;
 use App\Models\MedicalCenter;
+use App\Models\RatingMedicalCenter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -139,18 +140,22 @@ Route::group([
   Route::get('/ratings/doctor/{doctor_id}', [RatingDoctorController::class, 'getCustomerRatingsOfDoctorId']); // lấy dsach rating của customer theo doctor id
   Route::get('/ratings/medical-center/{medical_center_id}', [RatingMedicalCenterController::class, 'getCustomerRatingsOfMedicalCenterId']); // lấy dsach rating của customer theo medical center id
 
+  Route::get('/ratings/product/{product_id}/detail', [RatingProductController::class, 'getDetailRatingProductOfCustomer']);
   Route::post('/ratings/product/{product_id}', [RatingProductController::class, 'createRatingProduct']);
   Route::patch('/ratings/{rating_id}/product', [RatingProductController::class, 'updateRatingProduct']);
   Route::delete('/ratings/{rating_id}/product', [RatingProductController::class, 'deleteRatingProduct']);
 
+  Route::get('/ratings/shop/{shop_id}/detail', [RatingShopController::class, 'getDetailRatingShopOfCustomer']);
   Route::post('/ratings/shop/{shop_id}', [RatingShopController::class, 'createRatingShop']);
   Route::patch('/ratings/{rating_id}/shop', [RatingShopController::class, 'updateRatingShop']);
   Route::delete('/ratings/{rating_id}/shop', [RatingShopController::class, 'deleteRatingShop']);
 
+  Route::get('/ratings/doctor/{doctor_id}/detail', [RatingDoctorController::class, 'getDetailRatingDoctorOfCustomer']);
   Route::post('/ratings/doctor/{doctor_id}', [RatingDoctorController::class, 'createRatingDoctor']);
   Route::patch('/ratings/{rating_id}/doctor', [RatingDoctorController::class, 'updateRatingDoctor']);
   Route::delete('/ratings/{rating_id}/doctor', [RatingDoctorController::class, 'deleteRatingDoctor']);
   
+  Route::get('/ratings/medical-center/{medical_center_id}/detail', [RatingMedicalCenterController::class, 'getDetailRatingMedicalCenterOfCustomer']);
   Route::post('/ratings/medical-center/{medical_center_id}', [RatingMedicalCenterController::class, 'createRatingMedicalCenter']);
   Route::patch('/ratings/{rating_id}/medical-center', [RatingMedicalCenterController::class, 'updateRatingMedicalCenter']);
   Route::delete('/ratings/{rating_id}/medical-center', [RatingMedicalCenterController::class, 'deleteRatingMedicalCenter']);

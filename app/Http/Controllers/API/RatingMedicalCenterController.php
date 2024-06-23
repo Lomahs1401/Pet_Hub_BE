@@ -51,6 +51,7 @@ class RatingMedicalCenterController extends Controller
           'reply' => $rating->reply,
           'reply_date' => $rating->reply_date,
           'rating_date' => $rating->created_at,
+          'customer_id' => $customer->id,
           'customer_username' => $account->username,
           'customer_avatar' => $account->avatar,
           'account_creation_date' => $account->created_at,
@@ -136,6 +137,62 @@ class RatingMedicalCenterController extends Controller
       'message' => 'Query successfully!',
       'status' => 200,
       'data' => $ratingCounts
+    ]);
+  }
+
+  public function getDetailRatingMedicalCenterOfCustomer($medical_center_id)
+  {
+    // Lấy thông tin khách hàng đang đăng nhập
+    $customer = auth()->user()->customer;
+
+    if (!$customer) {
+      return response()->json([
+        'message' => 'Customer not found!',
+        'status' => 404,
+      ], 404);
+    }
+
+    // Lấy thông tin đánh giá sản phẩm dựa trên rating_id và customer_id
+    $rating = RatingMedicalCenter::with(['medicalCenter', 'medicalCenter.account'])
+      ->where('medical_center_id', $medical_center_id)
+      ->where('customer_id', $customer->id)
+      ->first();
+
+    if (!$rating) {
+      return response()->json([
+        'message' => 'Rating not found!',
+        'status' => 404,
+      ], 404);
+    }
+
+    // Chuẩn bị dữ liệu trả về
+    $result = [
+      'rating_id' => $rating->id,
+      'rating' => $rating->rating,
+      'description' => $rating->description,
+      'reply' => $rating->reply,
+      'reply_date' => $rating->reply_date,
+      'created_at' => $rating->created_at,
+      'updated_at' => $rating->updated_at,
+      'medical_center_id' => $rating->medicalCenter->id,
+      'name' => $rating->medicalCenter->name,
+      'username' => $rating->medicalCenter->account->username,
+      'email' => $rating->medicalCenter->account->email,
+      'avatar' => $rating->medicalCenter->account->avatar,
+      'description' => $rating->medicalCenter->description,
+      'image' => $rating->medicalCenter->image,
+      'phone' => $rating->medicalCenter->phone,
+      'address' => $rating->medicalCenter->address,
+      'website' => $rating->medicalCenter->website,
+      'fanpage' => $rating->medicalCenter->fanpage,
+      'work_time' => $rating->medicalCenter->work_time,
+      'establish_year' => $rating->medicalCenter->establish_year,
+    ];
+
+    return response()->json([
+      'message' => 'Query successfully!',
+      'status' => 200,
+      'data' => $result,
     ]);
   }
 
