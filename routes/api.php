@@ -119,11 +119,13 @@ Route::group([
 
   // --------------     BLOG     --------------
   Route::get('/blogs', [BlogController::class, 'getBlogs']);
+  Route::post('/blogs', [BlogController::class, 'createBlog']);
   Route::get('/blogs/me/', [BlogController::class, 'getMyBlogs']);
-  Route::get('/blogs/{blog_id}', [BlogController::class, 'getBlogDetail']);
   Route::get('/blogs/search/username', [BlogController::class, 'searchBlogByUsername']);
   Route::get('/blogs/search/title', [BlogController::class, 'searchBlogByTitle']);
-  Route::post('/blogs', [BlogController::class, 'createBlog']);
+  Route::get('/blogs/profile', [BlogController::class, 'searchProfile']);
+  Route::get('/blogs/profile/{account_id}', [BlogController::class, 'showProfile']);
+  Route::get('/blogs/{blog_id}', [BlogController::class, 'getBlogDetail']);
   Route::put('/blogs/{blog_id}', [BlogController::class, 'updateBlog']);
   Route::delete('/blogs/{blog_id}', [BlogController::class, 'deleteBlog']);
 

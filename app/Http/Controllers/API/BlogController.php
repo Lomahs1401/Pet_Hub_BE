@@ -420,6 +420,114 @@ class BlogController extends Controller
     ]);
   }
 
+
+  public function searchProfile(Request $request)
+  {
+    $username = $request->input('username', '');
+    $page_number = intval($request->query('page_number', 1));
+    $num_of_page = intval($request->query('num_of_page', 10));
+
+    // Tìm kiếm người dùng theo username (tìm kiếm gần đúng)
+    $query = Account::where('username', 'like', '%' . $username . '%');
+
+    // Lấy tổng số người dùng tìm thấy
+    $total_users = $query->count();
+
+    // Tính toán offset cho phân trang
+    $offset = ($page_number - 1) * $num_of_page;
+
+    // Lấy danh sách người dùng với phân trang
+    $accounts = $query->offset($offset)
+      ->limit($num_of_page)
+      ->get();
+
+    if ($accounts->isEmpty()) {
+      return response()->json(['message' => 'No accounts found.'], 404);
+    }
+
+    // Trả về thông tin cơ bản của người dùng
+    $result = $accounts->map(function ($account) {
+      return [
+        'account_id' => $account->id,
+        'username' => $account->username,
+        'email' => $account->username,
+        'avatar' => $account->avatar,
+      ];
+    });
+
+    // Tính tổng số trang
+    $total_pages = ceil($total_users / $num_of_page);
+
+    return response()->json([
+      'message' => 'Users found.',
+      'status' => 200,
+      'page_number' => $page_number,
+      'num_of_page' => $num_of_page,
+      'total_pages' => $total_pages,
+      'total_users' => $total_users,
+      'data' => $result,
+    ], 200);
+  }
+
+  public function showProfile($account_id)
+  {
+    // Tìm kiếm người dùng theo account_id
+    $user = Account::find($account_id);
+
+    if (!$user) {
+      return response()->json(['message' => 'User not found.'], 404);
+    }
+
+    // Lấy các bài blog của người dùng
+    $blogs = Blog::where('account_id', $account_id)->get();
+
+    // Thêm thông tin likes, dislikes, comments_count, interaction_type vào từng blog
+    $blogs_data = $blogs->map(function ($blog) use ($account_id) {
+      $commentsCount = Comment::where('blog_id', $blog->id)->count();
+      $likesCount = Interact::where('target_label', 'blogs')
+        ->where('target_id', $blog->id)
+        ->where('target_type', 'like')
+        ->count();
+      $dislikesCount = Interact::where('target_label', 'blogs')
+        ->where('target_id', $blog->id)
+        ->where('target_type', 'dislike')
+        ->count();
+      $userInteraction = Interact::where('target_label', 'blogs')
+        ->where('target_id', $blog->id)
+        ->where('account_id', $account_id)
+        ->first();
+
+      return [
+        'id' => $blog->id,
+        'title' => $blog->title,
+        'text' => $blog->text,
+        'image' => $blog->image,
+        'account_id' => $blog->account_id,
+        'email' => $blog->account->email,
+        'username' => $blog->account->username,
+        'avatar' => $blog->account->avatar,
+        'comments_count' => $commentsCount,
+        'likes_count' => $likesCount,
+        'dislikes_count' => $dislikesCount,
+        'interaction_type' => $userInteraction ? $userInteraction->target_type : null,
+        'created_at' => $blog->created_at,
+        'updated_at' => $blog->updated_at,
+      ];
+    });
+
+    // Trả về thông tin chi tiết của người dùng và các bài blog
+    return response()->json([
+      'message' => 'User profile retrieved successfully.',
+      'data' => [
+        'user_id' => $user->id,
+        'username' => $user->username,
+        'account_id' => $user->id,
+        'email' => $user->email,
+        'blogs' => $blogs_data
+      ]
+    ], 200);
+  }
+
   public function createBlog(Request $request)
   {
     $account_id = auth()->user()->id;

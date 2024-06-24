@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Account;
 use App\Models\AdoptRequest;
 use App\Models\HistoryAdopt;
 use App\Models\Pet;
