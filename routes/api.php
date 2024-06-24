@@ -121,6 +121,8 @@ Route::group([
   Route::get('/blogs', [BlogController::class, 'getBlogs']);
   Route::get('/blogs/me/', [BlogController::class, 'getMyBlogs']);
   Route::get('/blogs/{blog_id}', [BlogController::class, 'getBlogDetail']);
+  Route::get('/blogs/search/username', [BlogController::class, 'searchBlogByUsername']);
+  Route::get('/blogs/search/title', [BlogController::class, 'searchBlogByTitle']);
   Route::post('/blogs', [BlogController::class, 'createBlog']);
   Route::put('/blogs/{blog_id}', [BlogController::class, 'updateBlog']);
   Route::delete('/blogs/{blog_id}', [BlogController::class, 'deleteBlog']);
@@ -161,6 +163,8 @@ Route::group([
   Route::delete('/ratings/{rating_id}/medical-center', [RatingMedicalCenterController::class, 'deleteRatingMedicalCenter']);
 
   // --------------     AID CENTER     --------------
+  Route::get('/adopt-request', [AidCenterController::class, 'getAdoptedRequest']);
+  Route::get('/adopt-request/{adopt_request_id}', [AidCenterController::class, 'getDetailAdoptedRequest']);
   Route::get('/unadopted-pets-of-aid-center/{aid_center_id}', [AidCenterController::class, 'getUnadoptedPetsOfAidCenter']);
   Route::get('/unadopted-pets', [AidCenterController::class, 'getUnadoptedPets']);
   Route::get('/unadopted-pets/{pet_id}', [AidCenterController::class, 'getDetailUnadpotedPet']);

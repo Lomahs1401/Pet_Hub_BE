@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Account;
 use App\Models\Blog;
 use App\Models\BlogCategory;
 use App\Models\Comment;
@@ -275,6 +276,146 @@ class BlogController extends Controller
     return response()->json([
       'message' => 'Query successfully!',
       'status' => 200,
+      'data' => $result,
+    ]);
+  }
+
+  public function searchBlogByUsername(Request $request)
+  {
+    $accountId = auth()->user()->id;
+
+    // Lấy tham số page_number và num_of_page từ request
+    $page_number = intval($request->query('page_number', 1));
+    $num_of_page = intval($request->query('num_of_page', 10));
+    $username = $request->query('username', '');
+
+    // Tìm tài khoản theo username
+    $accounts = Account::where('username', 'like', '%' . $username . '%')->pluck('id');
+
+    if ($accounts->isEmpty()) {
+      return response()->json([
+        'message' => 'Username not found!',
+        'status' => 404,
+      ], 404);
+    }
+
+    // Tìm kiếm blog theo account_id với phân trang
+    $blogs = Blog::whereIn('account_id', $accounts)
+      ->offset(($page_number - 1) * $num_of_page)
+      ->limit($num_of_page)
+      ->orderBy('created_at', 'desc')
+      ->get();
+
+    // Tính tổng số blogs và tổng số trang
+    $total_blogs = Blog::whereIn('account_id', $accounts)->count();
+    $total_pages = ceil($total_blogs / $num_of_page);
+
+    // Tạo danh sách kết quả
+    $result = $blogs->map(function ($blog) use ($accountId) {
+      $commentsCount = Comment::where('blog_id', $blog->id)->count();
+      $likesCount = Interact::where('target_label', 'blogs')
+        ->where('target_id', $blog->id)
+        ->where('target_type', 'like')
+        ->count();
+      $dislikesCount = Interact::where('target_label', 'blogs')
+        ->where('target_id', $blog->id)
+        ->where('target_type', 'dislike')
+        ->count();
+      $userInteraction = Interact::where('target_label', 'blogs')
+        ->where('target_id', $blog->id)
+        ->where('account_id', $accountId)
+        ->first();
+
+      return [
+        'id' => $blog->id,
+        'title' => $blog->title,
+        'text' => $blog->text,
+        'image' => $blog->image,
+        'account_id' => $blog->account_id,
+        'email' => $blog->account->email,
+        'username' => $blog->account->username,
+        'avatar' => $blog->account->avatar,
+        'comments_count' => $commentsCount,
+        'likes_count' => $likesCount,
+        'dislikes_count' => $dislikesCount,
+        'interaction_type' => $userInteraction ? $userInteraction->target_type : null,
+        'created_at' => $blog->created_at,
+        'updated_at' => $blog->updated_at,
+      ];
+    });
+
+    return response()->json([
+      'message' => 'Query successfully!',
+      'status' => 200,
+      'page_number' => $page_number,
+      'num_of_page' => $num_of_page,
+      'total_pages' => $total_pages,
+      'total_blogs' => $total_blogs,
+      'data' => $result,
+    ]);
+  }
+
+  public function searchBlogByTitle(Request $request)
+  {
+    $accountId = auth()->user()->id;
+
+    // Lấy tham số page_number và num_of_page từ request
+    $page_number = intval($request->query('page_number', 1));
+    $num_of_page = intval($request->query('num_of_page', 10));
+    $title = $request->query('title', '');
+
+    // Tìm kiếm blog theo title sử dụng tìm kiếm gần đúng với phân trang
+    $blogs = Blog::where('title', 'like', '%' . $title . '%')
+      ->offset(($page_number - 1) * $num_of_page)
+      ->limit($num_of_page)
+      ->orderBy('created_at', 'desc')
+      ->get();
+
+    // Tính tổng số blogs và tổng số trang
+    $total_blogs = Blog::where('title', 'like', '%' . $title . '%')->count();
+    $total_pages = ceil($total_blogs / $num_of_page);
+
+    // Tạo danh sách kết quả
+    $result = $blogs->map(function ($blog) use ($accountId) {
+      $commentsCount = Comment::where('blog_id', $blog->id)->count();
+      $likesCount = Interact::where('target_label', 'blogs')
+        ->where('target_id', $blog->id)
+        ->where('target_type', 'like')
+        ->count();
+      $dislikesCount = Interact::where('target_label', 'blogs')
+        ->where('target_id', $blog->id)
+        ->where('target_type', 'dislike')
+        ->count();
+      $userInteraction = Interact::where('target_label', 'blogs')
+        ->where('target_id', $blog->id)
+        ->where('account_id', $accountId)
+        ->first();
+
+      return [
+        'id' => $blog->id,
+        'title' => $blog->title,
+        'text' => $blog->text,
+        'image' => $blog->image,
+        'account_id' => $blog->account_id,
+        'email' => $blog->account->email,
+        'username' => $blog->account->username,
+        'avatar' => $blog->account->avatar,
+        'comments_count' => $commentsCount,
+        'likes_count' => $likesCount,
+        'dislikes_count' => $dislikesCount,
+        'interaction_type' => $userInteraction ? $userInteraction->target_type : null,
+        'created_at' => $blog->created_at,
+        'updated_at' => $blog->updated_at,
+      ];
+    });
+
+    return response()->json([
+      'message' => 'Query successfully!',
+      'status' => 200,
+      'page_number' => $page_number,
+      'num_of_page' => $num_of_page,
+      'total_pages' => $total_pages,
+      'total_blogs' => $total_blogs,
       'data' => $result,
     ]);
   }
