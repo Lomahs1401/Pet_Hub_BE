@@ -61,85 +61,94 @@ class AccountSeeder extends Seeder
     for ($i = 0; $i < TOTAL_CUSTOMER_ACCOUNT; $i++) {
       $created_at = $faker->dateTimeBetween('-2 years', 'now');
 
-      $customer_account = Account::factory()->create([
-        'username' => $faker->userName(),
-        'email' => $faker->safeEmail(),
-        'password' => Hash::make('customer123'),
-        'avatar' => $list_customer_avatars[$i],
-        'enabled' => $faker->boolean(100),
-        'is_approved' => $faker->boolean(100),
-        'role_id' => $role_customer,
-        'reset_code' => null,
-        'reset_code_expires_at' => null,
-        'reset_code_attempts' => null,
-        'created_at' => $created_at,
-        'updated_at' => $created_at,
-      ]);
+      $email = $faker->unique()->safeEmail; // Sử dụng unique để tránh trùng lặp email
+      // Kiểm tra xem email đã tồn tại trong cơ sở dữ liệu hay chưa
+      if (!Account::where('email', $email)->exists()) {
+        // Tạo account mới
+        $customer_account = Account::factory()->create([
+          'username' => $faker->userName(),
+          'email' => $faker->safeEmail(),
+          'password' => Hash::make('customer123'),
+          'avatar' => $list_customer_avatars[$i],
+          'enabled' => $faker->boolean(100),
+          'is_approved' => $faker->boolean(100),
+          'role_id' => $role_customer,
+          'reset_code' => null,
+          'reset_code_expires_at' => null,
+          'reset_code_attempts' => null,
+          'created_at' => $created_at,
+          'updated_at' => $created_at,
+        ]);
 
-      $ranking_point = $faker->randomNumber(4);
-      foreach ($rankings as $ranking) {
-        if ($ranking_point >= $ranking->check_point) {
-          $ranking_id = $ranking->id;
-          break;
+        $ranking_point = $faker->randomNumber(4);
+        foreach ($rankings as $ranking) {
+          if ($ranking_point >= $ranking->check_point) {
+            $ranking_id = $ranking->id;
+            break;
+          }
         }
+
+        if (!isset($ranking_id)) {
+          $ranking_id = 1; // Giá trị mặc định
+        }
+
+        $is_male_customer = $faker->boolean(chanceOfGettingTrue: 50);
+
+        DB::table('customers')->insert([
+          'account_id' => $customer_account->id,
+          'full_name' => $is_male_customer ? $faker->lastName() . ' ' . $faker->firstNameMale()
+            : $faker->lastName() . ' ' . $faker->firstNameFemale(),
+          'gender' => $is_male_customer ? 'Male' : 'Female',
+          'birthdate' => $faker->dateTimeInInterval('-20 years', '+2 years', 'Asia/Ho_Chi_Minh')->format('Y-m-d'),
+          'address' => $faker->city(),
+          'phone' => $faker->regexify('0(3|5|7|8|9){1}([0-9]{8})'),
+          'ranking_point' => $ranking_point,
+          'ranking_id' => $ranking_id,
+          'created_at' => $created_at,
+          'updated_at' => $created_at,
+        ]);
       }
-
-      if (!isset($ranking_id)) {
-        $ranking_id = 1; // Giá trị mặc định
-      }
-
-      $is_male_customer = $faker->boolean(chanceOfGettingTrue: 50);
-
-      DB::table('customers')->insert([
-        'account_id' => $customer_account->id,
-        'full_name' => $is_male_customer ? $faker->lastName() . ' ' . $faker->firstNameMale()
-          : $faker->lastName() . ' ' . $faker->firstNameFemale(),
-        'gender' => $is_male_customer ? 'Male' : 'Female',
-        'birthdate' => $faker->dateTimeInInterval('-20 years', '+2 years', 'Asia/Ho_Chi_Minh')->format('Y-m-d'),
-        'address' => $faker->city(),
-        'phone' => $faker->regexify('0(3|5|7|8|9){1}([0-9]{8})'),
-        'ranking_point' => $ranking_point,
-        'ranking_id' => $ranking_id,
-        'created_at' => $created_at,
-        'updated_at' => $created_at,
-      ]);
     }
 
     // --------------------------      ADMINS     -------------------------- 
     for ($i = 0; $i < TOTAL_ADMIN_ACCOUNT; $i++) {
       $created_at = $faker->dateTimeBetween('-2 years', 'now');
+      $email = $faker->unique()->safeEmail; // Sử dụng unique để tránh trùng lặp email
+      // Kiểm tra xem email đã tồn tại trong cơ sở dữ liệu hay chưa
+      if (!Account::where('email', $email)->exists()) {
+        // Tạo account mới
+        $admin_account = Account::factory()->create([
+          'username' => $faker->userName(),
+          'email' => $faker->safeEmail(),
+          'password' => Hash::make('admin123'),
+          'avatar' => $list_admin_avatars[$i],
+          'enabled' => $faker->boolean(100),
+          'is_approved' => $faker->boolean(100),
+          'role_id' => $role_admin,
+          'reset_code' => null,
+          'reset_code_expires_at' => null,
+          'reset_code_attempts' => null,
+          'created_at' => $created_at,
+          'updated_at' => $created_at,
+        ]);
 
-      $admin_account = Account::factory()->create([
-        'username' => $faker->userName(),
-        'email' => $faker->safeEmail(),
-        'password' => Hash::make('admin123'),
-        'avatar' => $list_admin_avatars[$i],
-        'enabled' => $faker->boolean(100),
-        'is_approved' => $faker->boolean(100),
-        'role_id' => $role_admin,
-        'reset_code' => null,
-        'reset_code_expires_at' => null,
-        'reset_code_attempts' => null,
-        'created_at' => $created_at,
-        'updated_at' => $created_at,
-      ]);
+        $is_male_admin = $faker->boolean(chanceOfGettingTrue: 50);
 
-      $is_male_admin = $faker->boolean(chanceOfGettingTrue: 50);
-
-      DB::table('admins')->insert([
-        'account_id' => $admin_account->id,
-        'full_name' => $is_male_admin ? $faker->lastName() . ' ' . $faker->firstNameMale()
-          : $faker->lastName() . ' ' . $faker->firstNameFemale(),
-        'gender' => $is_male_admin ? 'Male' : 'Female',
-        'birthdate' => $faker->dateTimeInInterval('-20 years', '+2 years', 'Asia/Ho_Chi_Minh')->format('Y-m-d'),
-        'CMND' => $faker->numerify('#########'),
-        'address' => $faker->city(),
-        'phone' => $faker->regexify('0(3|5|7|8|9){1}([0-9]{8})'),
-        'image' => $faker->imageUrl(),
-        'status' => $faker->boolean(100),
-        'created_at' => $created_at,
-        'updated_at' => $created_at,
-      ]);
+        DB::table('admins')->insert([
+          'account_id' => $admin_account->id,
+          'full_name' => $is_male_admin ? $faker->lastName() . ' ' . $faker->firstNameMale()
+            : $faker->lastName() . ' ' . $faker->firstNameFemale(),
+          'gender' => $is_male_admin ? 'Male' : 'Female',
+          'birthdate' => $faker->dateTimeInInterval('-20 years', '+2 years', 'Asia/Ho_Chi_Minh')->format('Y-m-d'),
+          'CMND' => $faker->numerify('#########'),
+          'address' => $faker->city(),
+          'phone' => $faker->regexify('0(3|5|7|8|9){1}([0-9]{8})'),
+          'image' => $faker->imageUrl(),
+          'status' => $faker->boolean(100),
+          'created_at' => $created_at,
+          'updated_at' => $created_at,
+        ]);
+      }
     }
   }
 }

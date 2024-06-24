@@ -314,6 +314,7 @@ class AuthController extends Controller
     $validator = Validator::make($request->all(), [
       'email' => 'required|string|email',
       'password' => 'required|string',
+      'expo_token' => 'nullable|string', // Thêm validation cho expo_token
     ]);
 
     if ($validator->fails()) {
@@ -360,6 +361,12 @@ class AuthController extends Controller
         'message' => 'Login failed!',
         'error' => 'Unauthorized',
       ], 401);
+    }
+
+    // Lưu Expo Push Token vào cơ sở dữ liệu nếu có
+    if ($request->expo_token) {
+      $account->expo_token = $request->expo_token;
+      $account->save();
     }
 
     return $this->respondWithToken($token);

@@ -30,6 +30,7 @@ use App\Http\Controllers\API\ServiceController;
 use App\Http\Controllers\API\ShopController;
 use App\Http\Controllers\API\ShopDashboardController;
 use App\Http\Controllers\API\SubOrderController;
+use App\Http\Controllers\HomeController;
 use App\Models\MedicalCenter;
 use App\Models\RatingMedicalCenter;
 use Illuminate\Http\Request;
@@ -51,6 +52,7 @@ Route::group([
   'middleware' => ['force.json.response', 'api'],
   'prefix' => 'auth'
 ], function ($router) {
+  Route::get('/', [HomeController::class, 'index']);
   Route::post('/login', [AuthController::class, 'login']);
   Route::post('/register-customer', [AuthController::class, 'registerCustomer']);
   Route::post('/register-shop', [AuthController::class, 'registerShop']);
