@@ -450,7 +450,7 @@ class BlogController extends Controller
       return [
         'account_id' => $account->id,
         'username' => $account->username,
-        'email' => $account->username,
+        'email' => $account->email,
         'avatar' => $account->avatar,
       ];
     });

@@ -476,7 +476,7 @@ class AidCenterController extends Controller
           'pet_id' => $pet->id,
           'pet_name' => $pet->name,
           'customer_id' => $customer->id,
-          'customer_name' => $customer->name,
+          'customer_name' => $customer->full_name,
           'request_status' => $adoptRequest->status,
           'request_date' => $adoptRequest->created_at,
         ],
