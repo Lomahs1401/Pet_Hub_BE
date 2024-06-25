@@ -6,8 +6,8 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use NotificationChannels\ExpoPushNotifications\ExpoChannel;
-use NotificationChannels\ExpoPushNotifications\ExpoMessage;
+use NotificationChannels\Expo\ExpoChannel;
+use NotificationChannels\Expo\ExpoMessage;
 
 class WelcomeNotification extends Notification
 {
@@ -21,21 +21,19 @@ class WelcomeNotification extends Notification
     //
   }
 
-  /**
-   * Get the notification's delivery channels.
-   */
   public function via($notifiable): array
   {
-    return [ExpoChannel::class];
+      return [ExpoChannel::class];
   }
 
-  public function toExpoPush($notifiable)
+  public function toExpo($notifiable): ExpoMessage
   {
-    return ExpoMessage::create()
-      ->badge(1)
-      ->enableSound()
-      ->title("Congratulations!")
-      ->body("Your account was approved!");
+      return ExpoMessage::create('Suspicious Activity')
+          ->body('Someone tried logging in to your account!')
+          ->data($notifiable->only('email', 'id'))
+          ->expiresAt(now()->addHour())
+          ->priority('high')
+          ->playSound();
   }
 
   /**

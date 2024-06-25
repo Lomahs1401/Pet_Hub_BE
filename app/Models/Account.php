@@ -7,6 +7,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use NotificationChannels\Expo\ExpoPushToken;
 
 class Account extends Authenticatable implements JWTSubject
 {
@@ -69,6 +70,18 @@ class Account extends Authenticatable implements JWTSubject
   public function getJWTCustomClaims()
   {
     return [];
+  }
+
+  protected function casts(): array
+  {
+    return [
+      'expo_token' => ExpoPushToken::class
+    ];
+  }
+
+  public function routeNotificationForExpo(): ?ExpoPushToken
+  {
+    return $this->expo_token;
   }
 
   public function customer()
