@@ -328,9 +328,12 @@ Route::group([
   // --------------     APPOINTMENT     --------------
   Route::get('/appointments/done', [AppointmentController::class, 'getListDoneAppointments']);
   Route::get('/appointments/waiting', [AppointmentController::class, 'getListWaitingAppointments']);
-
+  Route::get('/appointments/{appointment_id}', [AppointmentController::class, 'getAppointmentDetail']);
+  
+  // --------------     MEDICAL CENTER     --------------
+  Route::get('/profile', [MedicalCenterController::class, 'getProfile']);
+  Route::put('/profile/{account_id}', [MedicalCenterController::class, 'updateProfile']);
 });
-
 
 // Admin API
 Route::group([

@@ -63,16 +63,6 @@ class ShopController extends Controller
       ], 404);
     }
 
-    // Kiểm tra riêng xem email có bị trùng lặp hay không
-    $email = $request->input('email');
-    $existingAccount = Account::where('email', $email)->where('id', '!=', $shop->account_id)->first();
-    if ($existingAccount) {
-      return response()->json([
-        'message' => 'The email has already been taken.',
-        'status' => 422
-      ], 422);
-    }
-
     // Xác thực dữ liệu
     $validatedData = $request->validate([
       'name' => 'required|string',
@@ -87,7 +77,6 @@ class ShopController extends Controller
       'certificate' => 'nullable|string',
       'avatar' => 'nullable|string',
       'username' => 'required|string',
-      'email' => 'required|email',
     ]);
 
     // Cập nhật shop
@@ -108,7 +97,6 @@ class ShopController extends Controller
     $account = Account::findOrFail($shop->account_id);
     $account->update([
       'username' => $validatedData['username'],
-      'email' => $validatedData['email'],
       'avatar' => $validatedData['avatar'],
     ]);
 

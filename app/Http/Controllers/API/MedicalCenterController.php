@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Account;
 use App\Models\MedicalCenter;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -266,5 +268,102 @@ class MedicalCenterController extends Controller
       'total_products' => $total_medical_centers,
       'data' => $formatted_medical_centers,
     ]);
+  }
+
+  public function getProfile()
+  {
+    $account_id = auth()->user()->id;
+
+    $medicalCenter = MedicalCenter::where('account_id', $account_id)->first();
+
+    // Kiểm tra xem medicalCenter có tồn tại không
+    if (!$medicalCenter) {
+      return response()->json(['message' => 'Medical center not found'], 404);
+    }
+
+    $formattedMedicalCenter = [
+      'id' => $medicalCenter->id,
+      'account_id' => $medicalCenter->account->id,
+      'name' => $medicalCenter->name,
+      'username' => $medicalCenter->account->username,
+      'email' => $medicalCenter->account->email,
+      'role' => $medicalCenter->account->role->role_name,
+      'description' => $medicalCenter->description,
+      'image' => $medicalCenter->image,
+      'avatar' => $medicalCenter->account->avatar,
+      'phone' => $medicalCenter->phone,
+      'address' => $medicalCenter->address,
+      'website' => $medicalCenter->website,
+      'fanpage' => $medicalCenter->fanpage,
+      'work_time' => $medicalCenter->work_time,
+      'establish_year' => $medicalCenter->establish_year,
+      'certificate' => $medicalCenter->certificate,
+      'created_at' => $medicalCenter->created_at,
+      'updated_at' => $medicalCenter->updated_at,
+    ];
+
+    return response()->json([
+      'message' => 'Get medical center profile successfully',
+      'status' => 200,
+      'data' => $formattedMedicalCenter
+    ], 200);
+  }
+
+  public function updateProfile(Request $request)
+  {
+    $medical_center_id = auth()->user()->medicalCenter->id;
+
+    try {
+      // Lấy medical center hiện tại
+      $medicalCenter = MedicalCenter::findOrFail($medical_center_id);
+    } catch (ModelNotFoundException $e) {
+      return response()->json([
+        'message' => 'Medical center not found!',
+        'status' => 404
+      ], 404);
+    }
+
+    // Xác thực dữ liệu
+    $validatedData = $request->validate([
+      'name' => 'required|string',
+      'description' => 'nullable|string',
+      'image' => 'nullable|string',
+      'phone' => 'required|string',
+      'address' => 'required|string',
+      'website' => 'nullable|string',
+      'fanpage' => 'nullable|string',
+      'work_time' => 'required|string',
+      'establish_year' => 'required|string',
+      'certificate' => 'nullable|string',
+      'avatar' => 'nullable|string',
+      'username' => 'required|string',
+    ]);
+
+    // Cập nhật medicalCenter
+    $medicalCenter->update([
+      'name' => $validatedData['name'],
+      'description' => $validatedData['description'],
+      'image' => $validatedData['image'],
+      'phone' => $validatedData['phone'],
+      'address' => $validatedData['address'],
+      'website' => $validatedData['website'],
+      'fanpage' => $validatedData['fanpage'],
+      'work_time' => $validatedData['work_time'],
+      'establish_year' => $validatedData['establish_year'],
+      'certificate' => $validatedData['certificate'],
+    ]);
+
+    // Cập nhật thông tin tài khoản
+    $account = Account::findOrFail($medicalCenter->account_id);
+    $account->update([
+      'username' => $validatedData['username'],
+      'avatar' => $validatedData['avatar'],
+    ]);
+
+    return response()->json([
+      'message' => 'Medical center updated successfully.',
+      'status' => 200,
+      'data' => $medicalCenter
+    ], 200);
   }
 }
