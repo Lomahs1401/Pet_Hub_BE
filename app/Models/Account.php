@@ -71,18 +71,6 @@ class Account extends Authenticatable implements JWTSubject
     return [];
   }
 
-  // /**
-  //    * Get the attributes that should be cast.
-  //    *
-  //    * @return array<string, string>
-  //    */
-  //   protected function casts(): array
-  //   {
-  //       return [
-  //           'expo_token' => ExpoPushToken::class
-  //       ];
-  //   }
-
   public function expoTokens()
   {
     return $this->hasMany(ExpoToken::class);

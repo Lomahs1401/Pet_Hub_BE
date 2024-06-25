@@ -22,19 +22,6 @@ class WelcomeNotification extends Notification
     //
   }
 
-  // /**
-  //  * Get the expo representation of the notification.
-  //  */
-  // public function toExpo($notifiable): ExpoMessage
-  // {
-  //   return ExpoMessage::create('Suspicious Activity')
-  //     ->body('Someone tried logging in to your account!')
-  //     ->data($notifiable->only('email', 'id'))
-  //     ->expiresAt(now()->addHour())
-  //     ->priority('high')
-  //     ->playSound();
-  // }
-
   /**
    * Get the notification's delivery channels.
    */
@@ -45,8 +32,21 @@ class WelcomeNotification extends Notification
 
   public function toExpoNotification($notifiable): ExpoMessage
   {
+    $expoTokens = $notifiable->expoTokens->pluck('expo_token')->toArray();
+
+    if (empty($expoTokens)) {
+      // Handle case where there are no expo tokens available for the notifiable
+      // For example, return a default message or log an error.
+      // This is just an example, adjust as per your application's logic.
+      return (new ExpoMessage())
+        ->to('default-expo-token')  // Provide a fallback or default expo token
+        ->title('Default Title')
+        ->body('No expo tokens available for this user')
+        ->channelId('default');
+    }
+
     return (new ExpoMessage())
-      ->to($notifiable->expoTokens->pluck('value')->toArray())
+      ->to($expoTokens)
       ->title('A beautiful title')
       ->body('This is a content')
       ->channelId('default');
