@@ -28,7 +28,7 @@ class WelcomeNotification extends Notification
    */
   public function via($notifiable): array
   {
-    return [ExpoChannel::class];
+    return ['expo'];
   }
 
   public function toExpo($notifiable): ExpoMessage
