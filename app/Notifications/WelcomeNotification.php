@@ -6,8 +6,8 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use NotificationChannels\Expo\ExpoChannel;
-use NotificationChannels\Expo\ExpoMessage;
+use NotificationChannels\ExpoPushNotifications\ExpoChannel;
+use NotificationChannels\ExpoPushNotifications\ExpoMessage;
 // use YieldStudio\LaravelExpoNotifier\Dto\ExpoMessage;
 use YieldStudio\LaravelExpoNotifier\ExpoNotificationsChannel;
 
@@ -28,17 +28,16 @@ class WelcomeNotification extends Notification
    */
   public function via($notifiable): array
   {
-    return ['expo'];
+    return [ExpoChannel::class];
   }
 
-  public function toExpo($notifiable): ExpoMessage
+  public function toExpoPush($notifiable)
   {
-    return ExpoMessage::create('Suspicious Activity')
-      ->body('Someone tried logging in to your account!')
-      ->data($notifiable->only('email', 'id'))
-      ->expiresAt(now()->addHour())
-      ->priority('high')
-      ->playSound();
+    return ExpoMessage::create()
+      ->badge(1)
+      ->enableSound()
+      ->title("Congratulations!")
+      ->body("Your account was approved!");
   }
 
   // public function toExpoNotification($notifiable): ?ExpoMessage
