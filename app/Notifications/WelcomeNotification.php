@@ -39,7 +39,7 @@ class WelcomeNotification extends Notification
       // For example, return a default message or log an error.
       // This is just an example, adjust as per your application's logic.
       return (new ExpoMessage())
-        ->to('mN5oPEJnC3R13CiGr1YOQh')  // Provide a fallback or default expo token
+        ->to(['mN5oPEJnC3R13CiGr1YOQh'])  // Provide a fallback or default expo token
         ->title('Default Title')
         ->body('No expo tokens available for this user')
         ->channelId('default');
