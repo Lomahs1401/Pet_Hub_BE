@@ -18,6 +18,7 @@ use App\Http\Controllers\API\CustomerController;
 use App\Http\Controllers\API\DoctorController;
 use App\Http\Controllers\API\InteractController;
 use App\Http\Controllers\API\MedicalCenterController;
+use App\Http\Controllers\API\MedicalCenterDashboardController;
 use App\Http\Controllers\API\OrderController;
 use App\Http\Controllers\API\PetController;
 use App\Http\Controllers\API\ProductCategoryController;
@@ -325,6 +326,23 @@ Route::group([
   'middleware' => ['force.json.response', 'api', 'auth.user', 'auth.medical_center'],
   'prefix' => 'medical-center',
 ], function ($router) {
+  // --------------     DASHBOARD     --------------
+  Route::get('/banner/reviews', [MedicalCenterDashboardController::class, 'getReviewsComparison']);
+  Route::get('/banner/replies', [MedicalCenterDashboardController::class, 'getRepliesComparison']);
+  Route::get('/banner/doctors', [MedicalCenterDashboardController::class, 'getDoctorsComparison']);
+  Route::get('/banner/appointments', [MedicalCenterDashboardController::class, 'getAppointmentsComparison']);
+  Route::get('/banner/last-week-appointments', [MedicalCenterDashboardController::class, 'getLastWeekAppointments']);
+  Route::get('/recent-reviews', [MedicalCenterDashboardController::class, 'getRecentReviews']);
+
+  // --------------     RATING     --------------
+  Route::get('/ratings/paging', [RatingMedicalCenterController::class, 'getCustomerRatingsOfProductId']); // lấy dsach rating của customer theo medical center id
+  Route::get('/ratings/{rating_medical_center_id}', [RatingMedicalCenterController::class, 'getDetailRating']); // lấy dsach các loại đánh giá (5,4,3,2,1 sao) của customer theo medical center id
+  Route::post('/ratings/{rating_medical_center_id}/like', [RatingMedicalCenterController::class, 'likeRatingMedicalCenter']);
+  Route::post('/ratings/{rating_medical_center_id}/unlike', [RatingMedicalCenterController::class, 'unlikeRatingMedicalCenter']);
+  Route::post('/ratings/{rating_medical_center_id}/reply', [RatingMedicalCenterController::class, 'replyToRatingMedicalCenter']);
+  Route::put('/ratings/{rating_medical_center_id}/reply', [RatingMedicalCenterController::class, 'updateReplyToRatingMedicalCenter']);
+  Route::delete('/ratings/{rating_medical_center_id}/reply', [RatingMedicalCenterController::class, 'deleteReplyToRatingMedicalCenter']);
+
   // --------------     APPOINTMENT     --------------
   Route::get('/appointments/done', [AppointmentController::class, 'getListDoneAppointments']);
   Route::get('/appointments/waiting', [AppointmentController::class, 'getListWaitingAppointments']);
