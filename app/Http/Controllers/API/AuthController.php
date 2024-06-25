@@ -7,6 +7,7 @@ use App\Models\Account;
 use App\Models\AccountHasRole;
 use App\Models\AidCenter;
 use App\Models\Customer;
+use App\Models\ExpoToken;
 use App\Models\MedicalCenter;
 use App\Models\Ranking;
 use App\Models\Role;
@@ -365,8 +366,14 @@ class AuthController extends Controller
 
     // Lưu Expo Push Token vào cơ sở dữ liệu nếu có
     if ($request->expo_token) {
-      $account->expo_token = $request->expo_token;
-      $account->save();
+      $existingToken = ExpoToken::where('expo_token', $request->expo_token)->first();
+
+      if (!$existingToken) {
+        ExpoToken::create([
+          'account_id' => $account->id,
+          'expo_token' => $request->expo_token,
+        ]);
+      }
     }
 
     return $this->respondWithToken($token);

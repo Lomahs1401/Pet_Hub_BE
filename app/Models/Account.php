@@ -32,7 +32,6 @@ class Account extends Authenticatable implements JWTSubject
     'enabled',
     'role_id',
     'is_approved',
-    'expo_token',
     'reset_code',
     'reset_code_expired_at',
     'reset_code_attempts'
