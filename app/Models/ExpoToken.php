@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable;
 
 class ExpoToken extends Model
 {
-  use HasFactory;
+  use HasFactory, Notifiable;
 
   /**
    * The table associated with the model.
@@ -22,9 +24,23 @@ class ExpoToken extends Model
    * @var array<int, string>
    */
   protected $fillable = [
-    'account_id', 
+    'account_id',
     'expo_token'
   ];
+
+  protected function casts(): array
+  {
+    return [
+      'expo_token' => ExpoToken::class
+    ];
+  }
+  /**
+   * @return Collection<int, ExpoPushToken>
+   */
+  public function routeNotificationForExpo(): Collection
+  {
+    return $this->devices->pluck('expo_token');
+  }
 
   public function account()
   {
