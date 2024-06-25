@@ -21,24 +21,24 @@ class WelcomeNotification extends Notification
   }
 
   /**
+   * Get the expo representation of the notification.
+   */
+  public function toExpo($notifiable): ExpoMessage
+  {
+    return ExpoMessage::create('Suspicious Activity')
+      ->body('Someone tried logging in to your account!')
+      ->data($notifiable->only('email', 'id'))
+      ->expiresAt(now()->addHour())
+      ->priority('high')
+      ->playSound();
+  }
+
+  /**
    * Get the notification's delivery channels.
    */
   public function via($notifiable): array
   {
     return ['expo'];
-  }
-
-  /**
-   * Get the expo representation of the notification.
-   */
-  public function toExpo($notifiable): ExpoMessage
-  {
-    return ExpoMessage::create()
-      ->title('Welcome!')
-      ->body('Thank you for signing up!')
-      ->setData(['key' => 'value'])
-      ->badge(1)
-      ->enableSound();
   }
 
   /**

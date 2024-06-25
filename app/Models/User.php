@@ -42,21 +42,4 @@ class User extends Authenticatable
   protected $casts = [
     'email_verified_at' => 'datetime',
   ];
-
-  /**
-   * Get the attributes that should be cast.
-   *
-   * @return array<string, string>
-   */
-  protected function casts(): array
-  {
-    return [
-      'expo_token' => ExpoPushToken::class
-    ];
-  }
-
-  public function routeNotificationForExpo(): ?ExpoPushToken
-  {
-    return $this->expo_token;
-  }
 }
