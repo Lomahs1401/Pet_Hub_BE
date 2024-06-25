@@ -31,6 +31,7 @@ use App\Http\Controllers\API\ShopController;
 use App\Http\Controllers\API\ShopDashboardController;
 use App\Http\Controllers\API\SubOrderController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\NotificationController;
 use App\Models\MedicalCenter;
 use App\Models\RatingMedicalCenter;
 use Illuminate\Http\Request;
@@ -47,12 +48,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+
 // Public route
 Route::group([
   'middleware' => ['force.json.response', 'api'],
   'prefix' => 'auth'
 ], function ($router) {
-  Route::get('/', [HomeController::class, 'index']);
+  Route::post('/send-test-notification', [NotificationController::class, 'sendTestNotification']);
   Route::post('/login', [AuthController::class, 'login']);
   Route::post('/register-customer', [AuthController::class, 'registerCustomer']);
   Route::post('/register-shop', [AuthController::class, 'registerShop']);
