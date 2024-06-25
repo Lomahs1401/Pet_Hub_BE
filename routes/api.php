@@ -320,18 +320,24 @@ Route::group([
   Route::get('/sub-orders/{sub_order_id}', [OrderController::class, 'getSubOrders']);
 });
 
-// Shop API
+// Medical Center API
+Route::group([
+  'middleware' => ['force.json.response', 'api', 'auth.user', 'auth.medical_center'],
+  'prefix' => 'medical-center',
+], function ($router) {
+  // --------------     APPOINTMENT     --------------
+  Route::get('/appointments/done', [AppointmentController::class, 'getListDoneAppointments']);
+  Route::get('/appointments/waiting', [AppointmentController::class, 'getListWaitingAppointments']);
+
+});
+
+
+// Admin API
 Route::group([
   'middleware' => ['force.json.response', 'api', 'auth.user', 'auth.admin'],
   'prefix' => 'admin',
 ], function ($router) {
   // --------------     DASHBOARD     --------------
-  Route::get('/banner/reviews', [ShopDashboardController::class, 'getReviewsComparison']);
-  Route::get('/banner/replies', [ShopDashboardController::class, 'getRepliesComparison']);
-  Route::get('/banner/products', [ShopDashboardController::class, 'getProductsComparison']);
-  Route::get('/banner/orders', [ShopDashboardController::class, 'getOrdersComparison']);
-  Route::get('/banner/sales', [ShopDashboardController::class, 'getSales']);
-
   Route::get('/bar/shop', [AdminDashboardController::class, 'getShop']);
   Route::get('/bar/medical-center', [AdminDashboardController::class, 'getMedicalCenter']);
   Route::get('/bar/aid-center', [AdminDashboardController::class, 'getAidCenter']);

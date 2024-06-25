@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Account;
+use App\Models\Appointment;
 use App\Models\Role;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -12,36 +13,62 @@ class AdminDashboardController extends Controller
 {
   public function getShop(Request $request)
   {
-    $year = $request->get('year', Carbon::now()->year); // Lấy năm từ request hoặc sử dụng năm hiện tại
+    // $year = $request->get('year', Carbon::now()->year); // Lấy năm từ request hoặc sử dụng năm hiện tại
 
-    // Khởi tạo mảng để chứa dữ liệu theo tháng
-    $accountData = array_fill(0, 12, ['name' => '', 'count' => 0]);
+    // // Khởi tạo mảng để chứa dữ liệu theo tháng
+    // $accountData = array_fill(0, 12, ['name' => '', 'count' => 0]);
 
-    // Tên các tháng
-    $monthNames = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-    ];
+    // // Tên các tháng
+    // $monthNames = [
+    //   'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    //   'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    // ];
 
-    $role_id = Role::where('role_name', 'ROLE_SHOP')->value('id');
+    // $role_id = Role::where('role_name', 'ROLE_SHOP')->value('id');
 
-    foreach ($monthNames as $index => $month) {
-      $monthStart = Carbon::create($year, $index + 1, 1)->startOfMonth();
-      $monthEnd = $monthStart->copy()->endOfMonth();
+    // foreach ($monthNames as $index => $month) {
+    //   $monthStart = Carbon::create($year, $index + 1, 1)->startOfMonth();
+    //   $monthEnd = $monthStart->copy()->endOfMonth();
 
-      // Lấy số lượng account được tạo ra trong khoảng thời gian của tháng đó
-      $accountCount = Account::where('role_id', $role_id)->whereBetween('created_at', [$monthStart, $monthEnd])->count();
+    //   // Lấy số lượng account được tạo ra trong khoảng thời gian của tháng đó
+    //   $accountCount = Account::where('role_id', $role_id)->whereBetween('created_at', [$monthStart, $monthEnd])->count();
 
-      $accountData[$index] = [
-        'name' => $month,
-        'count' => (int)$accountCount, // Ép kiểu về số nguyên
-      ];
-    }
+    //   $accountData[$index] = [
+    //     'name' => $month,
+    //     'count' => (int)$accountCount, // Ép kiểu về số nguyên
+    //   ];
+    // }
+
+    // return response()->json([
+    //   'message' => 'Shop accounts retrieved successfully!',
+    //   'status' => 200,
+    //   'data' => $accountData
+    // ]);
+    $page_number = intval($request->query('page_number', 1));
+    $num_of_page = intval($request->query('num_of_page', 10));
+
+    // Tính toán offset
+    $offset = ($page_number - 1) * $num_of_page;
+
+    // Lấy số lượng các cuộc hẹn đã hoàn thành
+    $total_appointments = Appointment::where('done', true)->count();
+    $total_pages = ceil($total_appointments / $num_of_page);
+
+    // Lấy danh sách các cuộc hẹn đã hoàn thành
+    $appointments = Appointment::where('done', true)
+      ->offset($offset)
+      ->limit($num_of_page)
+      ->orderBy('start_time', 'desc')
+      ->get();
 
     return response()->json([
-      'message' => 'Shop accounts retrieved successfully!',
+      'message' => 'Query successfully!',
       'status' => 200,
-      'data' => $accountData
+      'page_number' => $page_number,
+      'num_of_page' => $num_of_page,
+      'total_pages' => $total_pages,
+      'total_appointments' => $total_appointments,
+      'data' => $appointments,
     ]);
   }
 

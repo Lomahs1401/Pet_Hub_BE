@@ -604,6 +604,169 @@ class AppointmentController extends Controller
     ], 200);
   }
 
+  // ==================================     FOR MEDICAL CENTER     ==================================
+  public function getListDoneAppointments(Request $request)
+  {
+    $page_number = intval($request->query('page_number', 1));
+    $num_of_page = intval($request->query('num_of_page', 10));
+    $sort_by = $request->query('sort_by', 'newest');
+
+    // Tính toán offset
+    $offset = ($page_number - 1) * $num_of_page;
+
+    // Lấy số lượng các cuộc hẹn đã hoàn thành
+    $query = Appointment::withTrashed()
+      ->with(['doctor.account', 'doctor.medicalCenter', 'pet', 'customer.account'])
+      ->where('done', true);
+
+    $total_appointments = $query->count();
+    $total_pages = ceil($total_appointments / $num_of_page);
+
+    if ($sort_by === 'oldest') {
+      $appointments = $query->orderBy('start_time', 'asc')
+        ->offset($offset)
+        ->limit($num_of_page)
+        ->get();
+    } else {
+      $appointments = $query->orderBy('start_time', 'desc')
+        ->offset($offset)
+        ->limit($num_of_page)
+        ->get();
+    }
+
+    $formatted_appointments = [];
+
+    foreach ($appointments as $appointment) {
+      $doctor = $appointment->doctor;
+      $medicalCenter = $doctor->medicalCenter;
+
+      $formatted_appointments[] = [
+        'appointment_id' => $appointment->id,
+        'start_time' => $appointment->start_time,
+        'message' => $appointment->message,
+        'done' => $appointment->done,
+        'created_at' => $appointment->created_at,
+        'updated_at' => $appointment->updated_at,
+        'deleted_at' => $appointment->deleted_at,
+        'pet' => [
+          'pet_id' => $appointment->pet->id,
+          'name' => $appointment->pet->name,
+          'age' => $appointment->pet->age,
+          'breed' => $appointment->pet->breed->name,
+          'image' => $appointment->pet->breed->image,
+        ],
+        'doctor' => [
+          'id' => $doctor->id,
+          'full_name' => $doctor->full_name,
+          'email' => $doctor->account->email,
+          'image' => $doctor->image,
+          'avatar' => $doctor->account->avatar,
+          'phone' => $doctor->phone,
+        ],
+        'medical_center' => [
+          'id' => $medicalCenter->id,
+          'name' => $medicalCenter->name,
+          'email' => $medicalCenter->email,
+          'image' => $medicalCenter->image,
+          'avatar' => $medicalCenter->account->avatar,
+          'phone' => $medicalCenter->phone,
+          'address' => $medicalCenter->address,
+        ]
+      ];
+    }
+
+    return response()->json([
+      'message' => 'Fetch done appointments successfully!',
+      'status' => 200,
+      'page_number' => $page_number,
+      'num_of_page' => $num_of_page,
+      'total_pages' => $total_pages,
+      'total_appointments' => $total_appointments,
+      'data' => $formatted_appointments,
+    ]);
+  }
+
+  public function getListWaitingAppointments(Request $request)
+  {
+    $page_number = intval($request->query('page_number', 1));
+    $num_of_page = intval($request->query('num_of_page', 10));
+    $sort_by = $request->query('sort_by', 'newest');
+
+    // Tính toán offset
+    $offset = ($page_number - 1) * $num_of_page;
+
+    // Lấy số lượng các cuộc hẹn đang chờ
+    $query = Appointment::withTrashed()
+      ->with(['doctor.account', 'doctor.medicalCenter', 'pet', 'customer.account'])
+      ->where('done', false);
+
+    $total_appointments = $query->count();
+    $total_pages = ceil($total_appointments / $num_of_page);
+
+    if ($sort_by === 'oldest') {
+      $appointments = $query->orderBy('start_time', 'asc')
+        ->offset($offset)
+        ->limit($num_of_page)
+        ->get();
+    } else {
+      $appointments = $query->orderBy('start_time', 'desc')
+        ->offset($offset)
+        ->limit($num_of_page)
+        ->get();
+    }
+
+    $formatted_appointments = [];
+
+    foreach ($appointments as $appointment) {
+      $doctor = $appointment->doctor;
+      $medicalCenter = $doctor->medicalCenter;
+
+      $formatted_appointments[] = [
+        'appointment_id' => $appointment->id,
+        'start_time' => $appointment->start_time,
+        'message' => $appointment->message,
+        'done' => $appointment->done,
+        'created_at' => $appointment->created_at,
+        'updated_at' => $appointment->updated_at,
+        'deleted_at' => $appointment->deleted_at,
+        'pet' => [
+          'pet_id' => $appointment->pet->id,
+          'name' => $appointment->pet->name,
+          'age' => $appointment->pet->age,
+          'breed' => $appointment->pet->breed->name,
+          'image' => $appointment->pet->breed->image,
+        ],
+        'doctor' => [
+          'id' => $doctor->id,
+          'full_name' => $doctor->full_name,
+          'email' => $doctor->account->email,
+          'image' => $doctor->image,
+          'avatar' => $doctor->account->avatar,
+          'phone' => $doctor->phone,
+        ],
+        'medical_center' => [
+          'id' => $medicalCenter->id,
+          'name' => $medicalCenter->name,
+          'email' => $medicalCenter->email,
+          'image' => $medicalCenter->image,
+          'avatar' => $medicalCenter->account->avatar,
+          'phone' => $medicalCenter->phone,
+          'address' => $medicalCenter->address,
+        ]
+      ];
+    }
+
+    return response()->json([
+      'message' => 'Fetch done appointments successfully!',
+      'status' => 200,
+      'page_number' => $page_number,
+      'num_of_page' => $num_of_page,
+      'total_pages' => $total_pages,
+      'total_appointments' => $total_appointments,
+      'data' => $formatted_appointments,
+    ]);
+  }
+
   public function store(Request $request)
   {
     $customer_id = auth()->user()->id;
