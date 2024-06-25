@@ -46,7 +46,7 @@ class WelcomeNotification extends Notification
   public function toExpoNotification($notifiable): ExpoMessage
   {
     return (new ExpoMessage())
-      ->to([$notifiable->expoTokens->value])
+      ->to($notifiable->expoTokens->pluck('value')->toArray())
       ->title('A beautiful title')
       ->body('This is a content')
       ->channelId('default');
