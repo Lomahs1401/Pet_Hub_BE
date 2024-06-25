@@ -6,7 +6,9 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use NotificationChannels\Expo\ExpoMessage;
+// use NotificationChannels\Expo\ExpoMessage;
+use YieldStudio\LaravelExpoNotifier\Dto\ExpoMessage;
+use YieldStudio\LaravelExpoNotifier\ExpoNotificationsChannel;
 
 class WelcomeNotification extends Notification
 {
@@ -20,25 +22,34 @@ class WelcomeNotification extends Notification
     //
   }
 
-  /**
-   * Get the expo representation of the notification.
-   */
-  public function toExpo($notifiable): ExpoMessage
-  {
-    return ExpoMessage::create('Suspicious Activity')
-      ->body('Someone tried logging in to your account!')
-      ->data($notifiable->only('email', 'id'))
-      ->expiresAt(now()->addHour())
-      ->priority('high')
-      ->playSound();
-  }
+  // /**
+  //  * Get the expo representation of the notification.
+  //  */
+  // public function toExpo($notifiable): ExpoMessage
+  // {
+  //   return ExpoMessage::create('Suspicious Activity')
+  //     ->body('Someone tried logging in to your account!')
+  //     ->data($notifiable->only('email', 'id'))
+  //     ->expiresAt(now()->addHour())
+  //     ->priority('high')
+  //     ->playSound();
+  // }
 
   /**
    * Get the notification's delivery channels.
    */
   public function via($notifiable): array
   {
-    return ['expo'];
+    return [ExpoNotificationsChannel::class];
+  }
+
+  public function toExpoNotification($notifiable): ExpoMessage
+  {
+    return (new ExpoMessage())
+      ->to([$notifiable->expoTokens->value])
+      ->title('A beautiful title')
+      ->body('This is a content')
+      ->channelId('default');
   }
 
   /**
