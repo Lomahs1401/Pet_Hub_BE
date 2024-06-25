@@ -332,8 +332,29 @@ Route::group([
   
   // --------------     MEDICAL CENTER     --------------
   Route::get('/profile', [MedicalCenterController::class, 'getProfile']);
-  Route::put('/profile/{account_id}', [MedicalCenterController::class, 'updateProfile']);
+  Route::put('/profile', [MedicalCenterController::class, 'updateProfile']);
 });
+
+// Doctor API
+Route::group([
+  'middleware' => ['force.json.response', 'api', 'auth.user', 'auth.doctor'],
+  'prefix' => 'doctor',
+], function ($router) {
+  // --------------     DOCTOR     --------------
+  Route::get('/all', [DoctorController::class, 'getAllDoctors']);
+  Route::get('/medical-center/{medical_center_id}/paging', [DoctorController::class, 'getDoctorsOfMedicalCenter']);
+  Route::get('/detail/{doctor_id}', [DoctorController::class, 'show']);
+  Route::delete('/cancel-appointment/{appointment_id}', [DoctorController::class, 'cancelAppointment']);
+  Route::post('/vaccine-history', [DoctorController::class, 'createVaccineHistory']);
+  Route::post('/diagnosis-history', [DoctorController::class, 'createDiagnosisHistory']);
+  Route::put('/vaccine-history/{vaccine_history_id}', [DoctorController::class, 'updateVaccineHistory']);
+  Route::put('/diagnosis-history/{diagnosis_history_id}', [DoctorController::class, 'updateDiagnosisHistory']);
+  
+  // --------------     DOCTOR PROFILE     --------------
+  Route::get('/profile', [DoctorController::class, 'getProfile']);
+  Route::put('/profile', [DoctorController::class, 'updateProfile']);
+});
+
 
 // Admin API
 Route::group([

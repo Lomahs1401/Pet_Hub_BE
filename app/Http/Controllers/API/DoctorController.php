@@ -3,14 +3,70 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Account;
 use App\Models\Appointment;
 use App\Models\Doctor;
+use App\Models\HistoryDiagnosis;
+use App\Models\HistoryVaccine;
 use App\Models\MedicalCenter;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 
 class DoctorController extends Controller
 {
+  // Lấy danh sách toàn bộ các bác sĩ
+  public function getAllDoctors(Request $request)
+  {
+    // Lấy tham số phân trang từ request
+    $page_number = intval($request->input('page_number', 1));
+    $num_of_page = intval($request->input('num_of_page', 10));
+
+    // Lấy số lượng doctor
+    $total_doctors = Doctor::count();
+    $total_pages = ceil($total_doctors / $num_of_page);
+
+    // Tính toán offset
+    $offset = ($page_number - 1) * $num_of_page;
+
+    $doctors = Doctor::whereNull('deleted_at')
+      ->offset($offset)
+      ->limit($num_of_page)
+      ->get();
+
+    $formatted_doctors = [];
+    foreach ($doctors as $doctor) {
+      $ratingData = $doctor->calculateDoctorRating();
+
+      $formatted_doctors[] = [
+        'doctor_id' => $doctor->id,
+        'account_id' => $doctor->account->id,
+        'full_name' => $doctor->full_name,
+        'email' => $doctor->account->email,
+        'gender' => $doctor->gender,
+        'birthdate' => $doctor->birthdate,
+        'description' => $doctor->description,
+        'CMND' => $doctor->CMND,
+        'phone' => $doctor->phone,
+        'address' => $doctor->address,
+        'image' => $doctor->image,
+        'certificate' => $doctor->certificate,
+        'rating' => $ratingData['average'],
+        'rating_count' => $ratingData['count'],
+      ];
+    }
+
+    return response()->json([
+      'message' => 'Fetch doctors successfully!',
+      'status' => 200,
+      'page_number' => $page_number,
+      'num_of_page' => $num_of_page,
+      'total_pages' => $total_pages,
+      'total_doctors' => $total_doctors,
+      'data' => $formatted_doctors,
+    ], 200);
+  }
+
   public function getDoctorsOfMedicalCenter(Request $request, $medical_center_id)
   {
     if (!MedicalCenter::find($medical_center_id)) {
@@ -252,6 +308,232 @@ class DoctorController extends Controller
       'message' => 'Fetch free times successfully!',
       'status' => 200,
       'data' => $free_times,
+    ], 200);
+  }
+
+  public function cancelAppointment($appointment_id)
+  {
+    // Tìm cuộc hẹn theo ID
+    $appointment = Appointment::find($appointment_id);
+
+    // Kiểm tra xem cuộc hẹn có tồn tại và thuộc về bác sĩ không
+    if (!$appointment || $appointment->doctor_id != auth()->user()->doctor->id) {
+      return response()->json(['message' => 'Appointment not found or unauthorized'], 404);
+    }
+
+    // Kiểm tra xem cuộc hẹn đã hoàn thành hay chưa
+    if ($appointment->done) {
+      return response()->json(['message' => 'Cannot cancel a completed appointment'], 400);
+    }
+
+    // Thực hiện xóa mềm cuộc hẹn
+    $appointment->delete();
+
+    return response()->json(['message' => 'Appointment cancelled successfully'], 200);
+  }
+
+  public function createVaccineHistory(Request $request)
+  {
+    $doctor_id = auth()->user()->doctor->id;
+
+    $validatedData = $request->validate([
+      'vaccine' => 'required|string',
+      'note' => 'nullable|string',
+      'pet_id' => 'required|exists:pets,id',
+    ]);
+
+    $validatedData['doctor_id'] = $doctor_id;
+
+    $vaccineHistory = HistoryVaccine::create([
+      'vaccine' => $validatedData['vaccine'],
+      'note' => $validatedData['note'],
+      'doctor_id' => $validatedData['doctor_id'],
+      'pet_id' => $validatedData['pet_id'],
+    ]);
+
+    return response()->json($vaccineHistory, 201);
+  }
+
+  public function createDiagnosisHistory(Request $request)
+  {
+    $doctor_id = auth()->user()->doctor->id;
+
+    $validatedData = $request->validate([
+      'reason' => 'required',
+      'diagnosis' => 'required',
+      'treatment' => 'required',
+      'health_condition' => 'required',
+      'note' => 'nullable',
+      'pet_id' => 'required|exists:pets,id',
+    ]);
+
+    $validatedData['doctor_id'] = $doctor_id;
+
+    $diagnosisHistory = HistoryDiagnosis::create([
+      'reason' => $validatedData['reason'],
+      'diagnosis' => $validatedData['diagnosis'],
+      'treatment' => $validatedData['treatment'],
+      'health_condition' => $validatedData['health_condition'],
+      'note' => $validatedData['note'],
+      'doctor_id' => $validatedData['doctor_id'],
+      'pet_id' => $validatedData['pet_id'],
+    ]);
+
+    return response()->json($diagnosisHistory, 201);
+  }
+
+  public function updateVaccineHistory(Request $request, $vaccine_history_id)
+  {
+    $doctor_id = auth()->user()->doctor->id;
+
+    $validatedData = $request->validate([
+      'vaccine' => 'required|string',
+      'note' => 'nullable|string',
+      'pet_id' => 'required|exists:pets,id',
+    ]);
+
+    $vaccineHistory = HistoryVaccine::where('id', $vaccine_history_id)
+      ->where('doctor_id', $doctor_id)
+      ->first();
+
+    if (!$vaccineHistory) {
+      return response()->json(['message' => 'Vaccine history not found or unauthorized'], 404);
+    }
+
+    $vaccineHistory->update([
+      'vaccine' => $validatedData['vaccine'],
+      'note' => $validatedData['note'],
+      'pet_id' => $validatedData['pet_id'],
+    ]);
+
+    return response()->json($vaccineHistory, 200);
+  }
+
+  // Phương thức cập nhật lịch sử chẩn đoán
+  public function updateDiagnosisHistory(Request $request, $diagnosis_history_id)
+  {
+    $doctor_id = auth()->user()->doctor->id;
+
+    $validatedData = $request->validate([
+      'reason' => 'required',
+      'diagnosis' => 'required',
+      'treatment' => 'required',
+      'health_condition' => 'required',
+      'note' => 'nullable|string',
+      'pet_id' => 'required|exists:pets,id',
+    ]);
+
+    $diagnosisHistory = HistoryDiagnosis::where('id', $diagnosis_history_id)
+      ->where('doctor_id', $doctor_id)
+      ->first();
+
+    if (!$diagnosisHistory) {
+      return response()->json(['message' => 'Diagnosis history not found or unauthorized'], 404);
+    }
+
+    $diagnosisHistory->update([
+      'reason' => $validatedData['reason'],
+      'diagnosis' => $validatedData['diagnosis'],
+      'treatment' => $validatedData['treatment'],
+      'health_condition' => $validatedData['health_condition'],
+      'note' => $validatedData['note'],
+      'pet_id' => $validatedData['pet_id'],
+    ]);
+
+    return response()->json($diagnosisHistory, 200);
+  }
+
+  public function getProfile()
+  {
+    $account_id = auth()->user()->id;
+
+    $doctor = Doctor::where('account_id', $account_id)->first();
+
+    // Kiểm tra xem doctor có tồn tại không
+    if (!$doctor) {
+      return response()->json(['message' => 'Doctor center not found'], 404);
+    }
+
+    $formattedDoctor = [
+      'id' => $doctor->id,
+      'account_id' => $doctor->account->id,
+      'name' => $doctor->full_name,
+      'username' => $doctor->account->username,
+      'email' => $doctor->account->email,
+      'role' => $doctor->account->role->role_name,
+      'gender' => $doctor->gender,
+      'birthdate' => $doctor->birthdate,
+      'description' => $doctor->description,
+      'image' => $doctor->image,
+      'avatar' => $doctor->account->avatar,
+      'phone' => $doctor->phone,
+      'address' => $doctor->address,
+      'CMND' => $doctor->CMND,
+      'certificate' => $doctor->certificate,
+      'created_at' => $doctor->created_at,
+      'updated_at' => $doctor->updated_at,
+    ];
+
+    return response()->json([
+      'message' => 'Get doctor profile successfully',
+      'status' => 200,
+      'data' => $formattedDoctor
+    ], 200);
+  }
+
+  public function updateProfile(Request $request)
+  {
+    $doctor_id = auth()->user()->doctor->id;
+
+    try {
+      // Lấy doctor hiện tại
+      $doctor = Doctor::findOrFail($doctor_id);
+    } catch (ModelNotFoundException $e) {
+      return response()->json([
+        'message' => 'Doctor not found!',
+        'status' => 404
+      ], 404);
+    }
+
+    // Xác thực dữ liệu
+    $validatedData = $request->validate([
+      'full_name' => 'required|string',
+      'gender' => 'required|string',
+      'birthdate' => 'required|string',
+      'description' => 'nullable|string',
+      'CMND' => 'required|string',
+      'phone' => 'required|string',
+      'address' => 'required|string',
+      'image' => 'nullable|string',
+      'certificate' => 'nullable|string',
+      'avatar' => 'nullable|string',
+      'username' => 'required|string',
+    ]);
+
+    // Cập nhật doctor
+    $doctor->update([
+      'full_name' => $validatedData['full_name'],
+      'gender' => $validatedData['gender'],
+      'birthdate' => $validatedData['birthdate'],
+      'description' => $validatedData['description'],
+      'CMND' => $validatedData['CMND'],
+      'phone' => $validatedData['phone'],
+      'address' => $validatedData['address'],
+      'image' => $validatedData['image'],
+      'certificate' => $validatedData['certificate'],
+    ]);
+
+    // Cập nhật thông tin tài khoản
+    $account = Account::findOrFail($doctor->account_id);
+    $account->update([
+      'username' => $validatedData['username'],
+      'avatar' => $validatedData['avatar'],
+    ]);
+
+    return response()->json([
+      'message' => 'Doctor updated successfully.',
+      'status' => 200,
+      'data' => $doctor
     ], 200);
   }
 }

@@ -109,6 +109,11 @@ class Account extends Authenticatable implements JWTSubject
     return $this->hasOne(AidCenter::class, 'account_id');
   }
 
+  public function doctor()
+  {
+    return $this->hasOne(Doctor::class, 'account_id');
+  }
+
   public function role()
   {
     return $this->belongsTo(Role::class, 'role_id');
