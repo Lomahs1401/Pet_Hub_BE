@@ -8,8 +8,6 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use NotificationChannels\ExpoPushNotifications\ExpoChannel;
 use NotificationChannels\ExpoPushNotifications\ExpoMessage;
-// use YieldStudio\LaravelExpoNotifier\Dto\ExpoMessage;
-use YieldStudio\LaravelExpoNotifier\ExpoNotificationsChannel;
 
 class WelcomeNotification extends Notification
 {
@@ -39,28 +37,6 @@ class WelcomeNotification extends Notification
       ->title("Congratulations!")
       ->body("Your account was approved!");
   }
-
-  // public function toExpoNotification($notifiable): ?ExpoMessage
-  // {
-  //   $expoTokens = $notifiable->expoTokens->pluck('expo_token')->toArray();
-
-  //   if (empty($expoTokens)) {
-  //     // Handle case where there are no expo tokens available for the notifiable
-  //     // For example, return a default message or log an error.
-  //     // This is just an example, adjust as per your application's logic.
-  //     return (new ExpoMessage())
-  //       ->to(['mN5oPEJnC3R13CiGr1YOQh'])  // Provide a fallback or default expo token
-  //       ->title('Default Title')
-  //       ->body('No expo tokens available for this user')
-  //       ->channelId('default');
-  //   }
-
-  //   return (new ExpoMessage())
-  //     ->to($expoTokens)
-  //     ->title('A beautiful title')
-  //     ->body('This is a content')
-  //     ->channelId('default');
-  // }
 
   /**
    * Get the mail representation of the notification.

@@ -71,16 +71,6 @@ class Account extends Authenticatable implements JWTSubject
     return [];
   }
 
-  public function expoTokens()
-  {
-    return $this->hasMany(ExpoToken::class);
-  }
-
-  public function routeNotificationForExpo()
-  {
-    return $this->expoTokens->pluck('expo_token')->toArray();
-  }
-
   public function customer()
   {
     return $this->hasOne(Customer::class, 'account_id');
