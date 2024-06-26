@@ -55,7 +55,7 @@ Route::group([
   'middleware' => ['force.json.response', 'api'],
   'prefix' => 'auth'
 ], function ($router) {
-  Route::post('/send-test-notification', [NotificationController::class, 'sendTestNotification']);
+  Route::post('/send-test-notification', [NotificationController::class, 'index']);
   Route::post('/login', [AuthController::class, 'login']);
   Route::post('/register-customer', [AuthController::class, 'registerCustomer']);
   Route::post('/register-shop', [AuthController::class, 'registerShop']);
