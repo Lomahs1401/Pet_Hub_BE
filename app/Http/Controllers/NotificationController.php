@@ -28,7 +28,12 @@ class NotificationController extends Controller
     $account = Account::find($request->account_id);
 
     if ($account) {
-      $this->sendPushNotification('Welcome', 'Welcome to our app!');
+      $title = "Thông báo mới";
+      $body = "Bạn có một thông báo mới.";
+      $data = ["key1" => "value1", "key2" => "value2"];
+      $sound = "default";
+
+      $this->sendPushNotification($title, $body, $data, $sound);
 
       return response()->json([
         'status_code' => 200,
@@ -42,14 +47,19 @@ class NotificationController extends Controller
     }
   }
 
-  public static function sendPushNotification($title, $body)
+  public static function sendPushNotification($title, $body, $data = [], $sound = 'default')
   {
     $recipients = ["ExponentPushToken[mN5oPEJnC3R13CiGr1YOQh]"];
-    $response = Http::post("https://exp.host/--/api/v2/push/send", [
+
+    $payload = [
       "to" => $recipients,
       "title" => $title,
-      "body" => $body
-    ])->json();
+      "body" => $body,
+      "sound" => $sound, // Thêm trường sound
+      "data" => $data    // Thêm trường data
+    ];
+
+    $response = Http::post("https://exp.host/--/api/v2/push/send", $payload)->json();
     Log::info($response);
   }
 }
