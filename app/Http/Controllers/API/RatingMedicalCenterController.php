@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\MedicalCenter;
 use App\Models\RatingMedicalCenter;
 use App\Models\RatingMedicalCenterInteract;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -434,7 +435,7 @@ class RatingMedicalCenterController extends Controller
     ]);
   }
 
-  public function likeRatingProduct($rating_medical_center_id)
+  public function likeRatingMedicalCenter($rating_medical_center_id)
   {
     $medical_center_account_id = auth()->user()->id;
 
@@ -463,7 +464,7 @@ class RatingMedicalCenterController extends Controller
       ], 409); // 409 Conflict
     }
 
-    // Tạo một record mới trong bảng rating_product_interacts
+    // Tạo một record mới trong bảng rating_medical_center_interacts
     $like = RatingMedicalCenterInteract::create([
       'rating_medical_center_id' => $rating_medical_center_id,
       'account_id' => $medical_center_account_id,
@@ -477,5 +478,98 @@ class RatingMedicalCenterController extends Controller
       'total_likes' => $totalLikes,
       'data' => $like,
     ], 201);
+  }
+
+  public function unlikeRatingMedicalCenter($rating_medical_center_id)
+  {
+    $medical_center_account_id = auth()->user()->id;
+
+    // Tìm bản ghi tồn tại với rating_medical_center_id và account_id
+    $existingLike = RatingMedicalCenterInteract::where('rating_medical_center_id', $rating_medical_center_id)
+      ->where('account_id', $medical_center_account_id)
+      ->first();
+
+    if (!$existingLike) {
+      return response()->json([
+        'message' => 'You have not liked this rating medical center yet.',
+      ], 404); // 404 Not Found
+    }
+
+    // Xóa mềm bản ghi
+    $existingLike->delete();
+
+    $totalLikes = RatingMedicalCenterInteract::where('rating_medical_center_id', $rating_medical_center_id)
+      ->count();
+
+    return response()->json([
+      'message' => 'Rating medical center unliked successfully.',
+      'total_likes' => $totalLikes,
+    ], 200);
+  }
+
+  public function replyToRatingMedicalCenter(Request $request, $rating_medical_center_id)
+  {
+    // Tìm rating medical center theo ID
+    $ratingMedicalCenter = RatingMedicalCenter::find($rating_medical_center_id);
+
+    if (!$ratingMedicalCenter) {
+      return response()->json([
+        'message' => 'Rating medical center not found.',
+      ], 404); // 404 Not Found
+    }
+
+    // Cập nhật phần phản hồi và ngày phản hồi
+    $ratingMedicalCenter->reply = $request->input('reply');
+    $ratingMedicalCenter->reply_date = Carbon::now();
+    $ratingMedicalCenter->save();
+
+    return response()->json([
+      'message' => 'Reply added successfully.',
+      'data' => $ratingMedicalCenter,
+    ], 200); // 200 OK
+  }
+
+  public function updateReplyToRatingMedicalCenter(Request $request, $rating_medical_center_id)
+  {
+    // Tìm rating medical center theo ID
+    $ratingMedicalCenter = RatingMedicalCenter::find($rating_medical_center_id);
+
+    if (!$ratingMedicalCenter) {
+      return response()->json([
+        'message' => 'Rating medical center not found.',
+      ], 404); // 404 Not Found
+    }
+
+    // Cập nhật phần phản hồi và ngày phản hồi
+    $ratingMedicalCenter->reply = $request->input('reply');
+    $ratingMedicalCenter->reply_date = Carbon::now();
+    $ratingMedicalCenter->save();
+
+    return response()->json([
+      'message' => 'Reply updated successfully.',
+      'data' => $ratingMedicalCenter,
+    ], 200); // 200 OK
+  }
+
+  public function deleteReplyToRatingMedicalCenter($rating_medical_center_id)
+  {
+    // Tìm rating medical center theo ID
+    $ratingMedicalCenter = RatingMedicalCenter::find($rating_medical_center_id);
+
+    if (!$ratingMedicalCenter) {
+      return response()->json([
+        'message' => 'Rating medical center not found.',
+      ], 404); // 404 Not Found
+    }
+
+    // Xóa phần phản hồi và ngày phản hồi
+    $ratingMedicalCenter->reply = null;
+    $ratingMedicalCenter->reply_date = null;
+    $ratingMedicalCenter->save();
+
+    return response()->json([
+      'message' => 'Reply deleted successfully.',
+      'data' => $ratingMedicalCenter,
+    ], 200); // 200 OK
   }
 }

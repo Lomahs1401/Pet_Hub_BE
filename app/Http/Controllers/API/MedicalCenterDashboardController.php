@@ -356,23 +356,6 @@ class MedicalCenterDashboardController extends Controller
       ->limit($num_of_page)
       ->get();
 
-    $formattedRecentReviews = $recentReviews->map(function ($review) {
-      return [
-        'id' => $review->id,
-        'rating' => $review->rating,
-        'description' => $review->description,
-        'reply' => $review->reply,
-        'reply_date' => $review->reply_date,
-        'customer' => [
-          'id' => $review->customer->id,
-          'account_id' => $review->customer->email,
-          'username' => $review->customer->account->username,
-          'email' => $review->customer->account->email,
-          'avatar' => $review->customer->account->avatar,
-        ],
-      ];
-    });
-
     // Trả về kết quả dưới dạng JSON
     return response()->json([
       'message' => 'Recent reviews fetched successfully!',

@@ -343,15 +343,6 @@ Route::group([
   Route::put('/ratings/{rating_medical_center_id}/reply', [RatingMedicalCenterController::class, 'updateReplyToRatingMedicalCenter']);
   Route::delete('/ratings/{rating_medical_center_id}/reply', [RatingMedicalCenterController::class, 'deleteReplyToRatingMedicalCenter']);
 
-  // --------------     RATING DOCTOR    --------------
-  // Route::get('/ratings/paging', [RatingMedicalCenterController::class, 'getCustomerRatings']); // lấy dsach rating của customer theo medical center id
-  // Route::get('/ratings/{rating_medical_center_id}', [RatingMedicalCenterController::class, 'getDetailRating']); // lấy dsach các loại đánh giá (5,4,3,2,1 sao) của customer theo medical center id
-  // Route::post('/ratings/{rating_medical_center_id}/like', [RatingMedicalCenterController::class, 'likeRatingMedicalCenter']);
-  // Route::post('/ratings/{rating_medical_center_id}/unlike', [RatingMedicalCenterController::class, 'unlikeRatingMedicalCenter']);
-  // Route::post('/ratings/{rating_medical_center_id}/reply', [RatingMedicalCenterController::class, 'replyToRatingMedicalCenter']);
-  // Route::put('/ratings/{rating_medical_center_id}/reply', [RatingMedicalCenterController::class, 'updateReplyToRatingMedicalCenter']);
-  // Route::delete('/ratings/{rating_medical_center_id}/reply', [RatingMedicalCenterController::class, 'deleteReplyToRatingMedicalCenter']);
-
   // --------------     APPOINTMENT     --------------
   Route::get('/appointments/done', [AppointmentController::class, 'getListDoneAppointments']);
   Route::get('/appointments/waiting', [AppointmentController::class, 'getListWaitingAppointments']);
@@ -376,6 +367,15 @@ Route::group([
   Route::post('/diagnosis-history', [DoctorController::class, 'createDiagnosisHistory']);
   Route::put('/vaccine-history/{vaccine_history_id}', [DoctorController::class, 'updateVaccineHistory']);
   Route::put('/diagnosis-history/{diagnosis_history_id}', [DoctorController::class, 'updateDiagnosisHistory']);
+
+  // --------------     RATING DOCTOR    --------------
+  Route::get('/ratings/paging', [RatingDoctorController::class, 'getCustomerRatings']); // lấy dsach rating của customer theo medical center id
+  Route::get('/ratings/{rating_doctor_id}', [RatingDoctorController::class, 'getRatingDetail']); // lấy dsach các loại đánh giá (5,4,3,2,1 sao) của customer theo medical center id
+  Route::post('/ratings/{rating_doctor_id}/like', [RatingDoctorController::class, 'likeRatingDoctor']);
+  Route::post('/ratings/{rating_doctor_id}/unlike', [RatingDoctorController::class, 'unlikeRatingDoctor']);
+  Route::post('/ratings/{rating_doctor_id}/reply', [RatingDoctorController::class, 'replyToRatingDoctor']);
+  Route::put('/ratings/{rating_doctor_id}/reply', [RatingDoctorController::class, 'updateReplyToRatingDoctor']);
+  Route::delete('/ratings/{rating_doctor_id}/reply', [RatingDoctorController::class, 'deleteReplyToRatingDoctor']);
   
   // --------------     DOCTOR PROFILE     --------------
   Route::get('/profile', [DoctorController::class, 'getProfile']);
