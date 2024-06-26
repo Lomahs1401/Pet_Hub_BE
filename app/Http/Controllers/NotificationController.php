@@ -5,11 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Account;
 use App\Notifications\WelcomeNotification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class NotificationController extends Controller
 {
-  public function sendTestNotification(Request $request)
+  public function index(Request $request)
   {
     $validator = Validator::make($request->all(), [
       'account_id' => 'required|exists:accounts,id',
@@ -26,7 +28,7 @@ class NotificationController extends Controller
     $account = Account::find($request->account_id);
 
     if ($account) {
-      $account->notify(new WelcomeNotification());
+      $this->sendPushNotification($account->device_token, 'Welcome', 'Welcome to our app!');
 
       return response()->json([
         'status_code' => 200,
@@ -38,5 +40,15 @@ class NotificationController extends Controller
         'message' => 'Account not found',
       ], 404);
     }
+  }
+
+  public static function sendPushNotification($recipients, $title, $body)
+  {
+    $response = Http::post("https://exp.host/--/api/v2/push/send", [
+      "to" => $recipients,
+      "title" => $title,
+      "body" => $body
+    ])->json();
+    Log::info($response);
   }
 }
