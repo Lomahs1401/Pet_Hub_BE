@@ -334,14 +334,23 @@ Route::group([
   Route::get('/banner/last-week-appointments', [MedicalCenterDashboardController::class, 'getLastWeekAppointments']);
   Route::get('/recent-reviews', [MedicalCenterDashboardController::class, 'getRecentReviews']);
 
-  // --------------     RATING     --------------
-  Route::get('/ratings/paging', [RatingMedicalCenterController::class, 'getCustomerRatingsOfProductId']); // lấy dsach rating của customer theo medical center id
-  Route::get('/ratings/{rating_medical_center_id}', [RatingMedicalCenterController::class, 'getDetailRating']); // lấy dsach các loại đánh giá (5,4,3,2,1 sao) của customer theo medical center id
+  // --------------     RATING MEDICAL CENTER    --------------
+  Route::get('/ratings/paging', [RatingMedicalCenterController::class, 'getCustomerRatings']); // lấy dsach rating của customer theo medical center id
+  Route::get('/ratings/{rating_medical_center_id}', [RatingMedicalCenterController::class, 'getRatingDetail']);
   Route::post('/ratings/{rating_medical_center_id}/like', [RatingMedicalCenterController::class, 'likeRatingMedicalCenter']);
   Route::post('/ratings/{rating_medical_center_id}/unlike', [RatingMedicalCenterController::class, 'unlikeRatingMedicalCenter']);
   Route::post('/ratings/{rating_medical_center_id}/reply', [RatingMedicalCenterController::class, 'replyToRatingMedicalCenter']);
   Route::put('/ratings/{rating_medical_center_id}/reply', [RatingMedicalCenterController::class, 'updateReplyToRatingMedicalCenter']);
   Route::delete('/ratings/{rating_medical_center_id}/reply', [RatingMedicalCenterController::class, 'deleteReplyToRatingMedicalCenter']);
+
+  // --------------     RATING DOCTOR    --------------
+  // Route::get('/ratings/paging', [RatingMedicalCenterController::class, 'getCustomerRatings']); // lấy dsach rating của customer theo medical center id
+  // Route::get('/ratings/{rating_medical_center_id}', [RatingMedicalCenterController::class, 'getDetailRating']); // lấy dsach các loại đánh giá (5,4,3,2,1 sao) của customer theo medical center id
+  // Route::post('/ratings/{rating_medical_center_id}/like', [RatingMedicalCenterController::class, 'likeRatingMedicalCenter']);
+  // Route::post('/ratings/{rating_medical_center_id}/unlike', [RatingMedicalCenterController::class, 'unlikeRatingMedicalCenter']);
+  // Route::post('/ratings/{rating_medical_center_id}/reply', [RatingMedicalCenterController::class, 'replyToRatingMedicalCenter']);
+  // Route::put('/ratings/{rating_medical_center_id}/reply', [RatingMedicalCenterController::class, 'updateReplyToRatingMedicalCenter']);
+  // Route::delete('/ratings/{rating_medical_center_id}/reply', [RatingMedicalCenterController::class, 'deleteReplyToRatingMedicalCenter']);
 
   // --------------     APPOINTMENT     --------------
   Route::get('/appointments/done', [AppointmentController::class, 'getListDoneAppointments']);

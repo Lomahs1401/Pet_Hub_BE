@@ -272,7 +272,7 @@ class MedicalCenterDashboardController extends Controller
     ], 200);
   }
 
-  public function getLastWeekAppointments(Request $request)
+  public function getLastWeekAppointments()
   {
     // Lấy medical_center_id của medical center hiện tại
     $medical_center_id = auth()->user()->medicalCenter->id;
@@ -355,6 +355,23 @@ class MedicalCenterDashboardController extends Controller
       ->offset($offset)
       ->limit($num_of_page)
       ->get();
+
+    $formattedRecentReviews = $recentReviews->map(function ($review) {
+      return [
+        'id' => $review->id,
+        'rating' => $review->rating,
+        'description' => $review->description,
+        'reply' => $review->reply,
+        'reply_date' => $review->reply_date,
+        'customer' => [
+          'id' => $review->customer->id,
+          'account_id' => $review->customer->email,
+          'username' => $review->customer->account->username,
+          'email' => $review->customer->account->email,
+          'avatar' => $review->customer->account->avatar,
+        ],
+      ];
+    });
 
     // Trả về kết quả dưới dạng JSON
     return response()->json([

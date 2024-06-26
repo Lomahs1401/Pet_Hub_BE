@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\MedicalCenter;
 use App\Models\RatingMedicalCenter;
+use App\Models\RatingMedicalCenterInteract;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -302,5 +303,179 @@ class RatingMedicalCenterController extends Controller
       'message' => 'Rating deleted successfully!',
       'status' => 200
     ], 200);
+  }
+
+  // ====================================     For Medical Center     ====================================
+  public function getCustomerRatings(Request $request)
+  {
+    $medical_center_id = auth()->user()->medicalCenter->id;
+
+    // Kiểm tra xem medical center có tồn tại hay không
+    $medicalCenterExists = DB::table('medical_centers')->where('id', $medical_center_id)->exists();
+
+    if (!$medicalCenterExists) {
+      return response()->json([
+        'message' => 'Medical center not found!',
+        'status' => 404
+      ], 404);
+    }
+
+    $user = auth()->user();
+
+    $ratings = RatingMedicalCenter::with(['customer.account', 'customer.ratings', 'interacts.account'])
+      ->where('medical_center_id', $medical_center_id)
+      ->orderBy('created_at', 'desc')
+      ->get()
+      ->map(function ($rating) use ($user) {
+        $customer = $rating->customer;
+        $account = $customer->account;
+
+        // Lấy thông tin về lượt like
+        $likes = $rating->interacts->map(function ($interact) {
+          return [
+            'account_id' => $interact->account_id,
+            'username' => $interact->account->username,
+            'avatar' => $interact->account->avatar,
+          ];
+        });
+
+        // Kiểm tra xem user hiện tại có nằm trong danh sách likes hay không
+        $user_liked = $rating->interacts->contains('account_id', $user->id);
+
+        return [
+          'rating_id' => $rating->id,
+          'rating_score' => $rating->rating,
+          'description' => $rating->description,
+          'reply' => $rating->reply,
+          'reply_date' => $rating->reply_date,
+          'rating_date' => $rating->created_at,
+          'customer_id' => $customer->id,
+          'customer_username' => $account->username,
+          'customer_avatar' => $account->avatar,
+          'account_creation_date' => $account->created_at,
+          'customer_rating_count' => $customer->ratings->count(),
+          'customer_ranking_point' => $customer->ranking_point ?? 0,
+          'likes' => [
+            'total_likes' => $rating->interacts->count(),
+            'medical_center_liked' => $user_liked,
+            'details' => $likes,
+          ]
+        ];
+      });
+
+    // Tính tổng số ratings và tổng số trang
+    $totalRatings = $ratings->count();
+    $num_of_page = intval($request->query('num_of_page', 5));
+    $total_pages = ceil($totalRatings / $num_of_page);
+    $page_number = intval($request->query('page_number', 1));
+
+    // Phân trang dữ liệu ratings
+    $paginatedRatings = $ratings->forPage($page_number, $num_of_page)->values();
+
+    return response()->json([
+      'message' => 'Query successfully!',
+      'status' => 200,
+      'page_number' => $page_number,
+      'num_of_page' => $num_of_page,
+      'total_pages' => $total_pages,
+      'total_ratings' => $totalRatings,
+      'data' => $paginatedRatings,
+    ]);
+  }
+
+  public function getRatingDetail($rating_medical_center_id)
+  {
+    // Lấy rating theo id
+    $rating = RatingMedicalCenter::with(['customer.account', 'interacts.account'])
+      ->find($rating_medical_center_id);
+
+    // Kiểm tra nếu không tìm thấy rating
+    if (!$rating) {
+      return response()->json([
+        'message' => 'Rating not found!',
+        'status' => 404,
+      ], 404);
+    }
+
+    // Lấy thông tin chi tiết về rating
+    $customer = $rating->customer;
+    $account = $customer->account;
+
+    // Lấy thông tin về lượt like
+    $likes = $rating->interacts->map(function ($interact) {
+      return [
+        'account_id' => $interact->account_id,
+        'username' => $interact->account->username,
+        'avatar' => $interact->account->avatar,
+      ];
+    });
+
+    return response()->json([
+      'message' => 'Rating detail retrieved successfully!',
+      'status' => 200,
+      'data' => [
+        'rating_id' => $rating->id,
+        'rating_score' => $rating->rating,
+        'description' => $rating->description,
+        'reply' => $rating->reply,
+        'reply_date' => $rating->reply_date,
+        'rating_date' => $rating->created_at,
+        'customer_id' => $customer->id,
+        'customer_username' => $account->username,
+        'customer_avatar' => $account->avatar,
+        'account_creation_date' => $account->created_at,
+        'customer_rating_count' => $customer->ratings->count(),
+        'customer_ranking_point' => $customer->ranking_point ?? 0,
+        'likes' => [
+          'total_likes' => $rating->interacts->count(),
+          'details' => $likes,
+        ]
+      ]
+    ]);
+  }
+
+  public function likeRatingProduct($rating_medical_center_id)
+  {
+    $medical_center_account_id = auth()->user()->id;
+
+    // Kiểm tra xem đã tồn tại một record với rating_medical_center_id và account_id hay chưa
+    $existingLike = RatingMedicalCenterInteract::withTrashed()
+      ->where('rating_medical_center_id', $rating_medical_center_id)
+      ->where('account_id', $medical_center_account_id)
+      ->first();
+
+    if ($existingLike) {
+      // Nếu bản ghi đã bị xóa (unliked), khôi phục lại nó
+      if ($existingLike->trashed()) {
+        $existingLike->restore();
+        $totalLikes = RatingMedicalCenterInteract::where('rating_medical_center_id', $rating_medical_center_id)
+          ->count();
+
+        return response()->json([
+          'message' => 'Rating medical center liked successfully.',
+          'total_likes' => $totalLikes,
+          'data' => $existingLike,
+        ], 200);
+      }
+
+      return response()->json([
+        'message' => 'You have already liked this rating medical center.',
+      ], 409); // 409 Conflict
+    }
+
+    // Tạo một record mới trong bảng rating_product_interacts
+    $like = RatingMedicalCenterInteract::create([
+      'rating_medical_center_id' => $rating_medical_center_id,
+      'account_id' => $medical_center_account_id,
+    ]);
+
+    $totalLikes = RatingMedicalCenterInteract::where('rating_medical_center_id', $rating_medical_center_id)
+      ->count();
+
+    return response()->json([
+      'message' => 'Rating medical center liked successfully.',
+      'total_likes' => $totalLikes,
+      'data' => $like,
+    ], 201);
   }
 }
