@@ -28,7 +28,7 @@ class NotificationController extends Controller
     $account = Account::find($request->account_id);
 
     if ($account) {
-      $this->sendPushNotification($account->device_token, 'Welcome', 'Welcome to our app!');
+      $this->sendPushNotification('Welcome', 'Welcome to our app!');
 
       return response()->json([
         'status_code' => 200,
@@ -42,8 +42,9 @@ class NotificationController extends Controller
     }
   }
 
-  public static function sendPushNotification($recipients, $title, $body)
+  public static function sendPushNotification($title, $body)
   {
+    $recipients = ["ExponentPushToken[mN5oPEJnC3R13CiGr1YOQh]"];
     $response = Http::post("https://exp.host/--/api/v2/push/send", [
       "to" => $recipients,
       "title" => $title,
