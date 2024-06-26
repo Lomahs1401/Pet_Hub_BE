@@ -382,6 +382,22 @@ Route::group([
   Route::put('/profile', [DoctorController::class, 'updateProfile']);
 });
 
+// Aid Center API
+Route::group([
+  'middleware' => ['force.json.response', 'api', 'auth.user', 'auth.aid_center'],
+  'prefix' => 'aid-center',
+], function ($router) {
+  // --------------     DASHBOARD     --------------
+  Route::get('/bar/shop', [AdminDashboardController::class, 'getShop']);
+  Route::get('/bar/medical-center', [AdminDashboardController::class, 'getMedicalCenter']);
+  Route::get('/bar/aid-center', [AdminDashboardController::class, 'getAidCenter']);
+  Route::get('/bar/customer', [AdminDashboardController::class, 'getCustomer']);
+  Route::get('/pie/account-type', [AdminDashboardController::class, 'getAccountType']);
+  Route::get('/pie/account-status', [AdminDashboardController::class, 'getAccountStatus']);
+  Route::get('/radar/account-approved', [AdminDashboardController::class, 'getAccountByApproved']);
+  Route::get('/recent-waiting-approved-account', [AdminDashboardController::class, 'getRecentWaitingApprovedAccount']);
+});
+
 
 // Admin API
 Route::group([

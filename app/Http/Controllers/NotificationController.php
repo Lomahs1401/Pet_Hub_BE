@@ -49,7 +49,8 @@ class NotificationController extends Controller
 
   public static function sendPushNotification($title, $body, $data = [], $sound = 'default')
   {
-    $recipients = ["ExponentPushToken[mN5oPEJnC3R13CiGr1YOQh]"];
+    $old_recipients = ["ExponentPushToken[mN5oPEJnC3R13CiGr1YOQh]"];
+    $recipients = ["ExponentPushToken[v6Pzj4GxkFIIuXqAsSDU95]"];
 
     $payload = [
       "to" => $recipients,
