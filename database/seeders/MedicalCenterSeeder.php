@@ -47,6 +47,16 @@ class MedicalCenterSeeder extends Seeder
       'gs://new_petshop_bucket/doctors/8/',
       'gs://new_petshop_bucket/doctors/9/',
       'gs://new_petshop_bucket/doctors/10/',
+      'gs://new_petshop_bucket/doctors/1/',
+      'gs://new_petshop_bucket/doctors/2/',
+      'gs://new_petshop_bucket/doctors/3/',
+      'gs://new_petshop_bucket/doctors/4/',
+      'gs://new_petshop_bucket/doctors/5/',
+      'gs://new_petshop_bucket/doctors/6/',
+      'gs://new_petshop_bucket/doctors/7/',
+      'gs://new_petshop_bucket/doctors/8/',
+      'gs://new_petshop_bucket/doctors/9/',
+      'gs://new_petshop_bucket/doctors/10/',
     ];
 
     $start_time_options = ['06:00 AM', '07:00 AM', '08:00 AM', '09:00 AM']; // Giờ bắt đầu làm việc (AM/PM format)
@@ -89,42 +99,47 @@ class MedicalCenterSeeder extends Seeder
         'updated_at' => $created_at,
       ]);
 
-      $doctor_created_at = $faker->dateTimeBetween($created_at, 'now');
+      // Tạo số lượng bác sĩ ngẫu nhiên từ 1 đến 3 cho mỗi medical center
+      $num_doctors = $faker->numberBetween(1, 3);
 
-      $approved = $faker->boolean(80);
+      for ($j = 0; $j < $num_doctors; $j++) {
+        $doctor_created_at = $faker->dateTimeBetween($created_at, 'now');
 
-      $doctor_account = Account::factory()->create([
-        'username' => $faker->userName(),
-        'email' => $faker->safeEmail(),
-        'password' => Hash::make('doctor123'),
-        'avatar' => 'gs://new_petshop_bucket/avatars/doctor/' . ($i + 1) . '.jpg',
-        'enabled' => $approved,
-        'is_approved' => $approved,
-        'role_id' => $role_doctor,
-        'created_at' => $doctor_created_at,
-        'updated_at' => $doctor_created_at,
-        'reset_code' => null,
-        'reset_code_expires_at' => null,
-        'reset_code_attempts' => null
-      ]);
+        $avatar = $faker->randomElement([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
 
-      $is_male_doctor = $faker->boolean(chanceOfGettingTrue: 50);
+        $doctor_account = Account::factory()->create([
+          'username' => $faker->userName(),
+          'email' => $faker->safeEmail(),
+          'password' => Hash::make('doctor123'),
+          'avatar' => 'gs://new_petshop_bucket/avatars/doctor/' . $avatar . '.jpg',
+          'enabled' => true,
+          'is_approved' => true,
+          'role_id' => $role_doctor,
+          'created_at' => $doctor_created_at,
+          'updated_at' => $doctor_created_at,
+          'reset_code' => null,
+          'reset_code_expires_at' => null,
+          'reset_code_attempts' => null
+        ]);
 
-      DB::table('doctors')->insert([
-        'account_id' => $doctor_account->id,
-        'medical_center_id' => $medical_center->id,
-        'full_name' => $is_male_doctor ? $faker->lastName() . ' ' . $faker->firstNameMale()
-          : $faker->lastName() . ' ' . $faker->firstNameFemale(),
-        'gender' => $is_male_doctor ? 'Male' : 'Female',
-        'description' => $faker->paragraph(6),
-        'birthdate' => $faker->dateTimeInInterval('-20 years', '+2 years', 'Asia/Ho_Chi_Minh')->format('Y-m-d'),
-        'CMND' => $faker->numerify('#########'),
-        'address' => $faker->city(),
-        'phone' => $faker->regexify('0(3|5|7|8|9){1}([0-9]{8})'),
-        'image' => $list_doctors_avatars[$i],
-        'created_at' => $doctor_created_at,
-        'updated_at' => $doctor_created_at,
-      ]);
+        $is_male_doctor = $faker->boolean(50);
+
+        DB::table('doctors')->insert([
+          'account_id' => $doctor_account->id,
+          'medical_center_id' => $medical_center->id,
+          'full_name' => $is_male_doctor ? $faker->lastName() . ' ' . $faker->firstNameMale()
+            : $faker->lastName() . ' ' . $faker->firstNameFemale(),
+          'gender' => $is_male_doctor ? 'Male' : 'Female',
+          'description' => $faker->paragraph(6),
+          'birthdate' => $faker->dateTimeInInterval('-20 years', '+2 years', 'Asia/Ho_Chi_Minh')->format('Y-m-d'),
+          'CMND' => $faker->numerify('#########'),
+          'address' => $faker->city(),
+          'phone' => $faker->regexify('0(3|5|7|8|9){1}([0-9]{8})'),
+          'image' => $faker->randomElement($list_doctors_avatars),
+          'created_at' => $doctor_created_at,
+          'updated_at' => $doctor_created_at,
+        ]);
+      }
     }
   }
 }

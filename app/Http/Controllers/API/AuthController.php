@@ -364,17 +364,8 @@ class AuthController extends Controller
       ], 401);
     }
 
-    // // Lưu Expo Push Token vào cơ sở dữ liệu nếu có
-    // if ($request->expo_token) {
-    //   $existingToken = ExpoToken::where('expo_token', $request->expo_token)->first();
-
-    //   if (!$existingToken) {
-    //     ExpoToken::create([
-    //       'account_id' => $account->id,
-    //       'expo_token' => $request->expo_token,
-    //     ]);
-    //   }
-    // }
+    $account->expo_token = $request->expo_token;
+    $account->save();
 
     return $this->respondWithToken($token);
   }

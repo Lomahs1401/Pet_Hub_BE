@@ -347,6 +347,13 @@ Route::group([
   Route::get('/appointments/done', [AppointmentController::class, 'getListDoneAppointments']);
   Route::get('/appointments/waiting', [AppointmentController::class, 'getListWaitingAppointments']);
   Route::get('/appointments/{appointment_id}', [AppointmentController::class, 'getAppointmentDetail']);
+
+  // --------------     DOCTOR     --------------
+  Route::get('/doctors/paging', [DoctorController::class, 'getDoctorsOfMedicalCenter']);
+  Route::get('/doctors/deleted/paging', [DoctorController::class, 'getDeletedDoctorOfMedicalCenter']);
+  Route::post('/doctors', [DoctorController::class, 'createDoctor']);
+  Route::get('/doctors/{doctor_id}', [DoctorController::class, 'show']);
+  Route::delete('/doctors/{doctor_id}', [DoctorController::class, 'deleteDoctor']);
   
   // --------------     MEDICAL CENTER     --------------
   Route::get('/profile', [MedicalCenterController::class, 'getProfile']);
@@ -359,9 +366,6 @@ Route::group([
   'prefix' => 'doctor',
 ], function ($router) {
   // --------------     DOCTOR     --------------
-  Route::get('/all', [DoctorController::class, 'getAllDoctors']);
-  Route::get('/medical-center/{medical_center_id}/paging', [DoctorController::class, 'getDoctorsOfMedicalCenter']);
-  Route::get('/detail/{doctor_id}', [DoctorController::class, 'show']);
   Route::delete('/cancel-appointment/{appointment_id}', [DoctorController::class, 'cancelAppointment']);
   Route::post('/vaccine-history', [DoctorController::class, 'createVaccineHistory']);
   Route::post('/diagnosis-history', [DoctorController::class, 'createDiagnosisHistory']);
@@ -388,14 +392,15 @@ Route::group([
   'prefix' => 'aid-center',
 ], function ($router) {
   // --------------     DASHBOARD     --------------
-  Route::get('/bar/shop', [AdminDashboardController::class, 'getShop']);
-  Route::get('/bar/medical-center', [AdminDashboardController::class, 'getMedicalCenter']);
-  Route::get('/bar/aid-center', [AdminDashboardController::class, 'getAidCenter']);
-  Route::get('/bar/customer', [AdminDashboardController::class, 'getCustomer']);
-  Route::get('/pie/account-type', [AdminDashboardController::class, 'getAccountType']);
-  Route::get('/pie/account-status', [AdminDashboardController::class, 'getAccountStatus']);
-  Route::get('/radar/account-approved', [AdminDashboardController::class, 'getAccountByApproved']);
-  Route::get('/recent-waiting-approved-account', [AdminDashboardController::class, 'getRecentWaitingApprovedAccount']);
+  Route::get('/banner/adopt-request', [ShopDashboardController::class, 'getRepliesComparison']);
+  Route::get('/banner/new-pets', [ShopDashboardController::class, 'getReviewsComparison']);
+  Route::get('/banner/adopted-pets', [ShopDashboardController::class, 'getProductsComparison']);
+  Route::get('/banner/orders', [ShopDashboardController::class, 'getOrdersComparison']);
+  Route::get('/banner/last-week-adopt-request', [ShopDashboardController::class, 'getSales']);
+  Route::get('/bar/adopted-request', [AdminDashboardController::class, 'getMedicalCenter']);
+  Route::get('/bar/adopted-pets', [AdminDashboardController::class, 'get']);
+  Route::get('/pie/pets', [AdminDashboardController::class, 'getAccountType']);
+  Route::get('/recent-adopt-request', [AdminDashboardController::class, 'getRecentWaitingApprovedAccount']);
 });
 
 

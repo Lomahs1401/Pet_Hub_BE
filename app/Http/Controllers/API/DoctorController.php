@@ -9,9 +9,12 @@ use App\Models\Doctor;
 use App\Models\HistoryDiagnosis;
 use App\Models\HistoryVaccine;
 use App\Models\MedicalCenter;
+use App\Models\Role;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 class DoctorController extends Controller
 {
@@ -67,8 +70,10 @@ class DoctorController extends Controller
     ], 200);
   }
 
-  public function getDoctorsOfMedicalCenter(Request $request, $medical_center_id)
+  public function getDoctorsOfMedicalCenter(Request $request)
   {
+    $medical_center_id = auth()->user()->medicalCenter->id;
+
     if (!MedicalCenter::find($medical_center_id)) {
       return response()->json([
         'message' => 'Medical Center not found!',
@@ -126,7 +131,9 @@ class DoctorController extends Controller
 
   public function show($doctor_id)
   {
-    $doctor = Doctor::with(['account', 'medicalCenter'])->find($doctor_id);
+    $doctor = Doctor::with(['account', 'medicalCenter'])
+      ->withTrashed()
+      ->find($doctor_id);
 
     if (!$doctor) {
       return response()->json([
@@ -170,6 +177,144 @@ class DoctorController extends Controller
       'message' => 'Fetch doctor detail successfully!',
       'status' => 200,
       'data' => $formatted_doctor,
+    ], 200);
+  }
+
+  public function getDeletedDoctorOfMedicalCenter(Request $request)
+  {
+    $medical_center_id = auth()->user()->medicalCenter->id;
+
+    if (!MedicalCenter::find($medical_center_id)) {
+      return response()->json([
+        'message' => 'Medical Center not found!',
+        'status' => 404
+      ], 404);
+    }
+
+    $page_number = intval($request->query('page_number', 1));
+    $num_of_page = intval($request->query('num_of_page', 10));
+
+    // Lấy số lượng doctor
+    $total_deleted_doctors = Doctor::onlyTrashed('medical_center_id', $medical_center_id)->count();
+    $total_pages = ceil($total_deleted_doctors / $num_of_page);
+
+    // Tính toán offset
+    $offset = ($page_number - 1) * $num_of_page;
+
+    $deleted_doctors = Doctor::onlyTrashed('medical_center_id', $medical_center_id)
+      ->offset($offset)
+      ->limit($num_of_page)
+      ->get();
+
+    $formatted_deleted_doctors = [];
+    foreach ($deleted_doctors as $deleted_doctor) {
+      $ratingData = $deleted_doctor->calculateDoctorRating();
+
+      $formatted_deleted_doctors[] = [
+        'doctor_id' => $deleted_doctor->id,
+        'account_id' => $deleted_doctor->account->id,
+        'full_name' => $deleted_doctor->full_name,
+        'email' => $deleted_doctor->account->email,
+        'gender' => $deleted_doctor->gender,
+        'birthdate' => $deleted_doctor->birthdate,
+        'description' => $deleted_doctor->description,
+        'CMND' => $deleted_doctor->CMND,
+        'phone' => $deleted_doctor->phone,
+        'address' => $deleted_doctor->address,
+        'image' => $deleted_doctor->image,
+        'certificate' => $deleted_doctor->certificate,
+        'rating' => $ratingData['average'],
+        'rating_count' => $ratingData['count'],
+      ];
+    }
+
+    return response()->json([
+      'message' => 'Fetch deleted doctors successfully!',
+      'status' => 200,
+      'page_number' => $page_number,
+      'num_of_page' => $num_of_page,
+      'total_pages' => $total_pages,
+      'total_deleted_doctors' => $total_deleted_doctors,
+      'data' => $formatted_deleted_doctors,
+    ], 200);
+  }
+
+  /**
+   * Tạo một bác sĩ mới.
+   */
+  public function createDoctor(Request $request)
+  {
+    $medical_center_id = auth()->user()->medicalCenter->id;
+
+    // Validate input
+    $validatedData = $request->validate([
+      'full_name' => 'required|string|max:255',
+      'gender' => 'required|string|max:10',
+      'birthdate' => 'required|date',
+      'description' => 'nullable|string',
+      'CMND' => 'required|string|max:20|unique:doctors,CMND',
+      'phone' => 'required|string|max:15|unique:doctors,phone',
+      'address' => 'required|string|max:255',
+      'image' => 'nullable|string|max:255',
+      'certificate' => 'nullable|string|max:255',
+      'username' => 'required|string|max:50',
+      'email' => 'required|string|email|max:255|unique:accounts,email',
+      'password' => 'required|string',
+    ]);
+
+    $validatedData['medical_center_id'] = $medical_center_id;
+
+    // Tạo account mới cho bác sĩ
+    $account = Account::create([
+      'username' => $validatedData['username'],
+      'email' => $validatedData['email'],
+      'password' => Hash::make($validatedData['password']),
+      'role_id' => Role::where('role_name', 'ROLE_DOCTOR')->first()->id,
+      'enabled' => true,
+      'is_approved' => true,
+    ]);
+
+    // Tạo bác sĩ mới
+    $doctor = Doctor::create([
+      'full_name' => $validatedData['full_name'],
+      'gender' => $validatedData['gender'],
+      'birthdate' => $validatedData['birthdate'],
+      'description' => $validatedData['description'],
+      'CMND' => $validatedData['CMND'],
+      'phone' => $validatedData['phone'],
+      'address' => $validatedData['address'],
+      'image' => $validatedData['image'],
+      'certificate' => $validatedData['certificate'],
+      'account_id' => $account->id,
+      'medical_center_id' => $validatedData['medical_center_id'],
+    ]);
+
+    return response()->json([
+      'status_code' => 201,
+      'message' => 'Doctor created successfully',
+      'doctor' => $doctor,
+    ], 201);
+  }
+
+  /**
+   * Xóa bác sĩ theo ID.
+   */
+  public function deleteDoctor($doctor_id)
+  {
+    $doctor = Doctor::find($doctor_id);
+
+    if (!$doctor) {
+      return response()->json([
+        'status_code' => 404,
+        'message' => 'Doctor not found',
+      ], 404);
+    }
+
+    $doctor->delete();
+
+    return response()->json([
+      'status_code' => 200,
+      'message' => 'Doctor deleted successfully',
     ], 200);
   }
 
