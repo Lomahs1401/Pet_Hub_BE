@@ -731,6 +731,7 @@ class PetController extends Controller
         'status' => $pet->status,
         'created_at' => $pet->created_at,
         'updated_at' => $pet->updated_at,
+        'deleted_at' => $pet->deleted_at,
         'breed' => $pet->breed ? [
           'breed_id' => $pet->breed->id,
           'name' => $pet->breed->name,
@@ -1000,6 +1001,40 @@ class PetController extends Controller
       'message' => 'Fetch pet detail successfully!',
       'status' => 200,
       'data' => $petDetail,
+    ]);
+  }
+
+  public function deletePet(Request $request, $pet_id)
+  {
+    $aid_center_id = auth()->user()->aidCenter->id;
+
+    // Find the pet by ID
+    $pet = Pet::where('aid_center_id', $aid_center_id)->findOrFail($pet_id);
+
+    // Perform soft delete
+    $pet->delete();
+
+    return response()->json([
+      'message' => 'Pet deleted successfully!',
+      'status' => 200,
+      'data' => $pet,
+    ]);
+  }
+
+  public function restorePet(Request $request, $pet_id)
+  {
+    $aid_center_id = auth()->user()->aidCenter->id;
+
+    // Find the soft deleted pet by ID
+    $pet = Pet::onlyTrashed()->where('aid_center_id', $aid_center_id)->findOrFail($pet_id);
+
+    // Restore the pet
+    $pet->restore();
+
+    return response()->json([
+      'message' => 'Pet restored successfully!',
+      'status' => 200,
+      'data' => $pet,
     ]);
   }
 }

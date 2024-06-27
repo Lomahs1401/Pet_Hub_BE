@@ -378,7 +378,7 @@ Route::group([
   // --------------     APPOINTMENT     --------------
   Route::get('/appointments/done', [AppointmentController::class, 'getListDoneAppointmentsByDoctor']);
   Route::get('/appointments/waiting', [AppointmentController::class, 'getListWaitingAppointmentsByDoctor']);
-  Route::get('/appointments/{appointment_id}', [AppointmentController::class, 'getAppointmentDetail']);
+  Route::get('/appointments/{appointment_id}', [AppointmentController::class, 'getAppointmentDetailByDoctor']);
   Route::patch('/appointments/{appointment_id}', [AppointmentController::class, 'updateAppointment']);
   Route::delete('/appointments/{appointment_id}', [AppointmentController::class, 'cancelAppointment']);
 
@@ -423,6 +423,9 @@ Route::group([
   Route::get('/pets/unadopted/paging', [PetController::class, 'getUnadoptedPets']);
   Route::get('/pets/deleted/paging', [PetController::class, 'getDeletedPets']);
   Route::get('/pets/{pet_id}', [PetController::class, 'getPetDetail']);
+  Route::put('/pets/{pet_id}', [PetController::class, 'updatePet']);
+  Route::delete('/pets/{pet_id}', [PetController::class, 'deletePet']);
+  Route::put('/pets/{pet_id}/restore', [PetController::class, 'restorePet']);
 
   // --------------     ADOPT REQUEST     --------------
   Route::get('/profile/address', [AidCenterController::class, 'getAddress']);

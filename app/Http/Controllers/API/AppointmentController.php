@@ -1158,6 +1158,144 @@ class AppointmentController extends Controller
     ]);
   }
 
+  public function getAppointmentDetailByDoctor($appointment_id)
+  {
+    $doctor_id = auth()->user()->doctor->id;
+
+    // Lấy thông tin cơ bản của appointment
+    $appointment = Appointment::query()
+      ->where('id', $appointment_id)
+      ->where('doctor_id', $doctor_id)
+      ->whereNull('deleted_at')
+      ->first();
+
+    if (!$appointment) {
+      return response()->json([
+        'message' => 'Appointment not found or does not belong to the doctor',
+        'status' => 404,
+      ], 404);
+    }
+
+    // Format cơ bản cho appointment
+    $formatted_appointment = [
+      'appointment_id' => $appointment->id,
+      'start_time' => $appointment->start_time,
+      'message' => $appointment->message,
+      'done' => $appointment->done,
+      'created_at' => $appointment->created_at,
+      'updated_at' => $appointment->updated_at,
+      'deleted_at' => $appointment->deleted_at,
+      'pet' => [
+        'pet_id' => $appointment->pet->id,
+        'name' => $appointment->pet->name,
+        'type' => $appointment->pet->type,
+        'age' => $appointment->pet->age,
+        'gender' => $appointment->pet->gender,
+        'description' => $appointment->pet->description,
+        'image' => $appointment->pet->image,
+        'is_purebred' => $appointment->pet->is_purebred,
+        'status' => $appointment->pet->status,
+        'breed' => [
+          'breed_id' => $appointment->pet->breed->id,
+          'name' => $appointment->pet->breed->name,
+          'type' => $appointment->pet->breed->type,
+          'description' => $appointment->pet->breed->description,
+          'image' => $appointment->pet->breed->image,
+          'origin' => $appointment->pet->breed->origin,
+          'lifespan' => $appointment->pet->breed->lifespan,
+          'average_size' => $appointment->pet->breed->average_size,
+        ],
+      ],
+      'doctor' => [
+        'doctor_id' => $appointment->doctor->id,
+        'account_id' => $appointment->doctor->account->id,
+        'full_name' => $appointment->doctor->full_name,
+        'email' => $appointment->doctor->account->email,
+        'gender' => $appointment->doctor->gender,
+        'birthdate' => $appointment->doctor->birthdate,
+        'description' => $appointment->doctor->description,
+        'phone' => $appointment->doctor->phone,
+        'address' => $appointment->doctor->address,
+        'image' => $appointment->doctor->image,
+        'certificate' => $appointment->doctor->certificate,
+      ],
+      'medical_center' => [
+        'medical_center_id' => $appointment->doctor->medicalCenter->id,
+        'account_id' => $appointment->doctor->medicalCenter->account->id,
+        'name' => $appointment->doctor->medicalCenter->name,
+        'email' => $appointment->doctor->medicalCenter->account->email,
+        'description' => $appointment->doctor->medicalCenter->description,
+        'image' => $appointment->doctor->medicalCenter->image,
+        'phone' => $appointment->doctor->medicalCenter->phone,
+        'address' => $appointment->doctor->medicalCenter->address,
+        'website' => $appointment->doctor->medicalCenter->website,
+        'fanpage' => $appointment->doctor->medicalCenter->fanpage,
+        'work_time' => $appointment->doctor->medicalCenter->work_time,
+        'establish_year' => $appointment->doctor->medicalCenter->establish_year,
+        'certificate' => $appointment->doctor->medicalCenter->certificate,
+      ],
+      'customer' => [
+        'customer_id' => $appointment->customer->id,
+        'account_id' => $appointment->customer->account->id,
+        'name' => $appointment->customer->full_name,
+        'email' => $appointment->customer->account->email,
+        'gender' => $appointment->customer->gender,
+        'birthdate' => $appointment->customer->birthdate,
+        'CMND' => $appointment->customer->CMND,
+        'address' => $appointment->customer->address,
+        'phone' => $appointment->customer->phone,
+        'ranking_point' => $appointment->customer->ranking_point,
+        'ranking_id' => $appointment->customer->ranking_id,
+      ],
+    ];
+
+    // Kiểm tra nếu appointment đã hoàn thành (done = true), thêm thông tin vaccine history và diagnosis history
+    if ($appointment->done) {
+      // Lấy vaccine history của pet có doctor_id và pet_id tương ứng
+      $vaccineHistory = $appointment->pet->historyVaccines()
+        ->where('doctor_id', $doctor_id)
+        ->where('pet_id', $appointment->pet_id)
+        ->where('created_at', $appointment->created_at)
+        ->latest()
+        ->first();
+
+      // Lấy diagnosis history của pet có doctor_id và pet_id tương ứng
+      $diagnosisHistory = $appointment->pet->historyDiagnosis()
+        ->where('doctor_id', $doctor_id)
+        ->where('pet_id', $appointment->pet_id)
+        ->where('created_at', $appointment->created_at)
+        ->latest()
+        ->first();
+
+      if ($vaccineHistory) {
+        $formatted_appointment['vaccine_history'] = [
+          'vaccine_history_id' => $vaccineHistory->id,
+          'vaccine' => $vaccineHistory->vaccine,
+          'note' => $vaccineHistory->note,
+          'created_at' => $vaccineHistory->created_at,
+        ];
+      }
+
+      if ($diagnosisHistory) {
+        $formatted_appointment['diagnosis_history'] = [
+          'diagnosis_history_id' => $diagnosisHistory->id,
+          'reason' => $diagnosisHistory->reason,
+          'diagnosis' => $diagnosisHistory->diagnosis,
+          'treatment' => $diagnosisHistory->treatment,
+          'health_condition' => $diagnosisHistory->health_condition,
+          'note' => $diagnosisHistory->note,
+          'created_at' => $diagnosisHistory->created_at,
+        ];
+      }
+    }
+
+    return response()->json([
+      'message' => 'Fetch appointment detail successfully!',
+      'status' => 200,
+      'data' => $formatted_appointment,
+    ], 200);
+  }
+
   public function updateAppointment(Request $request, $appointment_id)
   {
     $doctor_id = auth()->user()->doctor->id;
