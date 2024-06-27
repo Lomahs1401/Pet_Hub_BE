@@ -552,27 +552,6 @@ class DoctorController extends Controller
     ], 200);
   }
 
-  public function cancelAppointment($appointment_id)
-  {
-    // Tìm cuộc hẹn theo ID
-    $appointment = Appointment::find($appointment_id);
-
-    // Kiểm tra xem cuộc hẹn có tồn tại và thuộc về bác sĩ không
-    if (!$appointment || $appointment->doctor_id != auth()->user()->doctor->id) {
-      return response()->json(['message' => 'Appointment not found or unauthorized'], 404);
-    }
-
-    // Kiểm tra xem cuộc hẹn đã hoàn thành hay chưa
-    if ($appointment->done) {
-      return response()->json(['message' => 'Cannot cancel a completed appointment'], 400);
-    }
-
-    // Thực hiện xóa mềm cuộc hẹn
-    $appointment->delete();
-
-    return response()->json(['message' => 'Appointment cancelled successfully'], 200);
-  }
-
   public function createVaccineHistory(Request $request)
   {
     $doctor_id = auth()->user()->doctor->id;

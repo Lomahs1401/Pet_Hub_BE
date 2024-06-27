@@ -5,6 +5,8 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\Appointment;
 use App\Models\Doctor;
+use App\Models\HistoryDiagnosis;
+use App\Models\HistoryVaccine;
 use App\Models\MedicalCenter;
 use App\Models\Pet;
 use App\Models\RatingDoctor;
@@ -1154,5 +1156,78 @@ class AppointmentController extends Controller
       'total_appointments' => $totalAppointments,
       'data' => $appointments,
     ]);
+  }
+
+  public function updateAppointment(Request $request, $appointment_id)
+  {
+    $doctor_id = auth()->user()->doctor->id;
+
+    // Validate request data
+    $validatedData = $request->validate([
+      'vaccine' => 'nullable|string',
+      'note' => 'nullable|string',
+      'reason' => 'nullable|string',
+      'diagnosis' => 'nullable|string',
+      'treatment' => 'nullable|string',
+      'health_condition' => 'nullable|string',
+      'pet_id' => 'required|exists:pets,id',
+    ]);
+
+    // Find the appointment
+    $appointment = Appointment::findOrFail($appointment_id);
+
+    // Update the appointment status
+    $appointment->done = true;
+    $appointment->save();
+
+    // Create vaccine history if vaccine is provided
+    if (isset($validatedData['vaccine'])) {
+      $vaccineHistory = HistoryVaccine::create([
+        'vaccine' => $validatedData['vaccine'],
+        'note' => $validatedData['note'] ?? null,
+        'doctor_id' => $doctor_id,
+        'pet_id' => $validatedData['pet_id'],
+      ]);
+    }
+
+    // Create diagnosis history if reason, diagnosis, treatment, and health_condition are provided
+    if (isset($validatedData['reason']) && isset($validatedData['diagnosis']) && isset($validatedData['treatment']) && isset($validatedData['health_condition'])) {
+      $diagnosisHistory = HistoryDiagnosis::create([
+        'reason' => $validatedData['reason'],
+        'diagnosis' => $validatedData['diagnosis'],
+        'treatment' => $validatedData['treatment'],
+        'health_condition' => $validatedData['health_condition'],
+        'note' => $validatedData['note'] ?? null,
+        'doctor_id' => $doctor_id,
+        'pet_id' => $validatedData['pet_id'],
+      ]);
+    }
+
+    return response()->json([
+      'message' => 'Appointment updated successfully!',
+      'status' => 200,
+      'data' => $appointment,
+    ]);
+  }
+
+  public function cancelAppointment($appointment_id)
+  {
+    // Tìm cuộc hẹn theo ID
+    $appointment = Appointment::find($appointment_id);
+
+    // Kiểm tra xem cuộc hẹn có tồn tại và thuộc về bác sĩ không
+    if (!$appointment || $appointment->doctor_id != auth()->user()->doctor->id) {
+      return response()->json(['message' => 'Appointment not found or unauthorized'], 404);
+    }
+
+    // Kiểm tra xem cuộc hẹn đã hoàn thành hay chưa
+    if ($appointment->done) {
+      return response()->json(['message' => 'Cannot cancel a completed appointment'], 400);
+    }
+
+    // Thực hiện xóa mềm cuộc hẹn
+    $appointment->delete();
+
+    return response()->json(['message' => 'Appointment cancelled successfully'], 200);
   }
 }

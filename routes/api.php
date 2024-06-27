@@ -370,7 +370,7 @@ Route::group([
   'prefix' => 'doctor',
 ], function ($router) {
   // --------------     DOCTOR     --------------
-  Route::delete('/cancel-appointment/{appointment_id}', [DoctorController::class, 'cancelAppointment']);
+  
   Route::post('/vaccine-history', [DoctorController::class, 'createVaccineHistory']);
   Route::post('/diagnosis-history', [DoctorController::class, 'createDiagnosisHistory']);
   Route::put('/vaccine-history/{vaccine_history_id}', [DoctorController::class, 'updateVaccineHistory']);
@@ -380,6 +380,8 @@ Route::group([
   Route::get('/appointments/done', [AppointmentController::class, 'getListDoneAppointmentsByDoctor']);
   Route::get('/appointments/waiting', [AppointmentController::class, 'getListWaitingAppointmentsByDoctor']);
   Route::get('/appointments/{appointment_id}', [AppointmentController::class, 'getAppointmentDetail']);
+  Route::patch('/appointments/{appointment_id}', [AppointmentController::class, 'updateAppointment']);
+  Route::delete('/appointments/{appointment_id}', [AppointmentController::class, 'cancelAppointment']);
 
   // --------------     RATING DOCTOR    --------------
   Route::get('/ratings/paging', [RatingDoctorController::class, 'getCustomerRatings']); // lấy dsach rating của customer theo medical center id
