@@ -1249,45 +1249,38 @@ class AppointmentController extends Controller
       ],
     ];
 
-    // Kiểm tra nếu appointment đã hoàn thành (done = true), thêm thông tin vaccine history và diagnosis history
-    if ($appointment->done) {
-      // Lấy vaccine history của pet có doctor_id và pet_id tương ứng
-      $vaccineHistory = $appointment->pet->historyVaccines()
-        ->where('doctor_id', $doctor_id)
-        ->where('pet_id', $appointment->pet_id)
-        ->where('created_at', $appointment->created_at)
-        ->latest()
-        ->first();
+    // Lấy tất cả vaccine history của pet đó
+    $allVaccineHistories = $appointment->pet->historyVaccines()
+      ->where('pet_id', $appointment->pet_id)
+      ->orderBy('created_at', 'desc')
+      ->get();
 
-      // Lấy diagnosis history của pet có doctor_id và pet_id tương ứng
-      $diagnosisHistory = $appointment->pet->historyDiagnosis()
-        ->where('doctor_id', $doctor_id)
-        ->where('pet_id', $appointment->pet_id)
-        ->where('created_at', $appointment->created_at)
-        ->latest()
-        ->first();
+    // Lấy tất cả diagnosis history của pet đó
+    $allDiagnosisHistories = $appointment->pet->historyDiagnosis()
+      ->where('pet_id', $appointment->pet_id)
+      ->orderBy('created_at', 'desc')
+      ->get();
 
-      if ($vaccineHistory) {
-        $formatted_appointment['vaccine_history'] = [
-          'vaccine_history_id' => $vaccineHistory->id,
-          'vaccine' => $vaccineHistory->vaccine,
-          'note' => $vaccineHistory->note,
-          'created_at' => $vaccineHistory->created_at,
-        ];
-      }
+    $formatted_appointment['vaccine_history'] = $allVaccineHistories->map(function ($vaccineHistory) {
+      return [
+        'vaccine_history_id' => $vaccineHistory->id,
+        'vaccine' => $vaccineHistory->vaccine,
+        'note' => $vaccineHistory->note,
+        'created_at' => $vaccineHistory->created_at,
+      ];
+    })->all();
 
-      if ($diagnosisHistory) {
-        $formatted_appointment['diagnosis_history'] = [
-          'diagnosis_history_id' => $diagnosisHistory->id,
-          'reason' => $diagnosisHistory->reason,
-          'diagnosis' => $diagnosisHistory->diagnosis,
-          'treatment' => $diagnosisHistory->treatment,
-          'health_condition' => $diagnosisHistory->health_condition,
-          'note' => $diagnosisHistory->note,
-          'created_at' => $diagnosisHistory->created_at,
-        ];
-      }
-    }
+    $formatted_appointment['diagnosis_history'] = $allDiagnosisHistories->map(function ($diagnosisHistory) {
+      return [
+        'diagnosis_history_id' => $diagnosisHistory->id,
+        'reason' => $diagnosisHistory->reason,
+        'diagnosis' => $diagnosisHistory->diagnosis,
+        'treatment' => $diagnosisHistory->treatment,
+        'health_condition' => $diagnosisHistory->health_condition,
+        'note' => $diagnosisHistory->note,
+        'created_at' => $diagnosisHistory->created_at,
+      ];
+    })->all();
 
     return response()->json([
       'message' => 'Fetch appointment detail successfully!',
