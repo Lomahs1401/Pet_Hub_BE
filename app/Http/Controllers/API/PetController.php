@@ -22,7 +22,7 @@ class PetController extends Controller
       }
       $customerId = $customer_id;
     } else {
-      $customerId = auth()->user()->id;   
+      $customerId = auth()->user()->id;
     }
 
     $page_number = intval($request->query('page_number', 1));
@@ -88,7 +88,7 @@ class PetController extends Controller
       }
       $customerId = $customer_id;
     } else {
-      $customerId = auth()->user()->id;   
+      $customerId = auth()->user()->id;
     }
 
     $page_number = intval($request->query('page_number', 1));
@@ -157,7 +157,7 @@ class PetController extends Controller
       }
       $customerId = $customer_id;
     } else {
-      $customerId = auth()->user()->id;   
+      $customerId = auth()->user()->id;
     }
 
     $page_number = intval($request->query('page_number', 1));
@@ -568,5 +568,378 @@ class PetController extends Controller
       ],
       'data' => $formatted_pets,
     ], 200);
+  }
+
+  // ================================     For Aid Center     ================================
+  public function searchAdoptedPet(Request $request)
+  {
+    $aidCenterId = auth()->user()->aidCenter->id;
+    $pageNumber = intval($request->query('page_number', 1));
+    $numOfPage = intval($request->query('num_of_page', 10));
+    $searchTerm = $request->query('search_term', '');
+
+    $query = Pet::with(['breed', 'historyAdoptions.customer', 'customer.account'])
+      ->where('aid_center_id', $aidCenterId)
+      ->where('status', 1)
+      ->where(function ($query) use ($searchTerm) {
+        $query->where('name', 'LIKE', "%{$searchTerm}%")
+          ->orWhereHas('customer', function ($customerQuery) use ($searchTerm) {
+            $customerQuery->where('full_name', 'LIKE', "%{$searchTerm}%")
+              ->orWhere('phone', 'LIKE', "%{$searchTerm}%")
+              ->orWhereHas('account', function ($accountQuery) use ($searchTerm) {
+                $accountQuery->where('email', 'LIKE', "%{$searchTerm}%");
+              });
+          });
+      });
+
+    $pets = $query->paginate($numOfPage, ['*'], 'page', $pageNumber);
+
+    $formattedPets = [];
+    foreach ($pets as $pet) {
+      $formattedPets[] = [
+        'id' => $pet->id,
+        'name' => $pet->name,
+        'type' => $pet->type,
+        'age' => $pet->age,
+        'gender' => $pet->gender,
+        'description' => $pet->description,
+        'image' => $pet->image,
+        'is_purebred' => $pet->is_purebred,
+        'status' => $pet->status,
+        'created_at' => $pet->created_at,
+        'updated_at' => $pet->updated_at,
+        'breed' => $pet->breed ? [
+          'breed_id' => $pet->breed->id,
+          'name' => $pet->breed->name,
+          'type' => $pet->breed->type,
+          'description' => $pet->breed->description,
+          'image' => $pet->breed->image,
+          'origin' => $pet->breed->origin,
+          'lifespan' => $pet->breed->lifespan,
+          'average_size' => $pet->breed->average_size,
+        ] : null,
+        'customer' => $pet->historyAdoptions ? [
+          'customer_id' => $pet->historyAdoptions->customer->id,
+          'full_name' => $pet->historyAdoptions->customer->full_name,
+          'username' => $pet->historyAdoptions->customer->account->username,
+          'email' => $pet->historyAdoptions->customer->account->email,
+          'avatar' => $pet->historyAdoptions->customer->account->avatar,
+          'phone' => $pet->historyAdoptions->customer->phone,
+        ] : null,
+      ];
+    }
+
+    return response()->json([
+      'message' => 'Adopted pets retrieved successfully!',
+      'status' => 200,
+      'pagination' => [
+        'total' => $pets->total(),
+        'per_page' => $pets->perPage(),
+        'current_page' => $pets->currentPage(),
+        'last_page' => $pets->lastPage(),
+        'from' => $pets->firstItem(),
+        'to' => $pets->lastItem(),
+      ],
+      'data' => $formattedPets,
+    ]);
+  }
+
+  public function searchUnadoptedPet(Request $request)
+  {
+    $aidCenterId = auth()->user()->aidCenter->id;
+    $pageNumber = intval($request->query('page_number', 1));
+    $numOfPage = intval($request->query('num_of_page', 10));
+    $searchTerm = $request->query('search_term', '');
+
+    $query = Pet::where('aid_center_id', $aidCenterId)
+      ->where('status', 0)
+      ->where(function ($query) use ($searchTerm) {
+        $query->where('name', 'LIKE', "%{$searchTerm}%");
+      });
+
+    $pets = $query->paginate($numOfPage, ['*'], 'page', $pageNumber);
+
+    $formattedPets = [];
+    foreach ($pets as $pet) {
+      $formattedPets[] = [
+        'id' => $pet->id,
+        'name' => $pet->name,
+        'type' => $pet->type,
+        'age' => $pet->age,
+        'gender' => $pet->gender,
+        'description' => $pet->description,
+        'image' => $pet->image,
+        'is_purebred' => $pet->is_purebred,
+        'status' => $pet->status,
+        'created_at' => $pet->created_at,
+        'updated_at' => $pet->updated_at,
+        'breed' => $pet->breed ? [
+          'breed_id' => $pet->breed->id,
+          'name' => $pet->breed->name,
+          'type' => $pet->breed->type,
+          'description' => $pet->breed->description,
+          'image' => $pet->breed->image,
+          'origin' => $pet->breed->origin,
+          'lifespan' => $pet->breed->lifespan,
+          'average_size' => $pet->breed->average_size,
+        ] : null,
+      ];
+    }
+
+    return response()->json([
+      'message' => 'Unadopted pets retrieved successfully!',
+      'status' => 200,
+      'pagination' => [
+        'total' => $pets->total(),
+        'per_page' => $pets->perPage(),
+        'current_page' => $pets->currentPage(),
+        'last_page' => $pets->lastPage(),
+        'from' => $pets->firstItem(),
+        'to' => $pets->lastItem(),
+      ],
+      'data' => $formattedPets,
+    ]);
+  }
+
+  public function searchDeletedPet(Request $request)
+  {
+    $aidCenterId = auth()->user()->aidCenter->id;
+    $pageNumber = intval($request->query('page_number', 1));
+    $numOfPage = intval($request->query('num_of_page', 10));
+    $searchTerm = $request->query('search_term', '');
+
+    $pets = Pet::onlyTrashed('deleted_at')
+      ->where('aid_center_id', $aidCenterId)
+      ->where(function ($query) use ($searchTerm) {
+        $query->where('name', 'LIKE', "%{$searchTerm}%");
+      })
+      ->paginate($numOfPage, ['*'], 'page', $pageNumber);
+
+    $formattedPets = [];
+    foreach ($pets as $pet) {
+      $formattedPets[] = [
+        'id' => $pet->id,
+        'name' => $pet->name,
+        'type' => $pet->type,
+        'age' => $pet->age,
+        'gender' => $pet->gender,
+        'description' => $pet->description,
+        'image' => $pet->image,
+        'is_purebred' => $pet->is_purebred,
+        'status' => $pet->status,
+        'created_at' => $pet->created_at,
+        'updated_at' => $pet->updated_at,
+        'breed' => $pet->breed ? [
+          'breed_id' => $pet->breed->id,
+          'name' => $pet->breed->name,
+          'type' => $pet->breed->type,
+          'description' => $pet->breed->description,
+          'image' => $pet->breed->image,
+          'origin' => $pet->breed->origin,
+          'lifespan' => $pet->breed->lifespan,
+          'average_size' => $pet->breed->average_size,
+        ] : null,
+      ];
+    }
+
+    return response()->json([
+      'message' => 'Deleted pets retrieved successfully!',
+      'status' => 200,
+      'pagination' => [
+        'total' => $pets->total(),
+        'per_page' => $pets->perPage(),
+        'current_page' => $pets->currentPage(),
+        'last_page' => $pets->lastPage(),
+        'from' => $pets->firstItem(),
+        'to' => $pets->lastItem(),
+      ],
+      'data' => $formattedPets,
+    ]);
+  }
+
+  public function getAdoptedPets(Request $request)
+  {
+    $aidCenterId = auth()->user()->aidCenter->id;
+    $pageNumber = intval($request->query('page_number', 1));
+    $numOfPage = intval($request->query('num_of_page', 10));
+    $filter = strtolower($request->query('filter', 'all'));
+
+    $query = Pet::with(['breed', 'historyAdoptions.customer', 'customer.account'])
+      ->where('aid_center_id', $aidCenterId)
+      ->where('status', 1);
+
+    if ($filter !== 'all') {
+      $query->where('type', $filter);
+    }
+
+    $pets = $query->paginate($numOfPage, ['*'], 'page', $pageNumber);
+
+    $formattedPets = [];
+    foreach ($pets as $pet) {
+      $formattedPets[] = [
+        'id' => $pet->id,
+        'name' => $pet->name,
+        'type' => $pet->type,
+        'age' => $pet->age,
+        'gender' => $pet->gender,
+        'description' => $pet->description,
+        'image' => $pet->image,
+        'is_purebred' => $pet->is_purebred,
+        'status' => $pet->status,
+        'created_at' => $pet->created_at,
+        'updated_at' => $pet->updated_at,
+        'breed' => $pet->breed ? [
+          'breed_id' => $pet->breed->id,
+          'name' => $pet->breed->name,
+          'type' => $pet->breed->type,
+          'description' => $pet->breed->description,
+          'image' => $pet->breed->image,
+          'origin' => $pet->breed->origin,
+          'lifespan' => $pet->breed->lifespan,
+          'average_size' => $pet->breed->average_size,
+        ] : null,
+        'customer' => $pet->historyAdoptions ? [
+          'customer_id' => $pet->historyAdoptions->customer->id,
+          'full_name' => $pet->historyAdoptions->customer->full_name,
+          'phone' => $pet->historyAdoptions->customer->phone,
+          'username' => $pet->historyAdoptions->customer->account->username,
+          'email' => $pet->historyAdoptions->customer->account->email,
+          'avatar' => $pet->historyAdoptions->customer->account->avatar,
+        ] : null,
+      ];
+    }
+
+    return response()->json([
+      'message' => 'Adopted pets retrieved successfully!',
+      'status' => 200,
+      'pagination' => [
+        'total' => $pets->total(),
+        'per_page' => $pets->perPage(),
+        'current_page' => $pets->currentPage(),
+        'last_page' => $pets->lastPage(),
+        'from' => $pets->firstItem(),
+        'to' => $pets->lastItem(),
+      ],
+      'data' => $formattedPets,
+    ]);
+  }
+
+  public function getUnadoptedPets(Request $request)
+  {
+    $aidCenterId = auth()->user()->aidCenter->id;
+    $pageNumber = intval($request->query('page_number', 1));
+    $numOfPage = intval($request->query('num_of_page', 10));
+    $filter = strtolower($request->query('filter', 'all'));
+
+    $query = Pet::with(['breed'])
+      ->where('aid_center_id', $aidCenterId)
+      ->where('status', 0);
+
+    if ($filter !== 'all') {
+      $query->where('type', $filter);
+    }
+
+    $pets = $query->paginate($numOfPage, ['*'], 'page', $pageNumber);
+
+    $formattedPets = [];
+    foreach ($pets as $pet) {
+      $formattedPets[] = [
+        'id' => $pet->id,
+        'name' => $pet->name,
+        'type' => $pet->type,
+        'age' => $pet->age,
+        'gender' => $pet->gender,
+        'description' => $pet->description,
+        'image' => $pet->image,
+        'is_purebred' => $pet->is_purebred,
+        'status' => $pet->status,
+        'created_at' => $pet->created_at,
+        'updated_at' => $pet->updated_at,
+        'breed' => $pet->breed ? [
+          'breed_id' => $pet->breed->id,
+          'name' => $pet->breed->name,
+          'type' => $pet->breed->type,
+          'description' => $pet->breed->description,
+          'image' => $pet->breed->image,
+          'origin' => $pet->breed->origin,
+          'lifespan' => $pet->breed->lifespan,
+          'average_size' => $pet->breed->average_size,
+        ] : null,
+      ];
+    }
+
+    return response()->json([
+      'message' => 'Unadopted pets retrieved successfully!',
+      'status' => 200,
+      'pagination' => [
+        'total' => $pets->total(),
+        'per_page' => $pets->perPage(),
+        'current_page' => $pets->currentPage(),
+        'last_page' => $pets->lastPage(),
+        'from' => $pets->firstItem(),
+        'to' => $pets->lastItem(),
+      ],
+      'data' => $formattedPets,
+    ]);
+  }
+
+  public function getDeletedPets(Request $request)
+  {
+    $aidCenterId = auth()->user()->aidCenter->id;
+    $pageNumber = intval($request->query('page_number', 1));
+    $numOfPage = intval($request->query('num_of_page', 10));
+    $filter = strtolower($request->query('filter', 'all'));
+
+    $query = Pet::with(['breed'])
+      ->onlyTrashed('deleted_at')
+      ->where('aid_center_id', $aidCenterId);
+
+    if ($filter !== 'all') {
+      $query->where('type', $filter);
+    }
+
+    $pets = $query->paginate($numOfPage, ['*'], 'page', $pageNumber);
+
+    $formattedPets = [];
+    foreach ($pets as $pet) {
+      $formattedPets[] = [
+        'id' => $pet->id,
+        'name' => $pet->name,
+        'type' => $pet->type,
+        'age' => $pet->age,
+        'gender' => $pet->gender,
+        'description' => $pet->description,
+        'image' => $pet->image,
+        'is_purebred' => $pet->is_purebred,
+        'status' => $pet->status,
+        'created_at' => $pet->created_at,
+        'updated_at' => $pet->updated_at,
+        'deleted_at' => $pet->deleted_at,
+        'breed' => $pet->breed ? [
+          'breed_id' => $pet->breed->id,
+          'name' => $pet->breed->name,
+          'type' => $pet->breed->type,
+          'description' => $pet->breed->description,
+          'image' => $pet->breed->image,
+          'origin' => $pet->breed->origin,
+          'lifespan' => $pet->breed->lifespan,
+          'average_size' => $pet->breed->average_size,
+        ] : null,
+      ];
+    }
+
+    return response()->json([
+      'message' => 'Deleted pets retrieved successfully!',
+      'status' => 200,
+      'pagination' => [
+        'total' => $pets->total(),
+        'per_page' => $pets->perPage(),
+        'current_page' => $pets->currentPage(),
+        'last_page' => $pets->lastPage(),
+        'from' => $pets->firstItem(),
+        'to' => $pets->lastItem(),
+      ],
+      'data' => $formattedPets,
+    ]);
   }
 }

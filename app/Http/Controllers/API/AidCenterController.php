@@ -5,13 +5,35 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\Account;
 use App\Models\AdoptRequest;
+use App\Models\AidCenter;
 use App\Models\HistoryAdopt;
 use App\Models\Pet;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class AidCenterController extends Controller
 {
+  public function getAddress() {
+    $aid_center_id = auth()->user()->aidCenter->id;
+
+    try {
+      // Lấy aid center hiện tại
+      $aidCenter = AidCenter::findOrFail($aid_center_id);
+    } catch (ModelNotFoundException $e) {
+      return response()->json([
+        'message' => 'Aid center not found!',
+        'status' => 404
+      ], 404);
+    }
+
+    return response()->json([
+      'message' => 'Get aid center address successfully',
+      'status' => 200,
+      'data' => $aidCenter->address
+    ], 200);
+  }
+
   public function getAdoptedRequest(Request $request)
   {
     // Lấy ID của customer đang đăng nhập

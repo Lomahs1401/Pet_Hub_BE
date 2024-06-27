@@ -18,6 +18,102 @@ use Illuminate\Support\Facades\Validator;
 
 class DoctorController extends Controller
 {
+  public function searchDoctor(Request $request)
+  {
+    $medicalCenterId = auth()->user()->medicalCenter->id;
+    $page_number = intval($request->query('page_number', 1));
+    $num_of_page = intval($request->query('num_of_page', 10));
+    $searchTerm = $request->query('search_term', '');
+
+    $query = Doctor::with(['account']) // Eager load the account relationship
+      ->where('medical_center_id', $medicalCenterId)
+      ->where(function ($query) use ($searchTerm) {
+        $query->where('full_name', '=', $searchTerm)
+          ->orWhere('phone', '=', $searchTerm)
+          ->orWhere('CMND', '=', $searchTerm)
+          ->orWhereHas('account', function ($accountQuery) use ($searchTerm) {
+            $accountQuery->where('email', 'LIKE', "%{$searchTerm}%");
+          });
+      });
+
+    $doctors = $query->paginate($num_of_page, ['*'], 'page', $page_number);
+
+    return response()->json([
+      'message' => 'Doctors retrieved successfully!',
+      'status' => 200,
+      'pagination' => [
+        'loz' => 'Test',
+        'total' => $doctors->total(),
+        'per_page' => $doctors->perPage(),
+        'current_page' => $doctors->currentPage(),
+        'last_page' => $doctors->lastPage(),
+        'from' => $doctors->firstItem(),
+        'to' => $doctors->lastItem(),
+      ],
+      'data' => $doctors->items(),
+    ], 200);
+  }
+
+  public function searchDeletedDoctor(Request $request)
+  {
+    $medicalCenterId = auth()->user()->medicalCenter->id;
+    $page_number = intval($request->query('page_number', 1));
+    $num_of_page = intval($request->query('num_of_page', 10));
+    $searchTerm = $request->query('search_term', '');
+
+    $query = Doctor::onlyTrashed()
+      ->with(['account']) // Eager load the account relationship
+      ->where('medical_center_id', $medicalCenterId)
+      ->where(function ($query) use ($searchTerm) {
+        $query->where('full_name', '=', $searchTerm)
+          ->orWhere('phone', '=', $searchTerm)
+          ->orWhere('CMND', '=', $searchTerm)
+          ->orWhereHas('account', function ($accountQuery) use ($searchTerm) {
+            $accountQuery->where('email', 'LIKE', "%{$searchTerm}%");
+          });
+      });
+
+    $doctors = $query->paginate($num_of_page, ['*'], 'page', $page_number);
+
+    return response()->json([
+      'message' => 'Deleted doctors retrieved successfully!',
+      'status' => 200,
+      'pagination' => [
+        'total' => $doctors->total(),
+        'per_page' => $doctors->perPage(),
+        'current_page' => $doctors->currentPage(),
+        'last_page' => $doctors->lastPage(),
+        'from' => $doctors->firstItem(),
+        'to' => $doctors->lastItem(),
+      ],
+      'data' => $doctors->items(),
+    ], 200);
+  }
+
+  public function restoreDoctor($doctor_id)
+  {
+    $medical_center_id = auth()->user()->medicalCenter->id;
+
+    $doctor = Doctor::onlyTrashed()
+      ->where('id', $doctor_id)
+      ->where('medical_center_id', $medical_center_id)
+      ->first();
+
+    if (!$doctor) {
+      return response()->json([
+        'message' => 'Doctor not found or does not belong to the medical center',
+        'status' => 404,
+      ], 404);
+    }
+
+    $doctor->restore();
+
+    return response()->json([
+      'message' => 'Restore doctor successfully!',
+      'status' => 200,
+    ], 200);
+  }
+
   // Lấy danh sách toàn bộ các bác sĩ
   public function getAllDoctors(Request $request)
   {

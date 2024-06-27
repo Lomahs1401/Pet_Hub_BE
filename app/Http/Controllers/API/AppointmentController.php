@@ -606,17 +606,28 @@ class AppointmentController extends Controller
   // ==================================     FOR MEDICAL CENTER     ==================================
   public function getListDoneAppointments(Request $request)
   {
+    $medical_center_id = auth()->user()->medicalCenter->id;
+
     $page_number = intval($request->query('page_number', 1));
     $num_of_page = intval($request->query('num_of_page', 10));
     $sort_by = $request->query('sort_by', 'newest');
+    $date = $request->query('date');
 
     // Tính toán offset
     $offset = ($page_number - 1) * $num_of_page;
 
     // Lấy số lượng các cuộc hẹn đã hoàn thành
     $query = Appointment::withTrashed()
-      ->with(['doctor.account', 'doctor.medicalCenter', 'pet', 'customer.account'])
+      ->whereHas('doctor', function ($doctorQuery) use ($medical_center_id) {
+        $doctorQuery->where('medical_center_id', $medical_center_id);
+      })
+      ->with(['doctor.account', 'doctor.medicalCenter', 'pet.breed', 'customer.account'])
       ->where('done', true);
+
+    // Thêm bộ lọc theo ngày nếu tham số 'date' được cung cấp
+    if ($date) {
+      $query->whereDate('start_time', '=', $date);
+    }
 
     $total_appointments = $query->count();
     $total_pages = ceil($total_appointments / $num_of_page);
@@ -687,17 +698,28 @@ class AppointmentController extends Controller
 
   public function getListWaitingAppointments(Request $request)
   {
+    $medical_center_id = auth()->user()->medicalCenter->id;
+
     $page_number = intval($request->query('page_number', 1));
     $num_of_page = intval($request->query('num_of_page', 10));
     $sort_by = $request->query('sort_by', 'newest');
+    $date = $request->query('date');
 
     // Tính toán offset
     $offset = ($page_number - 1) * $num_of_page;
 
     // Lấy số lượng các cuộc hẹn đang chờ
     $query = Appointment::withTrashed()
-      ->with(['doctor.account', 'doctor.medicalCenter', 'pet', 'customer.account'])
+      ->whereHas('doctor', function ($doctorQuery) use ($medical_center_id) {
+        $doctorQuery->where('medical_center_id', $medical_center_id);
+      })
+      ->with(['doctor.account', 'doctor.medicalCenter', 'pet.breed', 'customer.account'])
       ->where('done', false);
+
+    // Thêm bộ lọc theo ngày nếu tham số 'date' được cung cấp
+    if ($date) {
+      $query->whereDate('start_time', '=', $date);
+    }
 
     $total_appointments = $query->count();
     $total_pages = ceil($total_appointments / $num_of_page);
@@ -1009,6 +1031,30 @@ class AppointmentController extends Controller
 
     return response()->json([
       'message' => 'Delete appointment successfully!',
+      'status' => 200,
+    ], 200);
+  }
+
+  public function restore($appointment_id)
+  {
+    $doctor_id = auth()->user()->doctor->id;
+
+    $appointment = Appointment::onlyTrashed()
+      ->where('id', $appointment_id)
+      ->where('doctor_id', $doctor_id)
+      ->first();
+
+    if (!$appointment) {
+      return response()->json([
+        'message' => 'Appointment not found or does not belong to the doctor',
+        'status' => 404,
+      ], 404);
+    }
+
+    $appointment->restore();
+
+    return response()->json([
+      'message' => 'Restore appointment successfully!',
       'status' => 200,
     ], 200);
   }

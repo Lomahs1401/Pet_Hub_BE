@@ -7,6 +7,7 @@ use App\Http\Controllers\API\AdminDashboardController;
 use App\Http\Controllers\API\AdminMedicalCenterController;
 use App\Http\Controllers\API\AdminShopController;
 use App\Http\Controllers\API\AidCenterController;
+use App\Http\Controllers\API\AidCenterDashboardController;
 use App\Http\Controllers\API\AppointmentController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\BlogController;
@@ -352,6 +353,9 @@ Route::group([
   Route::get('/doctors/paging', [DoctorController::class, 'getDoctorsOfMedicalCenter']);
   Route::get('/doctors/deleted/paging', [DoctorController::class, 'getDeletedDoctorOfMedicalCenter']);
   Route::post('/doctors', [DoctorController::class, 'createDoctor']);
+  Route::get('/doctors/search', [DoctorController::class, 'searchDoctor']);
+  Route::get('/doctors/search-deleted', [DoctorController::class, 'searchDeletedDoctor']);
+  Route::put('/doctors/{doctor_id}/restore', [DoctorController::class, 'restoreDoctor']);
   Route::get('/doctors/{doctor_id}', [DoctorController::class, 'show']);
   Route::delete('/doctors/{doctor_id}', [DoctorController::class, 'deleteDoctor']);
   
@@ -371,6 +375,12 @@ Route::group([
   Route::post('/diagnosis-history', [DoctorController::class, 'createDiagnosisHistory']);
   Route::put('/vaccine-history/{vaccine_history_id}', [DoctorController::class, 'updateVaccineHistory']);
   Route::put('/diagnosis-history/{diagnosis_history_id}', [DoctorController::class, 'updateDiagnosisHistory']);
+
+  // --------------     APPOINTMENT     --------------
+  Route::get('/appointments/done', [AppointmentController::class, 'getListDoneAppointments']);
+  Route::get('/appointments/waiting', [AppointmentController::class, 'getListWaitingAppointments']);
+  Route::get('/appointments/{appointment_id}', [AppointmentController::class, 'getAppointmentDetail']);
+  Route::get('/appointments/{appointment_id}/restore', [AppointmentController::class, 'restoreAppointment']);
 
   // --------------     RATING DOCTOR    --------------
   Route::get('/ratings/paging', [RatingDoctorController::class, 'getCustomerRatings']); // lấy dsach rating của customer theo medical center id
@@ -392,15 +402,29 @@ Route::group([
   'prefix' => 'aid-center',
 ], function ($router) {
   // --------------     DASHBOARD     --------------
-  Route::get('/banner/adopt-request', [ShopDashboardController::class, 'getRepliesComparison']);
-  Route::get('/banner/new-pets', [ShopDashboardController::class, 'getReviewsComparison']);
-  Route::get('/banner/adopted-pets', [ShopDashboardController::class, 'getProductsComparison']);
-  Route::get('/banner/orders', [ShopDashboardController::class, 'getOrdersComparison']);
-  Route::get('/banner/last-week-adopt-request', [ShopDashboardController::class, 'getSales']);
-  Route::get('/bar/adopted-request', [AdminDashboardController::class, 'getMedicalCenter']);
-  Route::get('/bar/adopted-pets', [AdminDashboardController::class, 'get']);
-  Route::get('/pie/pets', [AdminDashboardController::class, 'getAccountType']);
-  Route::get('/recent-adopt-request', [AdminDashboardController::class, 'getRecentWaitingApprovedAccount']);
+  Route::get('/banner/adopt-request', [AidCenterDashboardController::class, 'getAdoptRequestComparison']);
+  Route::get('/banner/new-pets', [AidCenterDashboardController::class, 'getNewPetsComparison']);
+  Route::get('/banner/adopted-pets', [AidCenterDashboardController::class, 'getAdoptedPetsComparison']);
+  Route::get('/banner/unadopted-pets', [AidCenterDashboardController::class, 'getUnadoptedPetsComparison']);
+  Route::get('/banner/last-week-adopt-request', [AidCenterDashboardController::class, 'getLastWeekAdoptRequest']);
+  Route::get('/bar/adopt-request', [AidCenterDashboardController::class, 'getBarAdoptRequest']);
+  Route::get('/bar/adopted-pets', [AidCenterDashboardController::class, 'getBarAdoptedPets']);
+  Route::get('/pie/pets', [AidCenterDashboardController::class, 'getPiePets']);
+  Route::get('/recent-adopt-request', [AidCenterDashboardController::class, 'getRecentAdoptRequest']);
+
+  // --------------     PROFILE     --------------
+  Route::get('/profile/address', [AidCenterController::class, 'getAddress']);
+
+  // --------------     PET     --------------
+  Route::get('/pets/search-adopted-pet', [PetController::class, 'searchAdoptedPet']);
+  Route::get('/pets/search-unadopted-pet', [PetController::class, 'searchUnadoptedPet']);
+  Route::get('/pets/search-deleted-pet', [PetController::class, 'searchDeletedPet']);
+  Route::get('/pets/adopted/paging', [PetController::class, 'getAdoptedPets']);
+  Route::get('/pets/unadopted/paging', [PetController::class, 'getUnadoptedPets']);
+  Route::get('/pets/deleted/paging', [PetController::class, 'getDeletedPets']);
+
+  // --------------     ADOPT REQUEST     --------------
+  Route::get('/profile/address', [AidCenterController::class, 'getAddress']);
 });
 
 
