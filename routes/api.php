@@ -377,10 +377,9 @@ Route::group([
   Route::put('/diagnosis-history/{diagnosis_history_id}', [DoctorController::class, 'updateDiagnosisHistory']);
 
   // --------------     APPOINTMENT     --------------
-  Route::get('/appointments/done', [AppointmentController::class, 'getListDoneAppointments']);
-  Route::get('/appointments/waiting', [AppointmentController::class, 'getListWaitingAppointments']);
+  Route::get('/appointments/done', [AppointmentController::class, 'getListDoneAppointmentsByDoctor']);
+  Route::get('/appointments/waiting', [AppointmentController::class, 'getListWaitingAppointmentsByDoctor']);
   Route::get('/appointments/{appointment_id}', [AppointmentController::class, 'getAppointmentDetail']);
-  Route::get('/appointments/{appointment_id}/restore', [AppointmentController::class, 'restoreAppointment']);
 
   // --------------     RATING DOCTOR    --------------
   Route::get('/ratings/paging', [RatingDoctorController::class, 'getCustomerRatings']); // lấy dsach rating của customer theo medical center id
@@ -422,6 +421,7 @@ Route::group([
   Route::get('/pets/adopted/paging', [PetController::class, 'getAdoptedPets']);
   Route::get('/pets/unadopted/paging', [PetController::class, 'getUnadoptedPets']);
   Route::get('/pets/deleted/paging', [PetController::class, 'getDeletedPets']);
+  Route::get('/pets/{pet_id}', [PetController::class, 'getPetDetail']);
 
   // --------------     ADOPT REQUEST     --------------
   Route::get('/profile/address', [AidCenterController::class, 'getAddress']);

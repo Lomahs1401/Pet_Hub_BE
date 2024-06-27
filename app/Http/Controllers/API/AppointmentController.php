@@ -1058,4 +1058,101 @@ class AppointmentController extends Controller
       'status' => 200,
     ], 200);
   }
+
+  // ==================================     FOR DOCTOR     ==================================
+  public function getListDoneAppointmentsByDoctor(Request $request)
+  {
+    $doctorId = auth()->user()->doctor->id;
+
+    $pageNumber = intval($request->query('page_number', 1));
+    $numOfPage = intval($request->query('num_of_page', 10));
+    $sortBy = $request->query('sort_by', 'newest');
+    $date = $request->query('date');
+
+    // Tính toán offset
+    $offset = ($pageNumber - 1) * $numOfPage;
+
+    // Lấy số lượng các cuộc hẹn đã hoàn thành
+    $query = Appointment::where('doctor_id', $doctorId)
+      ->where('done', true)
+      ->with(['customer.account', 'pet']);
+
+    // Thêm bộ lọc theo ngày nếu tham số 'date' được cung cấp
+    if ($date) {
+      $query->whereDate('start_time', '=', $date);
+    }
+
+    $totalAppointments = $query->count();
+    $totalPages = ceil($totalAppointments / $numOfPage);
+
+    if ($sortBy === 'oldest') {
+      $appointments = $query->orderBy('start_time', 'asc')
+        ->offset($offset)
+        ->limit($numOfPage)
+        ->get();
+    } else {
+      $appointments = $query->orderBy('start_time', 'desc')
+        ->offset($offset)
+        ->limit($numOfPage)
+        ->get();
+    }
+
+    return response()->json([
+      'message' => 'Fetch done appointments successfully!',
+      'status' => 200,
+      'page_number' => $pageNumber,
+      'num_of_page' => $numOfPage,
+      'total_pages' => $totalPages,
+      'total_appointments' => $totalAppointments,
+      'data' => $appointments,
+    ]);
+  }
+
+  public function getListWaitingAppointmentsByDoctor(Request $request)
+  {
+    $doctorId = auth()->user()->doctor->id;
+
+    $pageNumber = intval($request->query('page_number', 1));
+    $numOfPage = intval($request->query('num_of_page', 10));
+    $sortBy = $request->query('sort_by', 'newest');
+    $date = $request->query('date');
+
+    // Tính toán offset
+    $offset = ($pageNumber - 1) * $numOfPage;
+
+    // Lấy số lượng các cuộc hẹn đang chờ
+    $query = Appointment::where('doctor_id', $doctorId)
+      ->where('done', false)
+      ->with(['customer.account', 'pet']);
+
+    // Thêm bộ lọc theo ngày nếu tham số 'date' được cung cấp
+    if ($date) {
+      $query->whereDate('start_time', '=', $date);
+    }
+
+    $totalAppointments = $query->count();
+    $totalPages = ceil($totalAppointments / $numOfPage);
+
+    if ($sortBy === 'oldest') {
+      $appointments = $query->orderBy('start_time', 'asc')
+        ->offset($offset)
+        ->limit($numOfPage)
+        ->get();
+    } else {
+      $appointments = $query->orderBy('start_time', 'desc')
+        ->offset($offset)
+        ->limit($numOfPage)
+        ->get();
+    }
+
+    return response()->json([
+      'message' => 'Fetch waiting appointments successfully!',
+      'status' => 200,
+      'page_number' => $pageNumber,
+      'num_of_page' => $numOfPage,
+      'total_pages' => $totalPages,
+      'total_appointments' => $totalAppointments,
+      'data' => $appointments,
+    ]);
+  }
 }

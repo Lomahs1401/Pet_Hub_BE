@@ -578,12 +578,14 @@ class PetController extends Controller
     $numOfPage = intval($request->query('num_of_page', 10));
     $searchTerm = $request->query('search_term', '');
 
+    // var_dump($searchTerm);
+
     $query = Pet::with(['breed', 'historyAdoptions.customer', 'customer.account'])
       ->where('aid_center_id', $aidCenterId)
       ->where('status', 1)
       ->where(function ($query) use ($searchTerm) {
-        $query->where('name', 'LIKE', "%{$searchTerm}%")
-          ->orWhereHas('customer', function ($customerQuery) use ($searchTerm) {
+        $query->where('name', '=', $searchTerm)
+          ->orWhereHas('historyAdoptions.customer', function ($customerQuery) use ($searchTerm) {
             $customerQuery->where('full_name', 'LIKE', "%{$searchTerm}%")
               ->orWhere('phone', 'LIKE', "%{$searchTerm}%")
               ->orWhereHas('account', function ($accountQuery) use ($searchTerm) {
@@ -940,6 +942,64 @@ class PetController extends Controller
         'to' => $pets->lastItem(),
       ],
       'data' => $formattedPets,
+    ]);
+  }
+
+  public function getPetDetail($pet_id)
+  {
+    $aid_center_id = auth()->user()->aidCenter->id;
+
+    // Tìm pet theo pet_id và aid_center_id
+    $pet = Pet::withTrashed()->with(['breed', 'historyAdoptions.customer', 'customer.account'])
+      ->where('id', $pet_id)
+      ->where('aid_center_id', $aid_center_id)
+      ->first();
+
+    // Nếu không tìm thấy pet, trả về lỗi
+    if (!$pet) {
+      return response()->json([
+        'message' => 'Pet not found or does not belong to your aid center',
+        'status' => 404,
+      ], 404);
+    }
+
+    // Format dữ liệu pet
+    $petDetail = [
+      'id' => $pet->id,
+      'name' => $pet->name,
+      'type' => $pet->type,
+      'age' => $pet->age,
+      'gender' => $pet->gender,
+      'description' => $pet->description,
+      'image' => $pet->image,
+      'is_purebred' => $pet->is_purebred,
+      'status' => $pet->status,
+      'created_at' => $pet->created_at,
+      'updated_at' => $pet->updated_at,
+      'breed' => $pet->breed ? [
+        'breed_id' => $pet->breed->id,
+        'name' => $pet->breed->name,
+        'type' => $pet->breed->type,
+        'description' => $pet->breed->description,
+        'image' => $pet->breed->image,
+        'origin' => $pet->breed->origin,
+        'lifespan' => $pet->breed->lifespan,
+        'average_size' => $pet->breed->average_size,
+      ] : null,
+      'customer' => $pet->historyAdoptions ? [
+        'customer_id' => $pet->historyAdoptions->customer->id,
+        'full_name' => $pet->historyAdoptions->customer->full_name,
+        'phone' => $pet->historyAdoptions->customer->phone,
+        'username' => $pet->historyAdoptions->customer->account->username,
+        'email' => $pet->historyAdoptions->customer->account->email,
+        'avatar' => $pet->historyAdoptions->customer->account->avatar,
+      ] : null,
+    ];
+
+    return response()->json([
+      'message' => 'Fetch pet detail successfully!',
+      'status' => 200,
+      'data' => $petDetail,
     ]);
   }
 }
