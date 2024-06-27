@@ -370,9 +370,8 @@ Route::group([
   'prefix' => 'doctor',
 ], function ($router) {
   // --------------     DOCTOR     --------------
-  
-  Route::post('/vaccine-history', [DoctorController::class, 'createVaccineHistory']);
-  Route::post('/diagnosis-history', [DoctorController::class, 'createDiagnosisHistory']);
+  // Route::post('/vaccine-history', [DoctorController::class, 'createVaccineHistory']);
+  // Route::post('/diagnosis-history', [DoctorController::class, 'createDiagnosisHistory']);
   Route::put('/vaccine-history/{vaccine_history_id}', [DoctorController::class, 'updateVaccineHistory']);
   Route::put('/diagnosis-history/{diagnosis_history_id}', [DoctorController::class, 'updateDiagnosisHistory']);
 

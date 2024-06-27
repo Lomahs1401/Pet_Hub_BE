@@ -552,55 +552,55 @@ class DoctorController extends Controller
     ], 200);
   }
 
-  public function createVaccineHistory(Request $request)
-  {
-    $doctor_id = auth()->user()->doctor->id;
+  // public function createVaccineHistory(Request $request)
+  // {
+  //   $doctor_id = auth()->user()->doctor->id;
 
-    $validatedData = $request->validate([
-      'vaccine' => 'required|string',
-      'note' => 'nullable|string',
-      'pet_id' => 'required|exists:pets,id',
-    ]);
+  //   $validatedData = $request->validate([
+  //     'vaccine' => 'required|string',
+  //     'note' => 'nullable|string',
+  //     'pet_id' => 'required|exists:pets,id',
+  //   ]);
 
-    $validatedData['doctor_id'] = $doctor_id;
+  //   $validatedData['doctor_id'] = $doctor_id;
 
-    $vaccineHistory = HistoryVaccine::create([
-      'vaccine' => $validatedData['vaccine'],
-      'note' => $validatedData['note'],
-      'doctor_id' => $validatedData['doctor_id'],
-      'pet_id' => $validatedData['pet_id'],
-    ]);
+  //   $vaccineHistory = HistoryVaccine::create([
+  //     'vaccine' => $validatedData['vaccine'],
+  //     'note' => $validatedData['note'],
+  //     'doctor_id' => $validatedData['doctor_id'],
+  //     'pet_id' => $validatedData['pet_id'],
+  //   ]);
 
-    return response()->json($vaccineHistory, 201);
-  }
+  //   return response()->json($vaccineHistory, 201);
+  // }
 
-  public function createDiagnosisHistory(Request $request)
-  {
-    $doctor_id = auth()->user()->doctor->id;
+  // public function createDiagnosisHistory(Request $request)
+  // {
+  //   $doctor_id = auth()->user()->doctor->id;
 
-    $validatedData = $request->validate([
-      'reason' => 'required',
-      'diagnosis' => 'required',
-      'treatment' => 'required',
-      'health_condition' => 'required',
-      'note' => 'nullable',
-      'pet_id' => 'required|exists:pets,id',
-    ]);
+  //   $validatedData = $request->validate([
+  //     'reason' => 'required',
+  //     'diagnosis' => 'required',
+  //     'treatment' => 'required',
+  //     'health_condition' => 'required',
+  //     'note' => 'nullable',
+  //     'pet_id' => 'required|exists:pets,id',
+  //   ]);
 
-    $validatedData['doctor_id'] = $doctor_id;
+  //   $validatedData['doctor_id'] = $doctor_id;
 
-    $diagnosisHistory = HistoryDiagnosis::create([
-      'reason' => $validatedData['reason'],
-      'diagnosis' => $validatedData['diagnosis'],
-      'treatment' => $validatedData['treatment'],
-      'health_condition' => $validatedData['health_condition'],
-      'note' => $validatedData['note'],
-      'doctor_id' => $validatedData['doctor_id'],
-      'pet_id' => $validatedData['pet_id'],
-    ]);
+  //   $diagnosisHistory = HistoryDiagnosis::create([
+  //     'reason' => $validatedData['reason'],
+  //     'diagnosis' => $validatedData['diagnosis'],
+  //     'treatment' => $validatedData['treatment'],
+  //     'health_condition' => $validatedData['health_condition'],
+  //     'note' => $validatedData['note'],
+  //     'doctor_id' => $validatedData['doctor_id'],
+  //     'pet_id' => $validatedData['pet_id'],
+  //   ]);
 
-    return response()->json($diagnosisHistory, 201);
-  }
+  //   return response()->json($diagnosisHistory, 201);
+  // }
 
   public function updateVaccineHistory(Request $request, $vaccine_history_id)
   {
