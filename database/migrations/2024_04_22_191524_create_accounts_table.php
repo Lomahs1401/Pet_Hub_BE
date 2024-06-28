@@ -21,7 +21,7 @@ class CreateAccountsTable extends Migration
       $table->string('avatar')->nullable();
       $table->boolean('enabled');
       $table->boolean('is_approved');
-      $table->string('expo_token')->nullable();
+      $table->string('expo_push_token')->nullable();
       $table->foreignId('role_id')->constrained('roles');
       $table->string('reset_code')->nullable();
       $table->timestamp('reset_code_expires_at')->nullable();

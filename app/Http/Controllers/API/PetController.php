@@ -1037,4 +1037,134 @@ class PetController extends Controller
       'data' => $pet,
     ]);
   }
+
+  public function getLatestPetId()
+  {
+    // Fetch the latest pet ID from the 'pets' table
+    $latestPet = Pet::withTrashed()->latest('id')->first();
+
+    if ($latestPet) {
+      $latestPetId = $latestPet->id;
+    } else {
+      // If no pets are found, return 0 as the latest ID
+      $latestPetId = 0;
+    }
+
+    return response()->json([
+      'message' => 'Query successfully!',
+      'status' => 200,
+      'data' => $latestPetId,
+    ]);
+  }
+
+  public function createPet(Request $request)
+  {
+    $aid_center_id = auth()->user()->aidCenter->id;
+
+    // Validate the request data
+    $validatedData = $request->validate([
+      'name' => 'required|string|max:255',
+      'type' => 'required|string|max:255',
+      'age' => 'required|integer|min:1',
+      'gender' => 'required|string',
+      'description' => 'nullable|string',
+      'image' => 'nullable|string',
+      'is_purebred' => 'required|boolean',
+      'status' => 'required',
+      'breed_id' => 'required|integer|exists:breeds,id',
+    ]);
+
+    $validatedData['aid_center_id'] = $aid_center_id;
+
+    // Create a new pet record
+    try {
+      $pet = Pet::create([
+        'name' => $validatedData['name'],
+        'type' => $validatedData['type'],
+        'age' => $validatedData['age'],
+        'gender' => $validatedData['gender'],
+        'description' => $validatedData['description'],
+        'image' => $validatedData['image'],
+        'is_purebred' => $validatedData['is_purebred'],
+        'status' => $validatedData['status'],
+        'breed_id' => $validatedData['breed_id'],
+        'aid_center_id' => $validatedData['aid_center_id'],
+      ]);
+
+      return response()->json([
+        'message' => 'Pet created successfully!',
+        'status' => 200,
+        'data' => $pet,
+      ], 200);
+    } catch (\Exception $e) {
+      return response()->json([
+        'message' => 'Failed to create pet.',
+        'status' => 500,
+        'error' => $e->getMessage(),
+      ], 500);
+    }
+  }
+
+  public function updatePet(Request $request, $pet_id)
+  {
+    $aid_center_id = auth()->user()->aidCenter->id;
+
+    // Validate the request data
+    $validatedData = $request->validate([
+      'name' => 'required|string|max:255',
+      'type' => 'required|string|max:255',
+      'age' => 'required|integer|min:1',
+      'gender' => 'required|string',
+      'description' => 'nullable|string',
+      'image' => 'nullable|string',
+      'is_purebred' => 'required|boolean',
+      'status' => 'required',
+      'breed_id' => 'required|integer|exists:breeds,id',
+    ]);
+
+    // Find the pet record
+    $pet = Pet::find($pet_id);
+
+    if (!$pet) {
+      return response()->json([
+        'message' => 'Pet not found.',
+        'status' => 404,
+      ], 404);
+    }
+
+    // Check if the pet belongs to the user's aid center
+    if ($pet->aid_center_id !== $aid_center_id) {
+      return response()->json([
+        'message' => 'Unauthorized action.',
+        'status' => 403,
+      ], 403);
+    }
+
+    // Update the pet record
+    try {
+      $pet->update([
+        'name' => $validatedData['name'],
+        'type' => $validatedData['type'],
+        'age' => $validatedData['age'],
+        'gender' => $validatedData['gender'],
+        'description' => $validatedData['description'],
+        'image' => $validatedData['image'],
+        'is_purebred' => $validatedData['is_purebred'],
+        'status' => $validatedData['status'],
+        'breed_id' => $validatedData['breed_id'],
+      ]);
+
+      return response()->json([
+        'message' => 'Pet updated successfully!',
+        'status' => 200,
+        'data' => $pet,
+      ], 200);
+    } catch (\Exception $e) {
+      return response()->json([
+        'message' => 'Failed to update pet.',
+        'status' => 500,
+        'error' => $e->getMessage(),
+      ], 500);
+    }
+  }
 }

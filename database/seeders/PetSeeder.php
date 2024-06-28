@@ -33,7 +33,7 @@ class PetSeeder extends Seeder
       $is_adopt_pet = $faker->boolean(40); // 40% aid_center_id; 60% customer_id
 
       if ($is_adopt_pet) {
-        $adopted = $faker->boolean(60); // 60% duoc nhan nuoi, 40% chua duoc nhan nuoi
+        $adopted = $faker->boolean(60); // 60% được nhận nuôi, 40% chưa được nhận nuôi
         $aid_center_id = $faker->randomElement($aid_center_ids);
         $customer_id = null;
       } else {
@@ -64,17 +64,71 @@ class PetSeeder extends Seeder
         'updated_at' => $created_at // giữ updated_at giống created_at cho consistency
       ]);
 
-      if ($adopted) {
-        $num_requests = $faker->numberBetween(2, 8);
-        $statuses = ['Pending', 'Approved', 'Done'];
+      // Nếu pet đã được nhận nuôi
+      if ($adopted === true) {
+        $num_requests = $faker->numberBetween(1, 3);
+        $requests = [];
+
+        for ($j = 0; $j < $num_requests; $j++) {
+          $customer_id = $faker->randomElement($customer_ids);
+
+          // Kiểm tra xem customer này đã tạo request cho pet này chưa
+          if (array_key_exists($customer_id, array_column($requests, 'customer_id'))) {
+            continue; // Bỏ qua nếu đã tạo request
+          }
+
+          $status = 'Pending';
+          if ($j === $num_requests - 1) {
+            $status = 'Done'; // Đảm bảo request cuối cùng là 'Done'
+          } else {
+            $status = $faker->randomElement(['Pending', 'Approved']);
+          }
+
+          $requests[] = [
+            'status' => $status,
+            'note' => $faker->sentence(),
+            'aid_center_id' => $pet->aid_center_id,
+            'pet_id' => $pet->id,
+            'customer_id' => $customer_id,
+            'created_at' => $created_at,
+            'updated_at' => $created_at
+          ];
+
+          if ($status == 'Done') {
+            break; // Thoát vòng lặp nếu request là 'Done'
+          }
+        }
+
+        // Lưu các yêu cầu nhận nuôi vào bảng adopt_request
+        foreach ($requests as $request) {
+          AdoptRequest::create($request);
+        }
+
+        // Lấy request có status là 'Done'
+        $doneRequest = array_filter($requests, function ($request) {
+          return $request['status'] == 'Done';
+        });
+
+        // Nếu có request 'Done', lưu vào bảng history_adoptions
+        if (!empty($doneRequest)) {
+          $history_adoption_created_at = $faker->dateTimeBetween($created_at, 'now');
+          HistoryAdopt::create([
+            'customer_id' => $doneRequest[array_key_first($doneRequest)]['customer_id'],
+            'pet_id' => $pet->id,
+            'created_at' => $history_adoption_created_at,
+            'updated_at' => $history_adoption_created_at
+          ]);
+        }
+      }
+
+      // Nếu pet chưa được nhận nuôi
+      if ($adopted === false) {
+        $num_requests = $faker->numberBetween(0, 2);
         $requests = [];
         $existing_customers = [];
 
-        $request_created_at = $faker->dateTimeBetween($created_at, 'now');
-
         for ($j = 0; $j < $num_requests; $j++) {
-          $status = $faker->randomElement($statuses);
-
+          $status = $faker->randomElement(['Pending', 'Approved']);
           $customer_id = $faker->randomElement($customer_ids);
 
           // Kiểm tra xem customer này đã tạo request cho pet này chưa
@@ -94,36 +148,12 @@ class PetSeeder extends Seeder
 
           // Thêm customer_id vào danh sách đã tạo request
           $existing_customers[] = $customer_id;
-
-          if ($status == 'Done') {
-            break;
-          }
-        }
-
-        // Nếu không có record nào là 'Done', chọn ngẫu nhiên một record và chuyển thành 'Done'
-        if (!in_array('Done', array_column($requests, 'status'))) {
-          $randomIndex = array_rand($requests);
-          $requests[$randomIndex]['status'] = 'Done';
         }
 
         // Lưu các yêu cầu nhận nuôi vào bảng adopt_request
         foreach ($requests as $request) {
           AdoptRequest::create($request);
         }
-
-        // Lấy request có status là 'Done'
-        $doneRequest = array_filter($requests, function ($request) {
-          return $request['status'] == 'Done';
-        });
-
-        // Lưu vào bảng history_adoptions
-        $history_adoption_created_at = $faker->dateTimeBetween($request_created_at, 'now');
-        HistoryAdopt::create([
-          'customer_id' => $doneRequest[array_key_first($doneRequest)]['customer_id'],
-          'pet_id' => $pet->id,
-          'created_at' => $history_adoption_created_at,
-          'updated_at' => $history_adoption_created_at
-        ]);
       }
     }
   }

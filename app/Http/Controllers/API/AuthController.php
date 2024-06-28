@@ -364,7 +364,7 @@ class AuthController extends Controller
       ], 401);
     }
 
-    $account->expo_token = $request->expo_token;
+    $account->expo_push_token = $request->expo_push_token;
     $account->save();
 
     return $this->respondWithToken($token);

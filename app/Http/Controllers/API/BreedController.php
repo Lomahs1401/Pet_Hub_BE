@@ -16,7 +16,7 @@ class BreedController extends Controller
     if ($target === 'all') {
       $breeds = Breed::select('id', 'name', 'type')->get();
     } else {
-      // Nếu 'target' là 'dog' hoặc 'cat' thì query dữ liệu từ bảng 'product_categories'
+      // Nếu 'target' là 'dog' hoặc 'cat' thì query dữ liệu từ bảng 'breeds'
       if ($target === 'dog' || $target === 'cat') {
         $breeds = Breed::select('id', 'name', 'type')->where('type', $target)->get();
       }
@@ -54,4 +54,43 @@ class BreedController extends Controller
       'data' => $breed,
     ], 200);
   }
+
+  public function getBreeds(Request $request)
+{
+    $target = strtolower($request->query('target')) ?? 'all';
+
+    // Fetch breeds based on the target
+    if ($target === 'all') {
+        $breeds = Breed::select('id', 'name', 'type')->get();
+    } else {
+        if ($target === 'dog' || $target === 'cat') {
+            $breeds = Breed::select('id', 'name', 'type')->where('type', $target)->get();
+        } else {
+            return response()->json([
+                'message' => 'Query successfully!',
+                'status' => 200,
+                'data' => []
+            ], 200);
+        }
+    }
+
+    // Group breeds by type
+    $groupedBreeds = $breeds->groupBy('type')->map(function ($items, $key) {
+        return [
+            'type' => ucfirst($key),
+            'breed' => $items->map(function ($item) {
+                return [
+                    'id' => $item->id,
+                    'name' => $item->name
+                ];
+            })->toArray()
+        ];
+    })->values()->toArray();
+
+    return response()->json([
+        'message' => 'Query successfully!',
+        'status' => 200,
+        'data' => $groupedBreeds,
+    ], 200);
+}
 }

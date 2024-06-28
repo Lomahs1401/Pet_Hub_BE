@@ -73,6 +73,7 @@ class AccountSeeder extends Seeder
           'enabled' => $faker->boolean(100),
           'is_approved' => $faker->boolean(100),
           'role_id' => $role_customer,
+          'expo_push_token' => 'ExponentPushToken[v6Pzj4GxkFIIuXqAsSDU95]',
           'reset_code' => null,
           'reset_code_expires_at' => null,
           'reset_code_attempts' => null,

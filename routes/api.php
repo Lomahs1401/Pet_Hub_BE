@@ -6,6 +6,7 @@ use App\Http\Controllers\API\AdminController;
 use App\Http\Controllers\API\AdminDashboardController;
 use App\Http\Controllers\API\AdminMedicalCenterController;
 use App\Http\Controllers\API\AdminShopController;
+use App\Http\Controllers\API\AdoptRequestController;
 use App\Http\Controllers\API\AidCenterController;
 use App\Http\Controllers\API\AidCenterDashboardController;
 use App\Http\Controllers\API\AppointmentController;
@@ -56,7 +57,6 @@ Route::group([
   'middleware' => ['force.json.response', 'api'],
   'prefix' => 'auth'
 ], function ($router) {
-  Route::post('/send-test-notification', [NotificationController::class, 'index']);
   Route::post('/login', [AuthController::class, 'login']);
   Route::post('/register-customer', [AuthController::class, 'registerCustomer']);
   Route::post('/register-shop', [AuthController::class, 'registerShop']);
@@ -416,19 +416,34 @@ Route::group([
   Route::get('/profile/address', [AidCenterController::class, 'getAddress']);
 
   // --------------     PET     --------------
+  Route::get('/pets/latest-id', [PetController::class, 'getLatestPetId']);
   Route::get('/pets/search-adopted-pet', [PetController::class, 'searchAdoptedPet']);
   Route::get('/pets/search-unadopted-pet', [PetController::class, 'searchUnadoptedPet']);
   Route::get('/pets/search-deleted-pet', [PetController::class, 'searchDeletedPet']);
   Route::get('/pets/adopted/paging', [PetController::class, 'getAdoptedPets']);
   Route::get('/pets/unadopted/paging', [PetController::class, 'getUnadoptedPets']);
   Route::get('/pets/deleted/paging', [PetController::class, 'getDeletedPets']);
+  Route::post('/pets', [PetController::class, 'createPet']);
   Route::get('/pets/{pet_id}', [PetController::class, 'getPetDetail']);
   Route::put('/pets/{pet_id}', [PetController::class, 'updatePet']);
   Route::delete('/pets/{pet_id}', [PetController::class, 'deletePet']);
   Route::put('/pets/{pet_id}/restore', [PetController::class, 'restorePet']);
+  
+  // --------------     BREED     --------------
+  Route::get('/breeds', [BreedController::class, 'getBreeds']);
+
+  // --------------     PROFILE     --------------
+  Route::get('/profile/address', [AidCenterController::class, 'getAddress']);
 
   // --------------     ADOPT REQUEST     --------------
-  Route::get('/profile/address', [AidCenterController::class, 'getAddress']);
+  Route::get('/adopt-request/pending', [AdoptRequestController::class, 'getPendingAdoptRequest']);
+  Route::get('/adopt-request/approve', [AdoptRequestController::class, 'getApproveAdoptRequest']);
+  Route::get('/adopt-request/done', [AdoptRequestController::class, 'getDoneAdoptRequest']);
+  Route::get('/adopt-request/search-pending', [AdoptRequestController::class, 'searchPendingAdoptRequest']);
+  Route::get('/adopt-request/search-approve', [AdoptRequestController::class, 'searchApproveAdoptRequest']);
+  Route::get('/adopt-request/search-done', [AdoptRequestController::class, 'searchDoneAdoptRequest']);
+  Route::patch('/adopt-request/{adopt_request_id}/approve-request', [AdoptRequestController::class, 'approveAdoptRequest']); 
+  Route::patch('/adopt-request/{adopt_request_id}/done-request', [AdoptRequestController::class, 'doneAdoptRequest']);
 });
 
 
