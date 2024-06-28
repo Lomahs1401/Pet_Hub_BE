@@ -10,6 +10,8 @@ use App\Models\Shop;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class RatingProductController extends Controller
 {
@@ -387,7 +389,7 @@ class RatingProductController extends Controller
   public function replyToRatingProduct(Request $request, $rating_product_id)
   {
     // Tìm rating product theo ID
-    $ratingProduct = RatingProduct::find($rating_product_id);
+    $ratingProduct = RatingProduct::with('customer.account')->find($rating_product_id);
 
     if (!$ratingProduct) {
       return response()->json([
@@ -399,6 +401,20 @@ class RatingProductController extends Controller
     $ratingProduct->reply = $request->input('reply');
     $ratingProduct->reply_date = Carbon::now();
     $ratingProduct->save();
+
+    $account = $ratingProduct->customer->account;
+    if ($account) {
+      $title = "MyPet App";
+      $body = "Đánh giá sản phẩm của bạn đã được phản hồi";
+      $data = [
+        'rating_product_id' => $rating_product_id,
+        'reply' => $ratingProduct->reply,
+        'reply_date' => $ratingProduct->reply_date->toDateTimeString()
+      ];
+      $sound = "default";
+
+      $this->sendPushNotification($title, $body, $data, $sound, [$account->expo_push_token]);
+    }
 
     return response()->json([
       'message' => 'Reply added successfully.',
@@ -448,5 +464,22 @@ class RatingProductController extends Controller
       'message' => 'Reply deleted successfully.',
       'data' => $ratingProduct,
     ], 200); // 200 OK
+  }
+
+  public static function sendPushNotification($title, $body, $data = [], $sound = 'default')
+  {
+    $old_recipients = ["ExponentPushToken[mN5oPEJnC3R13CiGr1YOQh]"];
+    $recipients = ["ExponentPushToken[v6Pzj4GxkFIIuXqAsSDU95]"];
+
+    $payload = [
+      "to" => $recipients,
+      "title" => $title,
+      "body" => $body,
+      "sound" => $sound, // Thêm trường sound
+      "data" => $data    // Thêm trường data
+    ];
+
+    $response = Http::post("https://exp.host/--/api/v2/push/send", $payload)->json();
+    Log::info($response);
   }
 }
